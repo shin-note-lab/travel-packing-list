@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="旅行もちもの">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>家族旅行 もちものリスト v10.1</title>
+<title>家族旅行 もちものリスト v10.2</title>
 <style>
 :root{
   --navy:#0f172a;
@@ -577,9 +577,72 @@ button{cursor:pointer}
   background:var(--blue-soft);
   color:#1d4ed8;
 }
+
+.reorder-hint{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5;
+}
+.reorder-symbol{
+  display:inline-grid;
+  place-items:center;
+  width:24px;
+  height:24px;
+  border-radius:8px;
+  background:#f1f5f9;
+  color:#475569;
+  font-weight:900;
+}
+.drag-handle{
+  width:42px;
+  height:42px;
+  min-width:42px;
+  padding:0;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#f8fafc;
+  color:#64748b;
+  display:grid;
+  place-items:center;
+  font-size:20px;
+  font-weight:900;
+  line-height:1;
+  cursor:grab;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+}
+.drag-handle:active{cursor:grabbing}
+.drag-handle:focus-visible{
+  outline:3px solid rgba(14,165,233,.25);
+  outline-offset:2px;
+}
+.item.dragging{
+  position:relative;
+  z-index:8;
+  background:#f8fafc;
+  border-radius:12px;
+  box-shadow:0 10px 24px rgba(15,23,42,.14);
+  opacity:.96;
+}
+.item.dragging .drag-handle{
+  background:#e0f2fe;
+  color:#0369a1;
+  border-color:#7dd3fc;
+}
+.item.drag-over-before{
+  box-shadow:inset 0 3px 0 #0ea5e9;
+}
+.item.drag-over-after{
+  box-shadow:inset 0 -3px 0 #0ea5e9;
+}
+
 .item{
   display:grid;
-  grid-template-columns:auto minmax(0,1fr) 90px auto;
+  grid-template-columns:42px auto minmax(0,1fr) 90px auto;
   gap:8px;
   align-items:center;
   padding:8px 0;
@@ -1051,7 +1114,7 @@ button{cursor:pointer}
   }
 
   .item{
-    grid-template-columns:auto minmax(0,1fr) 64px auto;
+    grid-template-columns:42px auto minmax(0,1fr) 64px auto;
     width:100%;
   }
   .item input[type="text"],
@@ -1104,6 +1167,22 @@ button{cursor:pointer}
     font-size:21px;
   }
 }
+
+@media(max-width:430px){
+  .item{
+    grid-template-columns:42px auto minmax(0,1fr) 58px;
+  }
+  .item .btn-delete-mini{
+    grid-column:3 / 5;
+    justify-self:end;
+    margin-top:2px;
+  }
+  .reorder-hint{
+    width:100%;
+    font-size:11px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1290,6 +1369,7 @@ button{cursor:pointer}
             <button class="btn btn-outline btn-sm" id="showUncheckedBtn">未準備だけ表示</button>
             <button class="btn btn-outline btn-sm" id="showAllBtn">全部表示</button>
           </div>
+          <div class="reorder-hint"><span class="reorder-symbol">≡</span>を押したまま上下に動かすと並び替えできます</div>
         </div>
 
         <div id="listArea" class="empty">まだ持ち物リストはありません。</div>
@@ -1395,7 +1475,7 @@ button{cursor:pointer}
     </div>
   </section>
 
-  <div class="footer">家族旅行 もちものリスト v10.1｜ブラウザだけで使える自分用旅行準備ツール</div>
+  <div class="footer">家族旅行 もちものリスト v10.2｜ブラウザだけで使える自分用旅行準備ツール</div>
 </div>
 
 <script>
@@ -1907,6 +1987,161 @@ function renderAll(){
   renderSummary();
   renderContext();
 }
+
+let itemDragState=null;
+
+function reorderVisibleItemsInGroup(group, orderedVisibleIds){
+  if(!Array.isArray(orderedVisibleIds) || orderedVisibleIds.length<1) return;
+
+  const visibleSet=new Set(orderedVisibleIds);
+  const byId=new Map(currentItems.map(item=>[item.id,item]));
+  const reorderedVisible=orderedVisibleIds.map(id=>byId.get(id)).filter(Boolean);
+  if(!reorderedVisible.length) return;
+
+  const groupItems=currentItems.filter(item=>item.group===group);
+  let visibleIndex=0;
+
+  // Checked/hidden rows keep their slots when "未準備だけ表示" is active.
+  const newGroupItems=groupItems.map(item=>{
+    if(visibleSet.has(item.id)){
+      return reorderedVisible[visibleIndex++] || item;
+    }
+    return item;
+  });
+
+  let groupIndex=0;
+  currentItems=currentItems.map(item=>{
+    if(item.group===group){
+      return newGroupItems[groupIndex++] || item;
+    }
+    return item;
+  });
+}
+
+function finishItemDrag(){
+  if(!itemDragState) return;
+
+  const {row,section,group,handle,pointerId}=itemDragState;
+
+  try{
+    if(handle.hasPointerCapture && handle.hasPointerCapture(pointerId)){
+      handle.releasePointerCapture(pointerId);
+    }
+  }catch(e){}
+
+  row.classList.remove("dragging","drag-over-before","drag-over-after");
+  section.querySelectorAll(".item").forEach(el=>{
+    el.classList.remove("drag-over-before","drag-over-after");
+  });
+
+  const orderedIds=[...section.querySelectorAll(".item[data-item-id]")]
+    .map(el=>el.dataset.itemId)
+    .filter(Boolean);
+
+  reorderVisibleItemsInGroup(group,orderedIds);
+  itemDragState=null;
+
+  scheduleAutoSave();
+  renderAll();
+}
+
+function attachItemReorder(handle,row,section,item){
+  handle.addEventListener("pointerdown",e=>{
+    if(e.button!==undefined && e.button!==0) return;
+
+    itemDragState={
+      row,
+      section,
+      group:item.group,
+      handle,
+      pointerId:e.pointerId
+    };
+
+    row.classList.add("dragging");
+
+    try{handle.setPointerCapture(e.pointerId)}catch(err){}
+    e.preventDefault();
+  });
+
+  handle.addEventListener("pointermove",e=>{
+    if(!itemDragState || itemDragState.pointerId!==e.pointerId) return;
+
+    const state=itemDragState;
+    const target=document.elementFromPoint(e.clientX,e.clientY)?.closest(".item[data-item-id]");
+
+    state.section.querySelectorAll(".item").forEach(el=>{
+      el.classList.remove("drag-over-before","drag-over-after");
+    });
+
+    if(target && target!==state.row && target.closest(".item-group")===state.section){
+      const rect=target.getBoundingClientRect();
+      const before=e.clientY < rect.top + rect.height/2;
+
+      target.classList.add(before?"drag-over-before":"drag-over-after");
+
+      if(before){
+        state.section.insertBefore(state.row,target);
+      }else{
+        state.section.insertBefore(state.row,target.nextSibling);
+      }
+    }
+
+    // Gentle auto-scroll while dragging near the screen edge.
+    const edge=90;
+    if(e.clientY<edge){
+      window.scrollBy(0,-12);
+    }else if(e.clientY>window.innerHeight-edge){
+      window.scrollBy(0,12);
+    }
+
+    e.preventDefault();
+  });
+
+  handle.addEventListener("pointerup",e=>{
+    if(itemDragState && itemDragState.pointerId===e.pointerId){
+      finishItemDrag();
+    }
+  });
+
+  handle.addEventListener("pointercancel",e=>{
+    if(itemDragState && itemDragState.pointerId===e.pointerId){
+      finishItemDrag();
+    }
+  });
+
+  // Keyboard alternative: focus the handle and use ↑ / ↓.
+  handle.addEventListener("keydown",e=>{
+    if(e.key!=="ArrowUp" && e.key!=="ArrowDown") return;
+
+    e.preventDefault();
+
+    const rows=[...section.querySelectorAll(".item[data-item-id]")];
+    const index=rows.indexOf(row);
+    if(index<0) return;
+
+    if(e.key==="ArrowUp" && index>0){
+      section.insertBefore(row,rows[index-1]);
+    }else if(e.key==="ArrowDown" && index<rows.length-1){
+      section.insertBefore(rows[index+1],row);
+    }else{
+      return;
+    }
+
+    const orderedIds=[...section.querySelectorAll(".item[data-item-id]")]
+      .map(el=>el.dataset.itemId)
+      .filter(Boolean);
+
+    reorderVisibleItemsInGroup(item.group,orderedIds);
+    scheduleAutoSave();
+    renderAll();
+
+    requestAnimationFrame(()=>{
+      const nextHandle=document.querySelector(`.item[data-item-id="${CSS.escape(item.id)}"] .drag-handle`);
+      if(nextHandle) nextHandle.focus();
+    });
+  });
+}
+
 function renderList(){
   if(!currentItems.length){
     els.listArea.className="empty";
@@ -1933,6 +2168,14 @@ function renderList(){
     visible.filter(i=>i.group===group).forEach(item=>{
       const row=document.createElement("div");
       row.className="item"+(item.checked?" checked":"");
+      row.dataset.itemId=item.id;
+
+      const handle=document.createElement("button");
+      handle.type="button";
+      handle.className="drag-handle";
+      handle.textContent="≡";
+      handle.setAttribute("aria-label",`${item.name}を並び替え`);
+      handle.title="押したまま上下にドラッグ。キーボードでは↑↓キーでも移動できます";
 
       const cb=document.createElement("input");
       cb.type="checkbox";cb.checked=item.checked;
@@ -1970,8 +2213,9 @@ function renderList(){
         renderAll();
       });
 
-      row.append(cb,name,qty,del);
+      row.append(handle,cb,name,qty,del);
       section.appendChild(row);
+      attachItemReorder(handle,row,section,item);
     });
     els.listArea.appendChild(section);
   });
