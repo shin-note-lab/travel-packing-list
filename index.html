@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="旅行もちもの">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>家族旅行 もちものリスト v10</title>
+<title>家族旅行 もちものリスト v10.1</title>
 <style>
 :root{
   --navy:#0f172a;
@@ -244,6 +244,85 @@ button{cursor:pointer}
 .step.active .step-num{background:linear-gradient(135deg,var(--teal),var(--sky));color:#fff}
 .step strong{display:block;font-size:13px}
 .step span{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+
+.main-tabs{
+  position:sticky;
+  top:74px;
+  z-index:18;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin:14px 0 18px;
+  padding:7px;
+  border:1px solid rgba(226,232,240,.95);
+  border-radius:18px;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(16px);
+  box-shadow:0 10px 28px rgba(15,23,42,.07);
+}
+.main-tab{
+  min-width:0;
+  border:none;
+  border-radius:13px;
+  padding:11px 12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  background:transparent;
+  color:var(--muted);
+  font-weight:850;
+  transition:.18s ease;
+}
+.main-tab:hover{background:#f8fafc;color:var(--navy)}
+.main-tab.active{
+  color:#fff;
+  background:linear-gradient(135deg,var(--teal),var(--cyan));
+  box-shadow:0 8px 18px rgba(15,118,110,.18);
+}
+.tab-icon{
+  flex:0 0 auto;
+  width:26px;
+  height:26px;
+  border-radius:9px;
+  display:grid;
+  place-items:center;
+  font-size:12px;
+  font-weight:900;
+  background:rgba(15,23,42,.07);
+}
+.main-tab.active .tab-icon{background:rgba(255,255,255,.18)}
+.tab-section[hidden]{display:none !important}
+@media(max-width:760px){
+  .main-tabs{
+    top:6px;
+    margin:10px 0 12px;
+    gap:5px;
+    padding:5px;
+    border-radius:14px;
+  }
+  .main-tab{
+    min-height:46px;
+    padding:9px 5px;
+    gap:5px;
+    font-size:12px;
+  }
+  .tab-icon{
+    width:23px;
+    height:23px;
+    border-radius:8px;
+    font-size:11px;
+  }
+}
+@media(max-width:430px){
+  .main-tab{
+    flex-direction:column;
+    gap:2px;
+    font-size:11px;
+  }
+  .tab-icon{width:21px;height:21px}
+}
+
 .dashboard{
   display:grid;
   grid-template-columns:minmax(0,1.45fr) minmax(320px,.75fr);
@@ -701,7 +780,86 @@ button{cursor:pointer}
   font-size:12px;
 }
 @media(max-width:1100px){
-  .dashboard{grid-template-columns:1fr}
+  
+.main-tabs{
+  position:sticky;
+  top:74px;
+  z-index:18;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin:14px 0 18px;
+  padding:7px;
+  border:1px solid rgba(226,232,240,.95);
+  border-radius:18px;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(16px);
+  box-shadow:0 10px 28px rgba(15,23,42,.07);
+}
+.main-tab{
+  min-width:0;
+  border:none;
+  border-radius:13px;
+  padding:11px 12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  background:transparent;
+  color:var(--muted);
+  font-weight:850;
+  transition:.18s ease;
+}
+.main-tab:hover{background:#f8fafc;color:var(--navy)}
+.main-tab.active{
+  color:#fff;
+  background:linear-gradient(135deg,var(--teal),var(--cyan));
+  box-shadow:0 8px 18px rgba(15,118,110,.18);
+}
+.tab-icon{
+  flex:0 0 auto;
+  width:26px;
+  height:26px;
+  border-radius:9px;
+  display:grid;
+  place-items:center;
+  font-size:12px;
+  font-weight:900;
+  background:rgba(15,23,42,.07);
+}
+.main-tab.active .tab-icon{background:rgba(255,255,255,.18)}
+.tab-section[hidden]{display:none !important}
+@media(max-width:760px){
+  .main-tabs{
+    top:6px;
+    margin:10px 0 12px;
+    gap:5px;
+    padding:5px;
+    border-radius:14px;
+  }
+  .main-tab{
+    min-height:46px;
+    padding:9px 5px;
+    gap:5px;
+    font-size:12px;
+  }
+  .tab-icon{
+    width:23px;
+    height:23px;
+    border-radius:8px;
+    font-size:11px;
+  }
+}
+@media(max-width:430px){
+  .main-tab{
+    flex-direction:column;
+    gap:2px;
+    font-size:11px;
+  }
+  .tab-icon{width:21px;height:21px}
+}
+
+.dashboard{grid-template-columns:1fr}
   .smart-panel{position:static}
   .hero-grid{grid-template-columns:1fr}
   .form-grid{grid-template-columns:repeat(2,1fr)}
@@ -755,7 +913,86 @@ button{cursor:pointer}
     overflow-wrap:anywhere;
   }
 
-  .dashboard{
+  
+.main-tabs{
+  position:sticky;
+  top:74px;
+  z-index:18;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin:14px 0 18px;
+  padding:7px;
+  border:1px solid rgba(226,232,240,.95);
+  border-radius:18px;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(16px);
+  box-shadow:0 10px 28px rgba(15,23,42,.07);
+}
+.main-tab{
+  min-width:0;
+  border:none;
+  border-radius:13px;
+  padding:11px 12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  background:transparent;
+  color:var(--muted);
+  font-weight:850;
+  transition:.18s ease;
+}
+.main-tab:hover{background:#f8fafc;color:var(--navy)}
+.main-tab.active{
+  color:#fff;
+  background:linear-gradient(135deg,var(--teal),var(--cyan));
+  box-shadow:0 8px 18px rgba(15,118,110,.18);
+}
+.tab-icon{
+  flex:0 0 auto;
+  width:26px;
+  height:26px;
+  border-radius:9px;
+  display:grid;
+  place-items:center;
+  font-size:12px;
+  font-weight:900;
+  background:rgba(15,23,42,.07);
+}
+.main-tab.active .tab-icon{background:rgba(255,255,255,.18)}
+.tab-section[hidden]{display:none !important}
+@media(max-width:760px){
+  .main-tabs{
+    top:6px;
+    margin:10px 0 12px;
+    gap:5px;
+    padding:5px;
+    border-radius:14px;
+  }
+  .main-tab{
+    min-height:46px;
+    padding:9px 5px;
+    gap:5px;
+    font-size:12px;
+  }
+  .tab-icon{
+    width:23px;
+    height:23px;
+    border-radius:8px;
+    font-size:11px;
+  }
+}
+@media(max-width:430px){
+  .main-tab{
+    flex-direction:column;
+    gap:2px;
+    font-size:11px;
+  }
+  .tab-icon{width:21px;height:21px}
+}
+
+.dashboard{
     width:100%;
     grid-template-columns:1fr;
   }
@@ -906,17 +1143,25 @@ button{cursor:pointer}
     </div>
   </section>
 
-  <nav class="step-nav">
-    <div class="step active"><div class="step-num">1</div><div><strong>旅行設定</strong><span>日数・行き先・季節</span></div></div>
-    <div class="step"><div class="step-num">2</div><div><strong>家族設定</strong><span>人数・名前・年齢</span></div></div>
-    <div class="step"><div class="step-num">3</div><div><strong>持ち物</strong><span>自動生成・編集・追加</span></div></div>
-    <div class="step"><div class="step-num">4</div><div><strong>最終確認</strong><span>未準備・比較・保存</span></div></div>
+  <nav class="main-tabs" id="mainTabs" role="tablist" aria-label="旅行準備メニュー">
+    <button class="main-tab active" type="button" role="tab" aria-selected="true" data-tab-target="setup">
+      <span class="tab-icon">1</span><span>旅行設定</span>
+    </button>
+    <button class="main-tab" type="button" role="tab" aria-selected="false" data-tab-target="packing">
+      <span class="tab-icon">2</span><span>持ち物</span>
+    </button>
+    <button class="main-tab" type="button" role="tab" aria-selected="false" data-tab-target="docs">
+      <span class="tab-icon">3</span><span>資料</span>
+    </button>
+    <button class="main-tab" type="button" role="tab" aria-selected="false" data-tab-target="review">
+      <span class="tab-icon">4</span><span>確認・比較</span>
+    </button>
   </nav>
 
   <div class="dashboard">
     <main class="stack">
 
-      <section class="panel">
+      <section class="panel tab-section" data-tab-section="setup">
         <div class="panel-head">
           <div>
             <h2>旅行を管理</h2>
@@ -945,7 +1190,7 @@ button{cursor:pointer}
         <div id="savedTripsArea" class="saved-trips"></div>
       </section>
 
-      <section class="panel">
+      <section class="panel tab-section" data-tab-section="setup">
         <div class="panel-head">
           <div>
             <h2>旅行条件</h2>
@@ -1002,7 +1247,7 @@ button{cursor:pointer}
       </section>
 
 
-      <section class="panel">
+      <section class="panel tab-section" data-tab-section="docs">
         <div class="panel-head">
           <div>
             <h2>関連資料</h2>
@@ -1024,7 +1269,7 @@ button{cursor:pointer}
         <div id="attachmentArea" class="attach-grid"></div>
       </section>
 
-      <section class="panel">
+      <section class="panel tab-section" data-tab-section="packing">
         <div class="panel-head">
           <div>
             <h2>持ち物リスト</h2>
@@ -1050,7 +1295,7 @@ button{cursor:pointer}
         <div id="listArea" class="empty">まだ持ち物リストはありません。</div>
       </section>
 
-      <section class="panel">
+      <section class="panel tab-section" data-tab-section="packing">
         <div class="panel-head">
           <div>
             <h2>持ち物を追加</h2>
@@ -1067,7 +1312,7 @@ button{cursor:pointer}
         </div>
       </section>
 
-      <section class="panel">
+      <section class="panel tab-section" data-tab-section="review">
         <div class="panel-head">
           <div>
             <h2>家族ごとの準備状況</h2>
@@ -1078,7 +1323,7 @@ button{cursor:pointer}
         <div id="compareArea" class="empty">まだ比較できるデータがありません。</div>
       </section>
 
-      <section class="panel">
+      <section class="panel tab-section" data-tab-section="review">
         <div class="panel-head">
           <div>
             <h2>旅行ごとの比較</h2>
@@ -1150,7 +1395,7 @@ button{cursor:pointer}
     </div>
   </section>
 
-  <div class="footer">家族旅行 もちものリスト v10｜ブラウザだけで使える自分用旅行準備ツール</div>
+  <div class="footer">家族旅行 もちものリスト v10.1｜ブラウザだけで使える自分用旅行準備ツール</div>
 </div>
 
 <script>
@@ -1648,6 +1893,7 @@ function generateItems(){
 
   refreshPeopleSelect();
   renderAll();
+  setActiveTab("packing",{scroll:true});
 
   scheduleAutoSave();
   if(!getForm().name){
@@ -1844,6 +2090,44 @@ function renderContext(){
     </div>`).join("");
 }
 
+
+const ACTIVE_TAB_KEY="travelPackingActiveTab_v10";
+
+function setActiveTab(tabName, options={}){
+  const valid=["setup","packing","docs","review"];
+  if(!valid.includes(tabName)) tabName="setup";
+
+  document.querySelectorAll(".main-tab").forEach(btn=>{
+    const active=btn.dataset.tabTarget===tabName;
+    btn.classList.toggle("active",active);
+    btn.setAttribute("aria-selected",active?"true":"false");
+  });
+
+  document.querySelectorAll(".tab-section").forEach(section=>{
+    section.hidden=section.dataset.tabSection!==tabName;
+  });
+
+  try{localStorage.setItem(ACTIVE_TAB_KEY,tabName)}catch(e){}
+
+  if(options.scroll){
+    const tabs=document.getElementById("mainTabs");
+    if(tabs){
+      const top=tabs.getBoundingClientRect().top+window.scrollY-8;
+      window.scrollTo({top,behavior:"smooth"});
+    }
+  }
+}
+
+function initTabs(){
+  document.querySelectorAll(".main-tab").forEach(btn=>{
+    btn.addEventListener("click",()=>setActiveTab(btn.dataset.tabTarget,{scroll:false}));
+  });
+
+  let saved="setup";
+  try{saved=localStorage.getItem(ACTIVE_TAB_KEY)||"setup"}catch(e){}
+  setActiveTab(saved,{scroll:false});
+}
+
 function makeBackupPayload(){
   return {
     app:"family-travel-packing-list",
@@ -1956,6 +2240,7 @@ function loadTrip(id){
   showStatus(`「${trips[id].form?.name||"名前なし旅行"}」を読み込みました。`,"saved");
 }
 function newTrip(){
+  setActiveTab("setup",{scroll:true});
   currentTripId=null;
   currentItems=[];
   filterMode="all";
@@ -2085,6 +2370,7 @@ window.addEventListener("beforeunload",e=>{
   }
 });
 
+initTabs();
 refreshTripUI();
 const ids=Object.keys(trips).sort((a,b)=>(trips[b].updatedAt||0)-(trips[a].updatedAt||0));
 if(currentTripId&&trips[currentTripId])loadTrip(currentTripId);
