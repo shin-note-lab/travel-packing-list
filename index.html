@@ -1,0 +1,2095 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="旅行もちもの">
+<link rel="manifest" href="./manifest.webmanifest">
+<title>家族旅行 もちものリスト v10</title>
+<style>
+:root{
+  --navy:#0f172a;
+  --navy-2:#1e293b;
+  --teal:#0f766e;
+  --cyan:#0891b2;
+  --sky:#38bdf8;
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --text:#0f172a;
+  --muted:#64748b;
+  --line:#e2e8f0;
+  --soft:#f8fafc;
+  --teal-soft:#ecfdf5;
+  --blue-soft:#eff6ff;
+  --amber:#b45309;
+  --amber-soft:#fff7ed;
+  --red:#b91c1c;
+  --red-soft:#fef2f2;
+  --shadow:0 18px 45px rgba(15,23,42,.08);
+  --shadow-sm:0 8px 24px rgba(15,23,42,.06);
+  --radius-xl:26px;
+  --radius-lg:20px;
+  --radius-md:14px;
+}
+*{box-sizing:border-box}
+html{
+  scroll-behavior:smooth;
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(56,189,248,.12), transparent 28%),
+    radial-gradient(circle at top right, rgba(15,118,110,.10), transparent 24%),
+    var(--bg);
+  color:var(--text);
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+}
+button,input,select{font:inherit}
+img{max-width:100%;height:auto}
+.app,.dashboard,.stack,.panel,.family-box,.people-grid,.person-card,.field{
+  min-width:0;
+}
+button{cursor:pointer}
+.app{
+  width:100%;
+  max-width:1320px;
+  margin:0 auto;
+  padding:18px 18px 72px;
+  overflow-x:hidden;
+}
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:20;
+  margin-bottom:14px;
+  padding:12px 14px;
+  border:1px solid rgba(226,232,240,.9);
+  border-radius:18px;
+  background:rgba(255,255,255,.88);
+  backdrop-filter:blur(18px);
+  box-shadow:0 8px 22px rgba(15,23,42,.06);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+.brand-mark{
+  width:38px;height:38px;border-radius:12px;
+  display:grid;place-items:center;
+  color:#fff;font-weight:900;
+  background:linear-gradient(135deg,var(--teal),var(--sky));
+  box-shadow:0 8px 18px rgba(8,145,178,.22);
+}
+.brand-copy{min-width:0}
+.brand-copy strong{display:block;font-size:15px}
+.brand-copy span{display:block;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-actions{
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end
+}
+.btn{
+  border:none;
+  border-radius:12px;
+  padding:11px 14px;
+  font-weight:800;
+  transition:.18s ease;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{color:#fff;background:linear-gradient(135deg,var(--teal),var(--cyan));box-shadow:0 8px 20px rgba(15,118,110,.18)}
+.btn-secondary{color:var(--navy);background:#eef2f7}
+.btn-outline{color:var(--navy);background:#fff;border:1px solid var(--line)}
+.btn-danger{color:var(--red);background:var(--red-soft)}
+.btn-sm{padding:8px 10px;border-radius:10px;font-size:13px}
+.hero{
+  background:
+    linear-gradient(135deg,rgba(15,23,42,.98),rgba(15,118,110,.92)),
+    var(--navy);
+  color:#fff;
+  border-radius:var(--radius-xl);
+  padding:28px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  position:relative;
+}
+.hero:after{
+  content:"";
+  position:absolute;
+  width:340px;height:340px;
+  right:-110px;top:-120px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(56,189,248,.32),transparent 68%);
+}
+.hero-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.4fr) minmax(300px,.8fr);
+  gap:22px;
+  position:relative;
+  z-index:1;
+}
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 10px;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:999px;
+  background:rgba(255,255,255,.09);
+  font-size:12px;
+  font-weight:800;
+}
+.hero h1{
+  margin:14px 0 8px;
+  font-size:clamp(30px,5vw,52px);
+  line-height:1.05;
+  letter-spacing:-.02em;
+}
+.hero p{
+  max-width:760px;
+  margin:0;
+  color:rgba(255,255,255,.84);
+  line-height:1.8;
+}
+.hero-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:18px;
+}
+.hero-chip{
+  padding:8px 10px;
+  border-radius:12px;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.12);
+  font-size:13px;
+}
+.hero-progress{
+  background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:20px;
+  padding:18px;
+  align-self:stretch;
+}
+.hero-progress-label{
+  color:rgba(255,255,255,.68);
+  font-size:12px;
+  font-weight:800;
+}
+.hero-progress-value{
+  margin-top:6px;
+  font-size:42px;
+  font-weight:900;
+}
+.hero-progress-bar{
+  margin-top:12px;
+  height:12px;
+  border-radius:999px;
+  background:rgba(255,255,255,.12);
+  overflow:hidden;
+}
+.hero-progress-bar span{
+  display:block;
+  height:100%;
+  background:linear-gradient(90deg,#5eead4,#38bdf8);
+}
+.hero-progress-foot{
+  margin-top:12px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.hero-stat{
+  padding:10px 12px;
+  border-radius:14px;
+  background:rgba(255,255,255,.08);
+}
+.hero-stat span{display:block;color:rgba(255,255,255,.66);font-size:11px}
+.hero-stat strong{display:block;margin-top:3px;font-size:18px}
+.step-nav{
+  margin:16px 0;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+.step{
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.85);
+  border-radius:16px;
+  padding:12px 14px;
+  box-shadow:var(--shadow-sm);
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.step-num{
+  width:30px;height:30px;border-radius:10px;
+  display:grid;place-items:center;
+  background:#e2e8f0;
+  font-weight:900;
+  color:var(--navy);
+}
+.step.active .step-num{background:linear-gradient(135deg,var(--teal),var(--sky));color:#fff}
+.step strong{display:block;font-size:13px}
+.step span{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.dashboard{
+  display:grid;
+  grid-template-columns:minmax(0,1.45fr) minmax(320px,.75fr);
+  gap:18px;
+  align-items:start;
+}
+.stack{display:flex;flex-direction:column;gap:18px}
+.panel{
+  background:rgba(255,255,255,.95);
+  border:1px solid rgba(226,232,240,.95);
+  border-radius:var(--radius-lg);
+  padding:20px;
+  box-shadow:var(--shadow-sm);
+}
+.panel-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+  margin-bottom:14px;
+}
+.panel-head h2{margin:0;font-size:21px}
+.panel-head p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.7}
+.kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:11px;
+  font-weight:900;
+  color:var(--teal);
+  background:var(--teal-soft);
+  padding:7px 9px;
+  border-radius:999px;
+  white-space:nowrap;
+}
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
+.field label{
+  display:block;
+  margin-bottom:6px;
+  font-size:12px;
+  color:var(--muted);
+  font-weight:800;
+}
+.field input,.field select{
+  width:100%;
+  padding:12px 13px;
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:12px;
+  color:var(--text);
+}
+.field input:focus,.field select:focus{
+  outline:none;
+  border-color:#7dd3fc;
+  box-shadow:0 0 0 4px rgba(56,189,248,.12);
+}
+.family-box{
+  margin-top:14px;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:var(--soft);
+}
+.family-head{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  margin-bottom:10px;
+}
+.family-head strong{font-size:14px}
+.family-head span{font-size:12px;color:var(--muted)}
+.people-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:10px;
+}
+.person-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px;
+  min-width:0;
+  overflow:hidden;
+}
+.person-card .title{
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:7px;
+  font-weight:800;
+  overflow-wrap:anywhere;
+}
+.person-card input{
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  padding:11px 12px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:#fff;
+  display:block;
+}
+.person-card input:focus{
+  outline:none;
+  border-color:#7dd3fc;
+  box-shadow:0 0 0 4px rgba(56,189,248,.12);
+}
+.transport-options{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+.transport-option{
+  position:relative;
+}
+.transport-option input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.transport-option label{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:46px;
+  padding:10px 12px;
+  margin:0;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#fff;
+  color:var(--navy);
+  font-size:13px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.18s ease;
+}
+.transport-option input:checked + label{
+  color:#fff;
+  border-color:transparent;
+  background:linear-gradient(135deg,var(--teal),var(--cyan));
+  box-shadow:0 8px 18px rgba(15,118,110,.16);
+}
+.transport-help{
+  margin-top:6px;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.5;
+}
+.family-actions,.panel-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+.panel-actions.right{
+  justify-content:flex-end;
+}
+.btn-delete-mini{
+  padding:7px 10px;
+  min-height:auto;
+  font-size:12px;
+  font-weight:800;
+  border-radius:10px;
+  background:var(--red-soft);
+  color:var(--red);
+  border:1px solid #fecaca;
+  box-shadow:none;
+}
+.btn-delete-mini:hover{
+  transform:none;
+  opacity:.92;
+}
+
+.storage-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto auto auto;
+  gap:10px;
+  align-items:end;
+}
+.status{
+  margin-top:10px;
+  padding:11px 13px;
+  border-radius:13px;
+  font-size:13px;
+  line-height:1.6;
+}
+.status.saved{background:var(--teal-soft);color:var(--teal)}
+.status.info{background:var(--blue-soft);color:#1d4ed8}
+.status.warn{background:var(--amber-soft);color:var(--amber)}
+.status.danger{background:var(--red-soft);color:var(--red)}
+.saved-trips{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:10px;
+  margin-top:12px;
+}
+.trip-card{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px;
+  background:#fff;
+}
+.trip-card strong{display:block}
+.trip-card .meta{color:var(--muted);font-size:12px;line-height:1.6;margin-top:4px}
+.summary-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+.summary{
+  padding:14px;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg,#fff,#f8fafc);
+}
+.summary span{display:block;color:var(--muted);font-size:11px}
+.summary strong{display:block;margin-top:5px;font-size:24px}
+.list-toolbar{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-bottom:12px;
+}
+.item-group{
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px;
+  background:#fff;
+  margin-bottom:12px;
+}
+.group-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:8px;
+}
+.group-head h3{margin:0;font-size:17px}
+.badge{
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  padding:6px 9px;
+  font-size:11px;
+  font-weight:900;
+  background:var(--blue-soft);
+  color:#1d4ed8;
+}
+.item{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) 90px auto;
+  gap:8px;
+  align-items:center;
+  padding:8px 0;
+  border-bottom:1px dashed #e8edf3;
+}
+.item .btn-delete-mini{
+  justify-self:end;
+  white-space:nowrap;
+}
+.item:last-child{border-bottom:none}
+.item input[type="checkbox"]{width:auto;transform:scale(1.16)}
+.item input[type="text"],.item input[type="number"]{
+  width:100%;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:10px;
+}
+.item.checked input[type="text"]{text-decoration:line-through;color:#94a3b8}
+.add-item-grid{
+  display:grid;
+  grid-template-columns:180px minmax(280px,1fr) 100px 150px;
+  gap:10px;
+  align-items:end;
+}
+.smart-panel{
+  position:sticky;
+  top:86px;
+}
+.smart-card{
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:linear-gradient(180deg,#fff,#f8fafc);
+  margin-top:10px;
+}
+.smart-card:first-child{margin-top:0}
+.smart-card .icon{
+  width:34px;height:34px;border-radius:11px;
+  display:grid;place-items:center;
+  font-weight:900;
+  background:var(--blue-soft);
+  color:#1d4ed8;
+  margin-bottom:9px;
+}
+.smart-card strong{display:block;font-size:14px}
+.smart-card p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.7}
+.smart-card.highlight{background:linear-gradient(135deg,#ecfeff,#eff6ff);border-color:#bae6fd}
+.table-wrap{
+  width:100%;
+  max-width:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+}
+.compare-table{
+  width:100%;
+  min-width:720px;
+  border-collapse:collapse;
+}
+.compare-table th,.compare-table td{
+  padding:10px;
+  border-bottom:1px solid var(--line);
+  text-align:left;
+  white-space:nowrap;
+}
+.compare-table th{font-size:11px;color:var(--muted);background:#f8fafc}
+.progress{
+  height:9px;
+  border-radius:999px;
+  background:#e2e8f0;
+  overflow:hidden;
+}
+.progress span{
+  display:block;height:100%;
+  background:linear-gradient(90deg,var(--teal),var(--sky));
+}
+.empty{
+  padding:16px;
+  border-radius:14px;
+  border:1px dashed var(--line);
+  background:#f8fafc;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.7;
+}
+
+.attach-drop{
+  border:1.5px dashed #cbd5e1;
+  border-radius:18px;
+  padding:16px;
+  background:linear-gradient(180deg,#fbfdff,#f8fafc);
+}
+.attach-drop input[type="file"]{
+  width:100%;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#fff;
+}
+.attach-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:10px;
+  margin-top:14px;
+}
+.attach-card{
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:#fff;
+  overflow:hidden;
+  box-shadow:0 8px 20px rgba(15,23,42,.04);
+}
+.attach-preview{
+  height:130px;
+  display:grid;
+  place-items:center;
+  background:#f8fafc;
+  border-bottom:1px solid var(--line);
+  overflow:hidden;
+}
+.attach-preview img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.pdf-badge{
+  width:58px;height:58px;border-radius:16px;
+  display:grid;place-items:center;
+  background:var(--red-soft);
+  color:var(--red);
+  font-weight:900;
+  font-size:15px;
+}
+.attach-body{padding:12px}
+.attach-name{
+  font-weight:800;
+  font-size:13px;
+  line-height:1.5;
+  word-break:break-word;
+}
+.attach-meta{
+  margin-top:4px;
+  color:var(--muted);
+  font-size:11px;
+}
+.attach-actions{
+  display:flex;
+  gap:6px;
+  margin-top:10px;
+}
+.attach-actions .btn{flex:1}
+
+
+.backup-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.backup-box{
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:linear-gradient(180deg,#fff,#f8fafc);
+  padding:14px;
+}
+.backup-box strong{
+  display:block;
+  margin-bottom:6px;
+}
+.backup-box p{
+  margin:0 0 10px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.7;
+}
+.backup-box input[type="file"]{
+  width:100%;
+  max-width:100%;
+  font-size:14px;
+}
+.install-note{
+  margin-top:10px;
+  padding:12px 13px;
+  border-radius:14px;
+  background:linear-gradient(135deg,#ecfeff,#eff6ff);
+  border:1px solid #bae6fd;
+  color:#0f3b58;
+  font-size:12px;
+  line-height:1.7;
+}
+@media(max-width:760px){
+  .backup-grid{grid-template-columns:1fr}
+}
+
+.footer{
+  margin-top:22px;
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+}
+@media(max-width:1100px){
+  .dashboard{grid-template-columns:1fr}
+  .smart-panel{position:static}
+  .hero-grid{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:repeat(2,1fr)}
+  .step-nav{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:760px){
+  body{
+    -webkit-text-size-adjust:100%;
+    text-size-adjust:100%;
+  }
+  .app{
+    width:100%;
+    padding:8px 8px 36px;
+  }
+  .topbar{
+    position:static;
+    width:100%;
+    border-radius:14px;
+    padding:10px 11px;
+  }
+  .brand{
+    min-width:0;
+    width:100%;
+  }
+  .brand-copy{
+    min-width:0;
+    max-width:calc(100vw - 74px);
+  }
+  .brand-copy strong,
+  .brand-copy span{
+    white-space:normal;
+    overflow-wrap:anywhere;
+  }
+  .top-actions{display:none}
+
+  .hero{
+    width:100%;
+    padding:20px 15px;
+    border-radius:18px;
+  }
+  .hero-grid{grid-template-columns:1fr}
+  .hero h1{
+    font-size:30px;
+    line-height:1.15;
+    overflow-wrap:anywhere;
+  }
+  .hero p{font-size:14px}
+  .hero-meta{gap:6px}
+  .hero-chip{
+    max-width:100%;
+    overflow-wrap:anywhere;
+  }
+
+  .dashboard{
+    width:100%;
+    grid-template-columns:1fr;
+  }
+  .stack{
+    width:100%;
+  }
+  .panel{
+    width:100%;
+    padding:15px;
+    border-radius:16px;
+    overflow:hidden;
+  }
+  .panel-head{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .form-grid,
+  .summary-grid,
+  .step-nav{
+    grid-template-columns:1fr 1fr;
+  }
+  .storage-grid,
+  .add-item-grid{
+    grid-template-columns:1fr;
+  }
+
+  .family-head{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .family-head span{
+    display:block;
+    margin-top:3px;
+    line-height:1.6;
+  }
+  .people-grid{
+    grid-template-columns:1fr;
+  }
+  .person-card{
+    width:100%;
+    max-width:100%;
+    padding:12px;
+  }
+  .person-card input,
+  .field input,
+  .field select{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    font-size:16px;
+  }
+
+  .transport-options{
+    grid-template-columns:1fr;
+  }
+
+  .item{
+    grid-template-columns:auto minmax(0,1fr) 64px auto;
+    width:100%;
+  }
+  .item input[type="text"],
+  .item input[type="number"]{
+    font-size:16px;
+    min-width:0;
+  }
+  .item .btn-delete-mini{
+    grid-column:auto;
+    width:auto;
+    justify-self:end;
+    align-self:center;
+  }
+
+  .saved-trips,
+  .attach-grid{
+    grid-template-columns:1fr;
+  }
+
+  .compare-table{
+    min-width:620px;
+  }
+
+  .smart-panel{
+    position:static;
+    top:auto;
+  }
+
+  .btn{
+    min-height:44px;
+  }
+}
+
+@media(max-width:520px){
+  .form-grid,
+  .summary-grid,
+  .step-nav{
+    grid-template-columns:1fr;
+  }
+  .hero-progress-foot{
+    grid-template-columns:1fr 1fr;
+  }
+  .hero h1{
+    font-size:27px;
+  }
+  .panel{
+    padding:14px 12px;
+  }
+  .summary strong{
+    font-size:21px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">旅</div>
+      <div class="brand-copy">
+        <strong>家族旅行 もちものリスト</strong>
+        <span>旅行準備を、家族ごと・旅行ごとにスマート管理</span>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="btn btn-outline btn-sm" id="topNewTripBtn">新しい旅行</button>
+      <button class="btn btn-primary btn-sm" id="topSaveBtn">今すぐ保存</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-grid">
+      <div>
+        <span class="eyebrow">TRAVEL PREP DASHBOARD</span>
+        <h1 id="heroTripName">旅行準備を、もっと軽やかに。</h1>
+        <p id="heroDescription">日数・季節・移動手段・家族構成に合わせて、必要な持ち物を整理。旅行ごとの保存や家族別の準備状況まで、1画面で確認できます。</p>
+        <div class="hero-meta" id="heroMeta"></div>
+      </div>
+      <div class="hero-progress">
+        <div class="hero-progress-label">PREPARATION</div>
+        <div class="hero-progress-value" id="heroRate">0%</div>
+        <div class="hero-progress-bar"><span id="heroRateBar" style="width:0%"></span></div>
+        <div class="hero-progress-foot">
+          <div class="hero-stat"><span>準備済み</span><strong id="heroDone">0</strong></div>
+          <div class="hero-stat"><span>未準備</span><strong id="heroRemain">0</strong></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="step-nav">
+    <div class="step active"><div class="step-num">1</div><div><strong>旅行設定</strong><span>日数・行き先・季節</span></div></div>
+    <div class="step"><div class="step-num">2</div><div><strong>家族設定</strong><span>人数・名前・年齢</span></div></div>
+    <div class="step"><div class="step-num">3</div><div><strong>持ち物</strong><span>自動生成・編集・追加</span></div></div>
+    <div class="step"><div class="step-num">4</div><div><strong>最終確認</strong><span>未準備・比較・保存</span></div></div>
+  </nav>
+
+  <div class="dashboard">
+    <main class="stack">
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>旅行を管理</h2>
+            <p>旅行名を入力すると自動保存が始まり、その後の変更も自動で保存されます。</p>
+          </div>
+          <span class="kicker" id="saveCountPill">保存 0件</span>
+        </div>
+
+        <div class="storage-grid">
+          <div class="field">
+            <label>保存した旅行</label>
+            <select id="tripSelect"></select>
+          </div>
+          <button class="btn btn-outline" id="newTripBtn">＋ 新しい旅行</button>
+          <button class="btn btn-primary" id="saveNewBtn">今すぐ保存</button>
+          <span class="kicker">変更は自動保存</span>
+        </div>
+
+        <div id="storageStatus" class="status info">保存機能を確認しています…</div>
+        <div id="saveStatus" class="status info">まだ保存していません。</div>
+
+        <div class="panel-actions right">
+          <button class="btn btn-delete-mini" id="deleteTripBtn">この旅行を削除</button>
+        </div>
+
+        <div id="savedTripsArea" class="saved-trips"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>旅行条件</h2>
+            <p>この条件をもとに、旅行向けの基本持ち物リストを自動作成します。</p>
+          </div>
+          <span class="kicker">STEP 1–2</span>
+        </div>
+
+        <div class="form-grid">
+          <div class="field"><label>旅行名</label><input id="tripName" placeholder="例：USJ旅行"></div>
+          <div class="field"><label>旅行日数</label><input id="days" type="number" min="1" max="30" value="2"></div>
+          <div class="field"><label>行き先</label><input id="destination" placeholder="例：大阪"></div>
+          <div class="field"><label>季節</label><select id="season"><option>春</option><option>夏</option><option>秋</option><option>冬</option></select></div>
+          <div class="field"><label>大人の人数</label><input id="adults" type="number" min="0" max="20" value="2"></div>
+          <div class="field"><label>子どもの人数</label><input id="children" type="number" min="0" max="10" value="2"></div>
+          <div class="field"><label>子どもの年齢</label><input id="ages" placeholder="例：7,3"></div>
+          <div class="field">
+  <label>移動手段（複数選択可）</label>
+  <div class="transport-options" id="transportOptions">
+    <div class="transport-option">
+      <input type="checkbox" id="transportCar" value="車" checked>
+      <label for="transportCar">車</label>
+    </div>
+    <div class="transport-option">
+      <input type="checkbox" id="transportTrain" value="電車">
+      <label for="transportTrain">電車</label>
+    </div>
+    <div class="transport-option">
+      <input type="checkbox" id="transportPlane" value="飛行機">
+      <label for="transportPlane">飛行機</label>
+    </div>
+  </div>
+  <div class="transport-help">例：車で駅まで行き、電車で移動する場合は「車」「電車」の両方を選択</div>
+</div>
+        </div>
+
+        <div class="family-box">
+          <div class="family-head">
+            <div>
+              <strong>家族の名前</strong>
+              <span>実際の名前で管理すると、準備担当が分かりやすくなります。</span>
+            </div>
+          </div>
+          <div id="peopleNames" class="people-grid"></div>
+          <div class="family-actions">
+            <button class="btn btn-outline btn-sm" id="updateNameFieldsBtn">名前入力欄を更新</button>
+            <button class="btn btn-outline btn-sm" id="refreshPeopleBtn">追加先一覧を更新</button>
+          </div>
+        </div>
+
+        <div class="panel-actions">
+          <button class="btn btn-primary" id="generateBtn">持ち物リストを作る</button>
+        </div>
+      </section>
+
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>関連資料</h2>
+            <p>予約確認書・旅程表・チケットPDF・現地マップ・写真などを、この旅行と一緒に保管できます。</p>
+          </div>
+          <span class="kicker">DOCUMENTS</span>
+        </div>
+
+        <div class="attach-drop">
+          <div class="field">
+            <label>PDF・写真を追加</label>
+            <input id="attachmentInput" type="file" multiple accept="application/pdf,image/*">
+          </div>
+          <div class="status info" id="attachmentStatus">
+            保存済み旅行を開いていると、追加した資料をこのブラウザ内に保存できます。
+          </div>
+        </div>
+
+        <div id="attachmentArea" class="attach-grid"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>持ち物リスト</h2>
+            <p>自動生成された項目は、名前・数量をそのまま編集できます。</p>
+          </div>
+          <span class="kicker">STEP 3</span>
+        </div>
+
+        <div class="summary-grid">
+          <div class="summary"><span>持ち物合計</span><strong id="sumTotal">0</strong></div>
+          <div class="summary"><span>準備済み</span><strong id="sumDone">0</strong></div>
+          <div class="summary"><span>未準備</span><strong id="sumRemain">0</strong></div>
+          <div class="summary"><span>進捗率</span><strong id="sumRate">0%</strong></div>
+        </div>
+
+        <div class="list-toolbar" style="margin-top:14px">
+          <div class="panel-actions" style="margin-top:0">
+            <button class="btn btn-outline btn-sm" id="showUncheckedBtn">未準備だけ表示</button>
+            <button class="btn btn-outline btn-sm" id="showAllBtn">全部表示</button>
+          </div>
+        </div>
+
+        <div id="listArea" class="empty">まだ持ち物リストはありません。</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>持ち物を追加</h2>
+            <p>「共通」「パパ」「はる（7歳）」のように追加先を選び、必要なものを追加できます。</p>
+          </div>
+          <span class="kicker">CUSTOM</span>
+        </div>
+
+        <div class="add-item-grid">
+          <div class="field"><label>追加先</label><select id="addPerson"></select></div>
+          <div class="field"><label>持ち物名</label><input id="customItem" placeholder="例：Nintendo Switch"></div>
+          <div class="field"><label>数量</label><input id="customQty" type="number" min="1" value="1"></div>
+          <button class="btn btn-primary" id="addItemBtn">追加する</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>家族ごとの準備状況</h2>
+            <p>誰の準備がどこまで終わっているか、横並びで確認できます。</p>
+          </div>
+          <span class="kicker">STEP 4</span>
+        </div>
+        <div id="compareArea" class="empty">まだ比較できるデータがありません。</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>旅行ごとの比較</h2>
+            <p>保存した旅行を、日数・人数・持ち物数・進捗で比較します。</p>
+          </div>
+          <span class="kicker">HISTORY</span>
+        </div>
+        <div id="tripCompareArea" class="empty">まだ旅行データがありません。</div>
+      </section>
+
+    </main>
+
+    <aside class="stack smart-panel">
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>準備アシスト</h2>
+            <p>入力内容と進捗に合わせて、今必要な補足情報を自動表示します。</p>
+          </div>
+          <span class="kicker">SMART TIPS</span>
+        </div>
+        <div id="smartTips"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>今回の旅行</h2>
+            <p>入力内容を要約して表示します。</p>
+          </div>
+        </div>
+        <div id="tripSnapshot"></div>
+      </section>
+    </aside>
+  </div>
+
+
+  <section class="panel" style="margin-top:18px">
+    <div class="panel-head">
+      <div>
+        <h2>バックアップと復元</h2>
+        <p>ブラウザの保存データが消えた場合に備えて、旅行情報をファイルとして保存できます。</p>
+      </div>
+      <span class="kicker">BACKUP</span>
+    </div>
+
+    <div class="backup-grid">
+      <div class="backup-box">
+        <strong>データを書き出す</strong>
+        <p>旅行情報・家族名・持ち物・チェック状態をJSONファイルとして保存します。</p>
+        <button class="btn btn-primary" id="exportBackupBtn">バックアップを保存</button>
+      </div>
+
+      <div class="backup-box">
+        <strong>データを復元する</strong>
+        <p>以前保存したバックアップJSONを読み込み、このブラウザへ復元します。</p>
+        <input id="importBackupInput" type="file" accept="application/json,.json">
+      </div>
+    </div>
+
+    <div id="backupStatus" class="status info">
+      ※ PDF・写真の関連資料はブラウザ内の別領域に保存されるため、このJSONバックアップには含まれません。
+    </div>
+
+    <div class="install-note">
+      <strong>スマホで安定して使うには：</strong>
+      このv10を固定URLで公開し、そのURLをスマホのホーム画面へ追加するのがおすすめです。
+      同じURLを同じブラウザで開けば、自動保存データを継続して使いやすくなります。
+    </div>
+  </section>
+
+  <div class="footer">家族旅行 もちものリスト v10｜ブラウザだけで使える自分用旅行準備ツール</div>
+</div>
+
+<script>
+const STORAGE_KEY="travelPackingTrips_v8";
+const LAST_TRIP_KEY="travelPackingLastTrip_v8";
+
+const $=id=>document.getElementById(id);
+const els={
+  storageStatus:$("storageStatus"),tripSelect:$("tripSelect"),tripName:$("tripName"),
+  days:$("days"),destination:$("destination"),season:$("season"),adults:$("adults"),
+  children:$("children"),ages:$("ages"),saveStatus:$("saveStatus"),
+  saveCountPill:$("saveCountPill"),savedTripsArea:$("savedTripsArea"),peopleNames:$("peopleNames"),
+  addPerson:$("addPerson"),customItem:$("customItem"),customQty:$("customQty"),listArea:$("listArea"),
+  compareArea:$("compareArea"),tripCompareArea:$("tripCompareArea"),sumTotal:$("sumTotal"),
+  sumDone:$("sumDone"),sumRemain:$("sumRemain"),sumRate:$("sumRate"),smartTips:$("smartTips"),
+  tripSnapshot:$("tripSnapshot"),heroTripName:$("heroTripName"),heroDescription:$("heroDescription"),
+  heroMeta:$("heroMeta"),heroRate:$("heroRate"),heroRateBar:$("heroRateBar"),
+  heroDone:$("heroDone"),heroRemain:$("heroRemain"),backupStatus:$("backupStatus"),
+  attachmentInput:$("attachmentInput"),attachmentStatus:$("attachmentStatus"),attachmentArea:$("attachmentArea")
+};
+
+let storageAvailable=testStorage();
+let trips=readStorage();
+let currentTripId=safeGet(LAST_TRIP_KEY)||null;
+let currentItems=[];
+let filterMode="all";
+let adultNames=[];
+let childNames=[];
+let hasUnsavedNewTrip=false;
+let autosaveTimer=null;
+let isAutoSaving=false;
+
+
+const FILE_DB_NAME="travelPackingFiles_v1";
+const FILE_STORE="attachments";
+let fileDbPromise=null;
+
+function openFileDb(){
+  if(fileDbPromise) return fileDbPromise;
+  fileDbPromise=new Promise((resolve,reject)=>{
+    const req=indexedDB.open(FILE_DB_NAME,1);
+    req.onupgradeneeded=()=>{
+      const db=req.result;
+      const store=db.createObjectStore(FILE_STORE,{keyPath:"id"});
+      store.createIndex("tripId","tripId",{unique:false});
+    };
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+  });
+  return fileDbPromise;
+}
+async function addAttachmentToDb(tripId,file){
+  const db=await openFileDb();
+  const record={
+    id:"file_"+Date.now()+"_"+Math.random().toString(36).slice(2,8),
+    tripId,
+    name:file.name,
+    type:file.type||"application/octet-stream",
+    size:file.size,
+    addedAt:Date.now(),
+    blob:file
+  };
+  await new Promise((resolve,reject)=>{
+    const tx=db.transaction(FILE_STORE,"readwrite");
+    tx.objectStore(FILE_STORE).put(record);
+    tx.oncomplete=resolve;
+    tx.onerror=()=>reject(tx.error);
+  });
+}
+async function getAttachmentsForTrip(tripId){
+  if(!tripId) return [];
+  const db=await openFileDb();
+  return await new Promise((resolve,reject)=>{
+    const tx=db.transaction(FILE_STORE,"readonly");
+    const idx=tx.objectStore(FILE_STORE).index("tripId");
+    const req=idx.getAll(tripId);
+    req.onsuccess=()=>resolve(req.result||[]);
+    req.onerror=()=>reject(req.error);
+  });
+}
+async function deleteAttachmentFromDb(id){
+  const db=await openFileDb();
+  await new Promise((resolve,reject)=>{
+    const tx=db.transaction(FILE_STORE,"readwrite");
+    tx.objectStore(FILE_STORE).delete(id);
+    tx.oncomplete=resolve;
+    tx.onerror=()=>reject(tx.error);
+  });
+}
+async function deleteAttachmentsForTrip(tripId){
+  if(!tripId) return;
+  const list=await getAttachmentsForTrip(tripId);
+  const db=await openFileDb();
+  await new Promise((resolve,reject)=>{
+    const tx=db.transaction(FILE_STORE,"readwrite");
+    const store=tx.objectStore(FILE_STORE);
+    list.forEach(r=>store.delete(r.id));
+    tx.oncomplete=resolve;
+    tx.onerror=()=>reject(tx.error);
+  });
+}
+function formatBytes(bytes){
+  if(bytes<1024) return bytes+" B";
+  if(bytes<1024*1024) return (bytes/1024).toFixed(1)+" KB";
+  return (bytes/1024/1024).toFixed(1)+" MB";
+}
+async function renderAttachments(){
+  els.attachmentArea.innerHTML="";
+  if(!currentTripId||!trips[currentTripId]){
+    els.attachmentStatus.className="status warn";
+    els.attachmentStatus.textContent="資料を保存するには、先に旅行を「今すぐ保存」してください。";
+    return;
+  }
+  try{
+    const files=await getAttachmentsForTrip(currentTripId);
+    els.attachmentStatus.className="status saved";
+    els.attachmentStatus.textContent=files.length
+      ?`この旅行には ${files.length}件 の関連資料があります。`
+      :"まだ関連資料はありません。PDFや写真を追加できます。";
+
+    if(!files.length) return;
+
+    files.sort((a,b)=>b.addedAt-a.addedAt).forEach(rec=>{
+      const card=document.createElement("div");
+      card.className="attach-card";
+
+      const preview=document.createElement("div");
+      preview.className="attach-preview";
+      const url=URL.createObjectURL(rec.blob);
+
+      if(rec.type.startsWith("image/")){
+        const img=document.createElement("img");
+        img.src=url;
+        img.alt=rec.name;
+        preview.appendChild(img);
+      }else{
+        const badge=document.createElement("div");
+        badge.className="pdf-badge";
+        badge.textContent="PDF";
+        preview.appendChild(badge);
+      }
+
+      const body=document.createElement("div");
+      body.className="attach-body";
+
+      const name=document.createElement("div");
+      name.className="attach-name";
+      name.textContent=rec.name;
+
+      const meta=document.createElement("div");
+      meta.className="attach-meta";
+      meta.textContent=`${formatBytes(rec.size)} ・ ${new Date(rec.addedAt).toLocaleDateString("ja-JP")}`;
+
+      const actions=document.createElement("div");
+      actions.className="attach-actions";
+
+      const openBtn=document.createElement("button");
+      openBtn.className="btn btn-outline btn-sm";
+      openBtn.textContent="開く";
+      openBtn.addEventListener("click",()=>{
+        window.open(url,"_blank");
+      });
+
+      const delBtn=document.createElement("button");
+      delBtn.className="btn btn-delete-mini";
+      delBtn.textContent="削除";
+      delBtn.addEventListener("click",async()=>{
+        if(!confirm(`「${rec.name}」を削除しますか？`)) return;
+        await deleteAttachmentFromDb(rec.id);
+        URL.revokeObjectURL(url);
+        renderAttachments();
+      });
+
+      actions.append(openBtn,delBtn);
+      body.append(name,meta,actions);
+      card.append(preview,body);
+      els.attachmentArea.appendChild(card);
+    });
+  }catch(e){
+    els.attachmentStatus.className="status danger";
+    els.attachmentStatus.textContent="関連資料の読み込みに失敗しました。";
+  }
+}
+
+function safeGet(key){try{return localStorage.getItem(key)}catch{return null}}
+function testStorage(){
+  try{
+    const key="__travelPackingTest__";
+    localStorage.setItem(key,"ok");
+    const ok=localStorage.getItem(key)==="ok";
+    localStorage.removeItem(key);
+    els.storageStatus.className="status "+(ok?"saved":"warn");
+    els.storageStatus.textContent=ok
+      ?"保存機能は利用できます。保存済み旅行は、このブラウザであとから開き直せます。入力内容は自動保存されます。"
+      :"保存機能を利用できません。";
+    return ok;
+  }catch(e){
+    els.storageStatus.className="status warn";
+    els.storageStatus.textContent="この開き方では保存が安定しない可能性があります。PCに保存したHTMLをChromeまたはEdgeで直接開いてください。";
+    return false;
+  }
+}
+function readStorage(){
+  if(!storageAvailable)return{};
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    return raw?JSON.parse(raw):{};
+  }catch{return{}}
+}
+function writeStorage(){
+  if(!storageAvailable){
+    showStatus("この開き方では保存できません。PCに保存したHTMLをChromeまたはEdgeで直接開いてください。","warn");
+    return false;
+  }
+  try{
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(trips));
+    if(currentTripId)localStorage.setItem(LAST_TRIP_KEY,currentTripId);
+    return true;
+  }catch{
+    showStatus("保存に失敗しました。ブラウザ設定をご確認ください。","danger");
+    return false;
+  }
+}
+function deepCopy(v){return JSON.parse(JSON.stringify(v))}
+function createId(prefix){return prefix+"_"+Date.now()+"_"+Math.random().toString(36).slice(2,8)}
+function showStatus(text,type="info"){els.saveStatus.className="status "+type;els.saveStatus.textContent=text}
+function nowText(){return new Date().toLocaleString("ja-JP")}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+
+function getTransportValues(){
+  const values=[];
+  if($("transportCar").checked) values.push("車");
+  if($("transportTrain").checked) values.push("電車");
+  if($("transportPlane").checked) values.push("飛行機");
+  return values;
+}
+function setTransportValues(value){
+  const values=Array.isArray(value) ? value : (value ? [value] : ["車"]);
+  $("transportCar").checked=values.includes("車");
+  $("transportTrain").checked=values.includes("電車");
+  $("transportPlane").checked=values.includes("飛行機");
+  if(!values.length) $("transportCar").checked=true;
+}
+function transportText(value){
+  const values=Array.isArray(value) ? value : (value ? [value] : []);
+  return values.length ? values.join("＋") : "未設定";
+}
+function getForm(){
+  return{
+    name:els.tripName.value.trim(),
+    days:Math.max(1,Number(els.days.value)||1),
+    destination:els.destination.value.trim(),
+    season:els.season.value,
+    adults:Math.max(0,Number(els.adults.value)||0),
+    children:Math.max(0,Number(els.children.value)||0),
+    ages:els.ages.value.trim(),
+    transport:getTransportValues(),
+    adultNames:[...adultNames],
+    childNames:[...childNames]
+  }
+}
+function setForm(form={}){
+  els.tripName.value=form.name||"";
+  els.days.value=form.days||2;
+  els.destination.value=form.destination||"";
+  els.season.value=form.season||"春";
+  els.adults.value=form.adults??2;
+  els.children.value=form.children??0;
+  els.ages.value=form.ages||"";
+  setTransportValues(form.transport||["車"]);
+  adultNames=Array.isArray(form.adultNames)?[...form.adultNames]:[];
+  childNames=Array.isArray(form.childNames)?[...form.childNames]:[];
+  renderNameFields();
+}
+
+function scheduleAutoSave(){
+  clearTimeout(autosaveTimer);
+  autosaveTimer=setTimeout(()=>{
+    smartAutoSave();
+  },700);
+}
+
+function smartAutoSave(){
+  if(isAutoSaving) return;
+  if(!storageAvailable) return;
+
+  const form=getForm();
+
+  // A new trip needs at least a trip name before it can be created.
+  if(!currentTripId || !trips[currentTripId]){
+    if(!form.name){
+      hasUnsavedNewTrip=true;
+      showStatus("旅行名を入力すると、この旅行は自動保存されます。","warn");
+      return;
+    }
+
+    isAutoSaving=true;
+    currentTripId=createId("trip");
+    trips[currentTripId]={
+      form:deepCopy(form),
+      items:deepCopy(currentItems),
+      updatedAt:Date.now()
+    };
+    const ok=writeStorage();
+    hasUnsavedNewTrip=!ok;
+    refreshTripUI();
+    if(currentTripId) els.tripSelect.value=currentTripId;
+    isAutoSaving=false;
+
+    if(ok){
+      showStatus(`「${form.name}」を新しい旅行として自動保存しました。${new Date().toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"})}`,"saved");
+    }
+    return;
+  }
+
+  isAutoSaving=true;
+  trips[currentTripId]={
+    form:deepCopy(form),
+    items:deepCopy(currentItems),
+    updatedAt:Date.now()
+  };
+  const ok=writeStorage();
+  refreshTripUI();
+  if(currentTripId) els.tripSelect.value=currentTripId;
+  isAutoSaving=false;
+
+  if(ok){
+    hasUnsavedNewTrip=false;
+    showStatus(`変更を自動保存しました。${new Date().toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"})}`,"saved");
+  }
+}
+
+function saveNow(){
+  clearTimeout(autosaveTimer);
+  smartAutoSave();
+}
+
+function markChanged(){
+  hasUnsavedNewTrip=(!currentTripId || !trips[currentTripId]);
+  scheduleAutoSave();
+  renderContext();
+}
+function renderNameFields(){
+  const adults=Math.max(0,Number(els.adults.value)||0);
+  const children=Math.max(0,Number(els.children.value)||0);
+  adultNames=Array.from({length:adults},(_,i)=>adultNames[i]||"");
+  childNames=Array.from({length:children},(_,i)=>childNames[i]||"");
+  els.peopleNames.innerHTML="";
+
+  for(let i=0;i<adults;i++){
+    const card=document.createElement("div");
+    card.className="person-card";
+    card.innerHTML='<div class="title">大人'+(i+1)+'の名前</div>';
+    const input=document.createElement("input");
+    input.placeholder=i===0?"例：たろう":i===1?"例：はなこ":`例：大人${i+1}の名前`;
+    input.value=adultNames[i];
+    input.addEventListener("input",()=>{
+      adultNames[i]=input.value;
+      markChanged();
+      refreshPeopleSelect();
+    });
+    card.appendChild(input);
+    els.peopleNames.appendChild(card);
+  }
+
+  for(let i=0;i<children;i++){
+    const card=document.createElement("div");
+    card.className="person-card";
+    card.innerHTML='<div class="title">子ども'+(i+1)+'の名前</div>';
+    const input=document.createElement("input");
+    input.placeholder=i===0?"例：はる":i===1?"例：ゆう":`例：子ども${i+1}の名前`;
+    input.value=childNames[i];
+    input.addEventListener("input",()=>{
+      childNames[i]=input.value;
+      markChanged();
+      refreshPeopleSelect();
+    });
+    card.appendChild(input);
+    els.peopleNames.appendChild(card);
+  }
+}
+function getPeople(){
+  const form=getForm();
+  const ages=form.ages.split(",").map(v=>Number(v.trim()));
+  const people=["共通"];
+  for(let i=0;i<form.adults;i++){
+    const name=(adultNames[i]||"").trim();
+    people.push(name||`大人${i+1}`);
+  }
+  for(let i=0;i<form.children;i++){
+    const name=(childNames[i]||"").trim();
+    const age=Number.isFinite(ages[i])?`（${ages[i]}歳）`:"";
+    people.push(name?`${name}${age}`:`子ども${i+1}${age}`);
+  }
+  return people;
+}
+function refreshPeopleSelect(){
+  const current=els.addPerson.value;
+  els.addPerson.innerHTML="";
+  getPeople().forEach(person=>{
+    const opt=document.createElement("option");
+    opt.value=person;opt.textContent=person;
+    els.addPerson.appendChild(opt);
+  });
+  if([...els.addPerson.options].some(o=>o.value===current))els.addPerson.value=current;
+}
+function refreshTripUI(){
+  const ids=Object.keys(trips).sort((a,b)=>(trips[b].updatedAt||0)-(trips[a].updatedAt||0));
+  els.tripSelect.innerHTML="";
+  els.savedTripsArea.innerHTML="";
+  els.saveCountPill.textContent=`保存 ${ids.length}件`;
+
+  if(!ids.length){
+    const opt=document.createElement("option");
+    opt.value="";opt.textContent="保存した旅行はありません";
+    els.tripSelect.appendChild(opt);
+    els.tripSelect.disabled=true;
+  }else{
+    els.tripSelect.disabled=false;
+    ids.forEach(id=>{
+      const trip=trips[id];
+      const opt=document.createElement("option");
+      opt.value=id;opt.textContent=trip.form?.name||"名前なし旅行";
+      els.tripSelect.appendChild(opt);
+
+      const box=document.createElement("div");
+      box.className="trip-card";
+      box.innerHTML=`<strong>${esc(trip.form?.name||"名前なし旅行")}</strong>
+        <div class="meta">${esc(trip.form?.destination||"-")} / ${trip.form?.days||"-"}日 / 持ち物 ${Array.isArray(trip.items)?trip.items.length:0}件</div>`;
+      const btn=document.createElement("button");
+      btn.className="btn btn-outline btn-sm";
+      btn.textContent="この旅行を開く";
+      btn.addEventListener("click",()=>loadTrip(id));
+      box.appendChild(btn);
+      els.savedTripsArea.appendChild(box);
+    });
+    if(currentTripId&&trips[currentTripId])els.tripSelect.value=currentTripId;
+  }
+  renderTripCompare();
+}
+function makeItem(group,name,qty=1,generated=true){
+  return{id:createId("item"),group,name,qty:Math.max(1,Number(qty)||1),checked:false,generated}
+}
+function generateItems(){
+  renderNameFields();
+  const form=getForm();
+  const people=getPeople();
+  const common=["財布","スマートフォン","充電器","身分証・保険証","常備薬","タオル","ティッシュ","ビニール袋"];
+  const seasonMap={春:["薄手の上着"],夏:["帽子","日焼け止め","汗拭きタオル"],秋:["薄手の上着"],冬:["防寒着","手袋","マフラー"]};
+  const transportMap={
+    車:["車内用の飲み物","車内用のおやつ"],
+    電車:["乗車券・ICカード","移動中の飲み物"],
+    飛行機:["搭乗に必要な予約情報","機内用の羽織り"]
+  };
+  const transportItems=[...new Set(
+    (Array.isArray(form.transport)?form.transport:[form.transport])
+      .flatMap(t=>transportMap[t]||[])
+  )];
+
+  currentItems=[];
+  [...common,...(seasonMap[form.season]||[]),...transportItems].forEach(name=>{
+    currentItems.push(makeItem("共通",name,1));
+  });
+
+  for(let i=0;i<form.adults;i++){
+    const group=people[i+1];
+    currentItems.push(
+      makeItem(group,"下着",form.days),
+      makeItem(group,"靴下",form.days),
+      makeItem(group,"着替え",form.days),
+      makeItem(group,"パジャマ",1),
+      makeItem(group,"洗面用品",1)
+    );
+  }
+
+  const ages=form.ages.split(",").map(v=>Number(v.trim()));
+  for(let i=0;i<form.children;i++){
+    const group=people[1+form.adults+i];
+    currentItems.push(
+      makeItem(group,"下着",form.days),
+      makeItem(group,"靴下",form.days),
+      makeItem(group,"着替え",form.days),
+      makeItem(group,"パジャマ",1),
+      makeItem(group,"ハンカチ",1),
+      makeItem(group,"飲み物",1)
+    );
+    if(Number.isFinite(ages[i])&&ages[i]<=3){
+      currentItems.push(
+        makeItem(group,"おしりふき",1),
+        makeItem(group,"予備の着替え",1),
+        makeItem(group,"ビニール袋",3)
+      );
+    }
+  }
+
+  refreshPeopleSelect();
+  renderAll();
+
+  scheduleAutoSave();
+  if(!getForm().name){
+    showStatus("持ち物リストを作りました。旅行名を入力すると自動保存されます。","warn");
+  }
+}
+function renderAll(){
+  renderList();
+  renderFamilyCompare();
+  renderTripCompare();
+  renderSummary();
+  renderContext();
+}
+function renderList(){
+  if(!currentItems.length){
+    els.listArea.className="empty";
+    els.listArea.textContent="まだ持ち物リストはありません。旅行条件を入力して「持ち物リストを作る」を押してください。";
+    return;
+  }
+  els.listArea.className="";
+  els.listArea.innerHTML="";
+  const visible=filterMode==="unchecked"?currentItems.filter(i=>!i.checked):currentItems;
+  if(!visible.length){
+    els.listArea.innerHTML='<div class="empty">すべて準備済みです。出発前に数量と貴重品だけ最終確認してください。</div>';
+    return;
+  }
+  [...new Set(visible.map(i=>i.group))].forEach(group=>{
+    const section=document.createElement("section");
+    section.className="item-group";
+    const all=currentItems.filter(i=>i.group===group);
+    const done=all.filter(i=>i.checked).length;
+    const head=document.createElement("div");
+    head.className="group-head";
+    head.innerHTML=`<h3>${esc(group)}</h3><span class="badge">${done} / ${all.length} 準備済み</span>`;
+    section.appendChild(head);
+
+    visible.filter(i=>i.group===group).forEach(item=>{
+      const row=document.createElement("div");
+      row.className="item"+(item.checked?" checked":"");
+
+      const cb=document.createElement("input");
+      cb.type="checkbox";cb.checked=item.checked;
+      cb.addEventListener("change",()=>{
+        item.checked=cb.checked;
+        scheduleAutoSave();
+        renderAll();
+      });
+
+      const name=document.createElement("input");
+      name.type="text";name.value=item.name;
+      name.addEventListener("change",()=>{
+        item.name=name.value.trim()||"名称未設定";
+        scheduleAutoSave();
+        renderAll();
+      });
+
+      const qty=document.createElement("input");
+      qty.type="number";qty.min=1;qty.value=item.qty;
+      qty.addEventListener("change",()=>{
+        item.qty=Math.max(1,Number(qty.value)||1);
+        qty.value=item.qty;
+        scheduleAutoSave();
+        renderAll();
+      });
+
+      const del=document.createElement("button");
+      del.className="btn btn-delete-mini";
+      del.textContent="削除";
+      del.addEventListener("click",()=>{
+        const ok=confirm(`「${item.name}」を削除しますか？`);
+        if(!ok) return;
+        currentItems=currentItems.filter(x=>x.id!==item.id);
+        scheduleAutoSave();
+        renderAll();
+      });
+
+      row.append(cb,name,qty,del);
+      section.appendChild(row);
+    });
+    els.listArea.appendChild(section);
+  });
+}
+function renderSummary(){
+  const total=currentItems.length;
+  const done=currentItems.filter(i=>i.checked).length;
+  const remain=total-done;
+  const rate=total?Math.round(done/total*100):0;
+  els.sumTotal.textContent=total;
+  els.sumDone.textContent=done;
+  els.sumRemain.textContent=remain;
+  els.sumRate.textContent=rate+"%";
+  els.heroRate.textContent=rate+"%";
+  els.heroRateBar.style.width=rate+"%";
+  els.heroDone.textContent=done;
+  els.heroRemain.textContent=remain;
+}
+function renderFamilyCompare(){
+  const groups=[...new Set(currentItems.map(i=>i.group))];
+  if(!groups.length){
+    els.compareArea.className="empty";
+    els.compareArea.textContent="まだ比較できるデータがありません。";
+    return;
+  }
+  els.compareArea.className="";
+  let html='<div class="table-wrap"><table class="compare-table"><thead><tr><th>人・分類</th><th>持ち物</th><th>準備済み</th><th>未準備</th><th>進捗</th></tr></thead><tbody>';
+  groups.forEach(group=>{
+    const items=currentItems.filter(i=>i.group===group);
+    const done=items.filter(i=>i.checked).length;
+    const total=items.length;
+    const remain=total-done;
+    const rate=total?Math.round(done/total*100):0;
+    html+=`<tr><td><strong>${esc(group)}</strong></td><td>${total}</td><td>${done}</td><td>${remain}</td><td><div class="progress"><span style="width:${rate}%"></span></div><div style="margin-top:4px;font-size:11px;color:var(--muted)">${rate}%</div></td></tr>`;
+  });
+  html+='</tbody></table></div>';
+  els.compareArea.innerHTML=html;
+}
+function renderTripCompare(){
+  const entries=Object.entries(trips).sort((a,b)=>(b[1].updatedAt||0)-(a[1].updatedAt||0));
+  if(!entries.length){
+    els.tripCompareArea.className="empty";
+    els.tripCompareArea.textContent="まだ旅行データがありません。旅行を保存すると、ここで比較できます。";
+    return;
+  }
+  els.tripCompareArea.className="";
+  let html='<div class="table-wrap"><table class="compare-table"><thead><tr><th>旅行名</th><th>行き先</th><th>日数</th><th>人数</th><th>持ち物</th><th>準備済み</th><th>未準備</th><th>進捗</th></tr></thead><tbody>';
+  entries.forEach(([id,trip])=>{
+    const form=trip.form||{};
+    const items=Array.isArray(trip.items)?trip.items:[];
+    const total=items.length;
+    const done=items.filter(i=>i.checked).length;
+    const remain=total-done;
+    const rate=total?Math.round(done/total*100):0;
+    const people=(Number(form.adults)||0)+(Number(form.children)||0);
+    html+=`<tr><td><strong>${esc(form.name||"名前なし旅行")}</strong></td><td>${esc(form.destination||"-")}</td><td>${form.days||"-"}日</td><td>${people}人</td><td>${total}</td><td>${done}</td><td>${remain}</td><td>${rate}%</td></tr>`;
+  });
+  html+='</tbody></table></div>';
+  els.tripCompareArea.innerHTML=html;
+}
+function renderContext(){
+  const f=getForm();
+  const total=currentItems.length;
+  const done=currentItems.filter(i=>i.checked).length;
+  const remain=total-done;
+  const rate=total?Math.round(done/total*100):0;
+  const people=f.adults+f.children;
+
+  els.heroTripName.textContent=f.name?f.name:"旅行準備を、もっと軽やかに。";
+  els.heroDescription.textContent=f.name
+    ?`${f.destination||"行き先未設定"}への旅行準備を管理中。持ち物の編集・家族別チェック・旅行比較まで、この画面で完結します。`
+    :"日数・季節・移動手段・家族構成に合わせて、必要な持ち物を整理。旅行ごとの保存や家族別の準備状況まで、1画面で確認できます。";
+
+  const meta=[];
+  if(f.destination)meta.push(f.destination);
+  meta.push(`${f.days}日`);
+  meta.push(`${people}人`);
+  meta.push(f.season);
+  meta.push(transportText(f.transport));
+  els.heroMeta.innerHTML=meta.map(x=>`<span class="hero-chip">${esc(x)}</span>`).join("");
+
+  const snapshot=[
+    ["旅行名",f.name||"未設定"],
+    ["行き先",f.destination||"未設定"],
+    ["日数",`${f.days}日`],
+    ["人数",`${people}人`],
+    ["季節",f.season],
+    ["移動",transportText(f.transport)]
+  ];
+  els.tripSnapshot.innerHTML='<div class="summary-grid" style="grid-template-columns:1fr 1fr">'+snapshot.map(([k,v])=>`<div class="summary"><span>${esc(k)}</span><strong style="font-size:16px">${esc(v)}</strong></div>`).join("")+'</div>';
+
+  const tips=[];
+  if(!f.name) tips.push(["01","まず旅行名を入力","旅行名を付けると、保存済み旅行を見分けやすくなります。"]);
+  if(!f.destination) tips.push(["02","行き先を入力","行き先が入ると、旅行の内容を見返しやすくなります。"]);
+  if(total===0) tips.push(["03","持ち物リストを作成","旅行条件を入力したら、まず基本リストを自動生成するのがおすすめです。"]);
+  if(f.children>0) tips.push(["KIDS","子ども用品は予備を意識","着替え・ビニール袋・飲み物などは、少し余裕を持たせると安心です。"]);
+  if(f.season==="冬") tips.push(["WINTER","防寒小物を最終確認","手袋・マフラー・防寒着は、出発直前に忘れやすい項目です。"]);
+  if(f.season==="夏") tips.push(["SUMMER","暑さ対策を確認","帽子・日焼け止め・飲み物・汗拭きタオルをチェックしましょう。"]);
+  if((Array.isArray(f.transport)?f.transport:[f.transport]).includes("飛行機")) tips.push(["AIR","機内用と預け荷物を分ける","貴重品・予約情報・機内で使うものは、取り出しやすい場所にまとめると便利です。"]);
+  if((Array.isArray(f.transport)?f.transport:[f.transport]).includes("電車")) tips.push(["TRAIN","移動中に使うものを分ける","ICカード・飲み物・子どもの暇つぶし用品は、すぐ取り出せるバッグへ。"]);
+  if((Array.isArray(f.transport)?f.transport:[f.transport]).includes("車")) tips.push(["CAR","車内用の小バッグを用意","飲み物・おやつ・ティッシュなど、車内で使うものは別にまとめるとラクです。"]);
+  if(total>0 && rate<50) tips.push(["NEXT","まずは共通品から","財布・スマホ・充電器など、全員共通のものから準備すると進みやすいです。"]);
+  if(total>0 && rate>=50 && rate<80) tips.push(["GOOD","半分以上準備できています","次は家族ごとの未準備品を見て、偏りがないか確認しましょう。"]);
+  if(total>0 && rate>=80 && remain>0) tips.push(["FINAL","最終確認モードがおすすめ","「未準備だけ表示」に切り替えると、残りだけに集中できます。"]);
+  if(total>0 && rate===100) tips.push(["DONE","準備完了","すべてチェック済みです。数量と貴重品だけ、出発前にもう一度確認しましょう。"]);
+  if(Object.keys(trips).length>=2) tips.push(["COMPARE","旅行比較が使えます","過去の旅行と持ち物数・準備進捗を比べると、次回の改善につながります。"]);
+
+  const shown=tips.slice(0,6);
+  if(!shown.length) shown.push(["TIP","準備のコツ","入力内容に合わせて、ここに補足情報を自動表示します。"]);
+
+  els.smartTips.innerHTML=shown.map((t,i)=>`
+    <div class="smart-card ${i===0?"highlight":""}">
+      <div class="icon">${esc(t[0])}</div>
+      <strong>${esc(t[1])}</strong>
+      <p>${esc(t[2])}</p>
+    </div>`).join("");
+}
+
+function makeBackupPayload(){
+  return {
+    app:"family-travel-packing-list",
+    version:10,
+    exportedAt:new Date().toISOString(),
+    trips:deepCopy(trips),
+    lastTripId:currentTripId||null
+  };
+}
+
+function downloadJson(filename,data){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+function exportBackup(){
+  const payload=makeBackupPayload();
+  const stamp=new Date().toISOString().slice(0,10).replaceAll("-","");
+  downloadJson(`旅行もちものリスト_backup_${stamp}.json`,payload);
+  els.backupStatus.className="status saved";
+  els.backupStatus.textContent=`バックアップを書き出しました。旅行 ${Object.keys(trips).length}件 を保存しました。`;
+}
+
+async function importBackup(file){
+  try{
+    const text=await file.text();
+    const data=JSON.parse(text);
+
+    if(!data || data.app!=="family-travel-packing-list" || typeof data.trips!=="object"){
+      throw new Error("invalid backup");
+    }
+
+    const count=Object.keys(data.trips).length;
+    const ok=confirm(`バックアップから ${count}件 の旅行データを復元します。現在の旅行データは置き換わります。よろしいですか？`);
+    if(!ok) return;
+
+    trips=deepCopy(data.trips);
+    currentTripId=(data.lastTripId && trips[data.lastTripId]) ? data.lastTripId : null;
+
+    writeStorage();
+    refreshTripUI();
+
+    const ids=Object.keys(trips).sort((a,b)=>(trips[b].updatedAt||0)-(trips[a].updatedAt||0));
+    if(currentTripId && trips[currentTripId]){
+      loadTrip(currentTripId);
+    }else if(ids.length){
+      loadTrip(ids[0]);
+    }else{
+      newTrip();
+    }
+
+    els.backupStatus.className="status saved";
+    els.backupStatus.textContent=`復元が完了しました。旅行 ${count}件 を読み込みました。`;
+  }catch(e){
+    els.backupStatus.className="status danger";
+    els.backupStatus.textContent="バックアップを読み込めませんでした。v10で書き出したJSONファイルか確認してください。";
+  }
+}
+
+function saveAsNewTrip(){
+  const form=getForm();
+  if(!form.name){alert("旅行名を入力してください。");els.tripName.focus();return}
+  if(!storageAvailable){showStatus("この開き方では保存できません。PCに保存したHTMLをChromeまたはEdgeで直接開いてください。","warn");return}
+  currentTripId=createId("trip");
+  trips[currentTripId]={form:deepCopy(form),items:deepCopy(currentItems),updatedAt:Date.now()};
+  const ok=writeStorage();
+  refreshTripUI();
+  if(currentTripId)els.tripSelect.value=currentTripId;
+  if(ok){
+    hasUnsavedNewTrip=false;
+    showStatus(`「${form.name}」を今すぐ保存しました。保存日時：${nowText()}`,"saved");
+    renderContext();
+  }
+}
+function overwriteTrip(){
+  const form=getForm();
+  if(!form.name){alert("旅行名を入力してください。");els.tripName.focus();return}
+  if(!storageAvailable){showStatus("この開き方では保存できません。PCに保存したHTMLをChromeまたはEdgeで直接開いてください。","warn");return}
+  if(!currentTripId||!trips[currentTripId]){showStatus("今開いている保存済み旅行がありません。最初は旅行名を入力すると自動保存されます。","warn");return}
+  trips[currentTripId]={form:deepCopy(form),items:deepCopy(currentItems),updatedAt:Date.now()};
+  const ok=writeStorage();
+  refreshTripUI();
+  if(currentTripId)els.tripSelect.value=currentTripId;
+  if(ok){
+    hasUnsavedNewTrip=false;
+    showStatus(`「${form.name}」を上書き保存しました。保存日時：${nowText()}`,"saved");
+  }
+}
+function autoSave(){
+  clearTimeout(autosaveTimer);
+  smartAutoSave();
+}
+function loadTrip(id){
+  if(!id||!trips[id])return;
+  currentTripId=id;
+  setForm(trips[id].form);
+  currentItems=Array.isArray(trips[id].items)?deepCopy(trips[id].items):[];
+  filterMode="all";
+  hasUnsavedNewTrip=false;
+  refreshPeopleSelect();
+  renderAll();
+  if(storageAvailable)localStorage.setItem(LAST_TRIP_KEY,currentTripId);
+  showStatus(`「${trips[id].form?.name||"名前なし旅行"}」を読み込みました。`,"saved");
+}
+function newTrip(){
+  currentTripId=null;
+  currentItems=[];
+  filterMode="all";
+  adultNames=[];
+  childNames=[];
+  hasUnsavedNewTrip=false;
+  setForm({name:"",days:2,destination:"",season:"春",adults:2,children:0,ages:"",transport:["車"],adultNames:[],childNames:[]});
+  refreshPeopleSelect();
+  renderAll();
+  refreshTripUI();
+  showStatus("新しい旅行を作成中です。旅行名を入力すると、その後の変更は自動保存されます。","info");
+}
+function deleteTrip(){
+  if(!currentTripId||!trips[currentTripId]){alert("削除する旅行がありません。");return}
+  const name=trips[currentTripId].form?.name||"この旅行";
+  if(!confirm(`「${name}」を削除しますか？`))return;
+  const deletingTripId=currentTripId;
+  delete trips[currentTripId];
+  deleteAttachmentsForTrip(deletingTripId).catch(()=>{});
+  currentTripId=null;
+  writeStorage();
+  refreshTripUI();
+  const ids=Object.keys(trips).sort((a,b)=>(trips[b].updatedAt||0)-(trips[a].updatedAt||0));
+  if(ids.length)loadTrip(ids[0]);else newTrip();
+}
+function addCustomItem(){
+  const itemName=els.customItem.value.trim();
+  if(!itemName){els.customItem.focus();return}
+  currentItems.push(makeItem(els.addPerson.value||"共通",itemName,els.customQty.value,false));
+  els.customItem.value="";
+  els.customQty.value=1;
+  scheduleAutoSave();
+  renderAll();
+  if(!getForm().name)showStatus("旅行名を入力すると、この内容は自動保存されます。","warn");
+}
+
+["tripName","days","destination","adults","children","ages"].forEach(id=>{
+  $(id).addEventListener("input",()=>{
+    if(id==="adults"||id==="children"){
+      renderNameFields();
+      refreshPeopleSelect();
+    }
+    markChanged();
+  });
+});
+$("season").addEventListener("change",markChanged);
+
+
+["transportCar","transportTrain","transportPlane"].forEach(id=>{
+  $(id).addEventListener("change",()=>{
+    if(getTransportValues().length===0){
+      $(id).checked=true;
+      showStatus("移動手段は1つ以上選択してください。","warn");
+      return;
+    }
+    markChanged();
+  });
+});
+
+$("updateNameFieldsBtn").addEventListener("click",()=>{renderNameFields();refreshPeopleSelect();showStatus("名前入力欄を更新しました。","info")});
+$("refreshPeopleBtn").addEventListener("click",()=>{refreshPeopleSelect();showStatus("追加先一覧を更新しました。","info")});
+$("generateBtn").addEventListener("click",generateItems);
+$("showUncheckedBtn").addEventListener("click",()=>{filterMode="unchecked";renderList()});
+$("showAllBtn").addEventListener("click",()=>{filterMode="all";renderList()});
+$("addItemBtn").addEventListener("click",addCustomItem);
+els.customItem.addEventListener("keydown",e=>{if(e.key==="Enter")addCustomItem()});
+$("saveNewBtn").addEventListener("click",saveNow);
+$("newTripBtn").addEventListener("click",newTrip);
+$("deleteTripBtn").addEventListener("click",deleteTrip);
+$("topNewTripBtn").addEventListener("click",newTrip);
+$("topSaveBtn").addEventListener("click",saveNow);
+els.tripSelect.addEventListener("change",()=>loadTrip(els.tripSelect.value));
+
+
+els.attachmentInput.addEventListener("change",async()=>{
+  const files=[...els.attachmentInput.files];
+  if(!files.length) return;
+
+  if(!currentTripId||!trips[currentTripId]){
+    els.attachmentInput.value="";
+    els.attachmentStatus.className="status warn";
+    els.attachmentStatus.textContent="先に旅行を「今すぐ保存」してから、関連資料を追加してください。";
+    return;
+  }
+
+  const allowed=files.filter(file=>file.type==="application/pdf"||file.type.startsWith("image/"));
+  if(allowed.length!==files.length){
+    els.attachmentStatus.className="status warn";
+    els.attachmentStatus.textContent="PDFまたは画像ファイルだけ追加できます。";
+  }
+
+  try{
+    for(const file of allowed){
+      await addAttachmentToDb(currentTripId,file);
+    }
+    els.attachmentInput.value="";
+    await renderAttachments();
+  }catch(e){
+    els.attachmentStatus.className="status danger";
+    els.attachmentStatus.textContent="資料の保存に失敗しました。ファイル容量が大きすぎる可能性があります。";
+  }
+});
+
+
+$("exportBackupBtn").addEventListener("click",exportBackup);
+$("importBackupInput").addEventListener("change",async()=>{
+  const file=$("importBackupInput").files?.[0];
+  if(!file) return;
+  await importBackup(file);
+  $("importBackupInput").value="";
+});
+
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  });
+}
+
+window.addEventListener("beforeunload",e=>{
+  clearTimeout(autosaveTimer);
+  if(getForm().name && storageAvailable){
+    smartAutoSave();
+  }
+  if(hasUnsavedNewTrip){
+    e.preventDefault();
+    e.returnValue="";
+  }
+});
+
+refreshTripUI();
+const ids=Object.keys(trips).sort((a,b)=>(trips[b].updatedAt||0)-(trips[a].updatedAt||0));
+if(currentTripId&&trips[currentTripId])loadTrip(currentTripId);
+else if(ids.length)loadTrip(ids[0]);
+else newTrip();
+</script>
+</body>
+</html>

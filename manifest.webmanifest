@@ -1,0 +1,10 @@
+{
+  "name": "家族旅行 もちものリスト",
+  "short_name": "旅行もちもの",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f7fb",
+  "theme_color": "#0f766e",
+  "description": "家族旅行の持ち物・準備状況・関連資料を旅行ごとに管理するブラウザツール"
+}
