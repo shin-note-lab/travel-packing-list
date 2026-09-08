@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="旅行もちもの">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>家族旅行 もちものリスト v10.11</title>
+<title>家族旅行 もちものリスト v10.12.4</title>
 <style>
 :root{
   --navy:#0f172a;
@@ -1569,7 +1569,7 @@ body.is-reordering{
 }
 
 
-/* ===== v10.11 タイトル一体型カバー ===== */
+/* ===== v10.12.4 タイトル一体型カバー ===== */
 .page-cover{
   display:none !important;
 }
@@ -1798,7 +1798,465 @@ body.is-reordering{
     font-size:13px;
   }
 }
-/* ===== /v10.11 タイトル一体型カバー ===== */
+/* ===== /v10.12.4 タイトル一体型カバー ===== */
+
+
+/* ===== v10.12.4 持ち物1行化 + 並び替え安定化 ===== */
+.item-delete-btn{
+  width:36px;
+  height:36px;
+  min-width:36px;
+  min-height:36px;
+  padding:0;
+  border-radius:10px;
+  display:grid;
+  place-items:center;
+  font-size:21px;
+  line-height:1;
+}
+
+.drag-ghost{
+  height:46px !important;
+  padding:0 9px;
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) auto;
+  align-items:center;
+  gap:8px;
+  border-radius:12px;
+  transform:none;
+  will-change:transform;
+  contain:layout paint style;
+}
+
+.drag-ghost-lite .ghost-handle{
+  width:32px;
+  height:32px;
+  display:grid;
+  place-items:center;
+  border-radius:9px;
+  background:#e0f2fe;
+  color:#0369a1;
+  font-size:19px;
+  font-weight:900;
+}
+
+.drag-ghost-lite .ghost-name{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#0f172a;
+  font-size:14px;
+  font-weight:800;
+}
+
+.drag-ghost-lite .ghost-qty{
+  min-width:28px;
+  color:#475569;
+  font-size:13px;
+  font-weight:800;
+  text-align:center;
+}
+
+@media(max-width:600px){
+  .item-group{
+    padding:11px 9px;
+  }
+
+  .item{
+    grid-template-columns:36px 26px minmax(0,1fr) 46px 36px !important;
+    gap:5px !important;
+    align-items:center;
+    padding:7px 0;
+    width:100%;
+  }
+
+  .drag-handle{
+    width:36px;
+    height:36px;
+    min-width:36px;
+    border-radius:9px;
+    font-size:18px;
+  }
+
+  .item input[type="checkbox"]{
+    width:20px;
+    height:20px;
+    margin:0;
+    transform:none;
+    justify-self:center;
+  }
+
+  .item input[type="text"]{
+    min-width:0;
+    padding:9px 8px;
+    border-radius:10px;
+    font-size:16px;
+  }
+
+  .item input[type="number"]{
+    width:46px;
+    min-width:46px;
+    padding:9px 3px;
+    border-radius:10px;
+    font-size:16px;
+    text-align:center;
+  }
+
+  .item .btn-delete-mini,
+  .item .item-delete-btn{
+    grid-column:auto !important;
+    grid-row:auto !important;
+    justify-self:end;
+    align-self:center;
+    margin:0 !important;
+    width:36px;
+    height:36px;
+    min-width:36px;
+    padding:0;
+  }
+}
+/* ===== /v10.12.4 ===== */
+
+
+/* ===== v10.12.4 スマホ専用ドラッグ安定化 ===== */
+.drag-handle{
+  touch-action:none !important;
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
+
+body.mobile-dragging{
+  overflow:hidden;
+  overscroll-behavior:none;
+}
+
+body.mobile-dragging .drag-handle{
+  touch-action:none !important;
+}
+.item-delete-btn{touch-action:manipulation !important;}
+
+.mobile-drag-placeholder{
+  height:4px;
+  margin:2px 0;
+  border-radius:999px;
+  background:#38bdf8;
+  box-shadow:0 0 0 2px rgba(56,189,248,.12);
+}
+
+.mobile-drag-ghost{
+  position:fixed;
+  z-index:9999;
+  left:8px;
+  right:8px;
+  min-height:48px;
+  padding:8px 10px;
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) auto;
+  align-items:center;
+  gap:8px;
+  border:1px solid rgba(14,165,233,.42);
+  border-radius:12px;
+  background:rgba(255,255,255,.98);
+  box-shadow:0 14px 34px rgba(15,23,42,.24);
+  pointer-events:none;
+  transform:translate3d(0,0,0);
+  will-change:transform;
+}
+
+.mobile-drag-ghost .ghost-handle{
+  width:32px;
+  height:32px;
+  display:grid;
+  place-items:center;
+  border-radius:9px;
+  background:#e0f2fe;
+  color:#0369a1;
+  font-size:20px;
+  font-weight:900;
+}
+
+.mobile-drag-ghost .ghost-name{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#0f172a;
+  font-size:15px;
+  font-weight:800;
+}
+
+.mobile-drag-ghost .ghost-qty{
+  color:#475569;
+  font-size:13px;
+  font-weight:800;
+}
+
+.item.mobile-drag-source{
+  opacity:.18;
+}
+
+@media(max-width:600px){
+  .drag-handle{
+    cursor:grab;
+  }
+}
+/* ===== /v10.12.4 ===== */
+
+
+/* ===== v10.12.4 グループ別持ち物追加 ===== */
+.group-add-wrap{
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px dashed #dbe3ec;
+}
+
+.group-add-toggle{
+  width:100%;
+  min-height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:7px;
+  padding:9px 11px;
+  border:1px dashed #cbd5e1;
+  border-radius:11px;
+  background:#f8fafc;
+  color:#475569;
+  font-size:13px;
+  font-weight:800;
+}
+
+.group-add-toggle:hover{
+  border-color:#7dd3fc;
+  background:#f0f9ff;
+  color:#0369a1;
+}
+
+.group-add-form{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 56px auto;
+  gap:7px;
+  margin-top:8px;
+  align-items:center;
+}
+
+.group-add-form[hidden]{
+  display:none !important;
+}
+
+.group-add-name{
+  min-width:0;
+}
+
+.group-add-qty{
+  width:56px;
+  min-width:56px;
+  text-align:center;
+}
+
+.group-add-submit{
+  min-width:68px;
+  white-space:nowrap;
+}
+
+@media(max-width:600px){
+  .group-add-wrap{
+    margin-top:8px;
+    padding-top:8px;
+  }
+
+  .group-add-toggle{
+    min-height:38px;
+    padding:7px 9px;
+    font-size:12px;
+  }
+
+  .group-add-form{
+    grid-template-columns:minmax(0,1fr) 48px 56px;
+    gap:5px;
+  }
+
+  .group-add-name{
+    padding:8px 7px !important;
+    font-size:16px !important;
+  }
+
+  .group-add-qty{
+    width:48px;
+    min-width:48px;
+    padding:8px 2px !important;
+    font-size:16px !important;
+  }
+
+  .group-add-submit{
+    min-width:56px;
+    padding:8px 7px;
+    font-size:12px;
+  }
+}
+/* ===== /v10.12.4 ===== */
+
+
+/* ===== v10.12.4 削除ボタン操作修正 ===== */
+.item{
+  position:relative;
+}
+
+.item-delete-btn{
+  position:relative;
+  z-index:20;
+  pointer-events:auto !important;
+  touch-action:manipulation !important;
+  -webkit-tap-highlight-color:rgba(239,68,68,.14);
+  cursor:pointer;
+}
+
+.item-delete-btn::before{
+  content:"";
+  position:absolute;
+  inset:-6px;
+}
+
+@media(max-width:600px){
+  .item-delete-btn{
+    width:38px !important;
+    height:38px !important;
+    min-width:38px !important;
+    min-height:38px !important;
+    font-size:22px !important;
+    border-radius:10px !important;
+  }
+}
+/* ===== /v10.12.4 ===== */
+
+
+/* ===== v10.12.4 PCドラッグ + 削除タップ安定化 ===== */
+.drag-handle[draggable="true"]{
+  cursor:grab;
+}
+
+.drag-handle[draggable="true"]:active{
+  cursor:grabbing;
+}
+
+.item.desktop-drag-source{
+  opacity:.32;
+}
+
+.item.desktop-drag-over-before{
+  box-shadow:inset 0 3px 0 #38bdf8;
+}
+
+.item.desktop-drag-over-after{
+  box-shadow:inset 0 -3px 0 #38bdf8;
+}
+
+.item-delete-btn{
+  isolation:isolate;
+}
+
+.item-delete-btn::before{
+  pointer-events:none !important;
+}
+/* ===== /v10.12.4 ===== */
+
+
+/* ===== v10.12.4 削除ボタン共通クリック方式 ===== */
+.item-delete-btn{
+  position:relative !important;
+  z-index:100 !important;
+  pointer-events:auto !important;
+  touch-action:manipulation !important;
+}
+
+.item-delete-btn::before{
+  content:none !important;
+}
+/* ===== /v10.12.4 ===== */
+
+
+/* ===== v10.12.4 アプリ内削除確認 ===== */
+.delete-modal-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:20000;
+  display:grid;
+  place-items:center;
+  padding:20px;
+  background:rgba(15,23,42,.46);
+  backdrop-filter:blur(4px);
+}
+
+.delete-modal-backdrop[hidden]{
+  display:none !important;
+}
+
+.delete-modal{
+  width:min(420px,100%);
+  padding:22px;
+  border-radius:18px;
+  background:#fff;
+  box-shadow:0 24px 70px rgba(15,23,42,.28);
+  text-align:center;
+}
+
+.delete-modal-icon{
+  width:48px;
+  height:48px;
+  margin:0 auto 12px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:#fee2e2;
+  color:#dc2626;
+  font-size:28px;
+  font-weight:900;
+}
+
+.delete-modal h2{
+  margin:0;
+  color:#0f172a;
+  font-size:20px;
+}
+
+.delete-modal p{
+  margin:9px 0 0;
+  color:#64748b;
+  font-size:14px;
+  line-height:1.6;
+}
+
+.delete-modal-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:20px;
+}
+
+.delete-confirm-danger{
+  border:1px solid #ef4444;
+  background:#dc2626;
+  color:#fff;
+  font-weight:850;
+}
+
+.delete-confirm-danger:hover{
+  background:#b91c1c;
+}
+
+@media(max-width:520px){
+  .delete-modal{
+    padding:19px 16px;
+    border-radius:16px;
+  }
+
+  .delete-modal-actions{
+    grid-template-columns:1fr;
+  }
+}
+/* ===== /v10.12.4 ===== */
 
 </style>
 </head>
@@ -2139,7 +2597,7 @@ body.is-reordering{
         <div class="panel-head">
           <div>
             <h2>持ち物リスト</h2>
-            <p>自動生成された項目は、名前・数量をそのまま編集できます。</p>
+            <p>自動生成された項目は編集でき、各グループの一番下から持ち物を追加できます。</p>
           </div>
           <span class="kicker">STEP 3</span>
         </div>
@@ -2162,22 +2620,13 @@ body.is-reordering{
         <div id="listArea" class="empty">まだ持ち物リストはありません。</div>
       </section>
 
-      <section class="panel tab-section" data-tab-section="packing">
-        <div class="panel-head">
-          <div>
-            <h2>持ち物を追加</h2>
-            <p>「共通」「パパ」「はる（7歳）」のように追加先を選び、必要なものを追加できます。</p>
-          </div>
-          <span class="kicker">CUSTOM</span>
-        </div>
 
-        <div class="add-item-grid">
-          <div class="field"><label>追加先</label><select id="addPerson"></select></div>
-          <div class="field"><label>持ち物名</label><input id="customItem" placeholder="例：Nintendo Switch"></div>
-          <div class="field"><label>数量</label><input id="customQty" type="number" min="1" value="1"></div>
-          <button class="btn btn-primary" id="addItemBtn">追加する</button>
-        </div>
-      </section>
+      <div hidden aria-hidden="true">
+        <select id="addPerson"></select>
+        <input id="customItem">
+        <input id="customQty" type="number" min="1" value="1">
+        <button id="addItemBtn" type="button">追加</button>
+      </div>
 
       <section class="panel tab-section" data-tab-section="review">
         <div class="panel-head">
@@ -2262,7 +2711,20 @@ body.is-reordering{
     </div>
   </section>
 
-  <div class="footer">家族旅行 もちものリスト v10.11｜ブラウザだけで使える自分用旅行準備ツール</div>
+  <div class="footer">家族旅行 もちものリスト v10.12.4｜ブラウザだけで使える自分用旅行準備ツール</div>
+</div>
+
+
+<div class="delete-modal-backdrop" id="deleteConfirmModal" hidden>
+  <div class="delete-modal" role="dialog" aria-modal="true" aria-labelledby="deleteConfirmTitle">
+    <div class="delete-modal-icon">×</div>
+    <h2 id="deleteConfirmTitle">この持ち物を削除しますか？</h2>
+    <p id="deleteConfirmText">選択した持ち物を削除します。</p>
+    <div class="delete-modal-actions">
+      <button type="button" class="btn btn-outline" id="deleteConfirmCancel">キャンセル</button>
+      <button type="button" class="btn delete-confirm-danger" id="deleteConfirmYes">削除する</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -3701,24 +4163,26 @@ function reorderVisibleItemsInGroup(group, orderedVisibleIds){
 
 function createDragGhost(row,e){
   const rect=row.getBoundingClientRect();
-  const ghost=row.cloneNode(true);
+  const nameValue=row.querySelector('input[type="text"]')?.value || "持ち物";
+  const qtyValue=row.querySelector('input[type="number"]')?.value || "1";
 
-  ghost.classList.remove("dragging","drag-over-before","drag-over-after");
-  ghost.classList.add("drag-ghost");
-  ghost.removeAttribute("data-item-id");
+  const ghost=document.createElement("div");
+  ghost.className="drag-ghost drag-ghost-lite";
   ghost.setAttribute("aria-hidden","true");
+  ghost.innerHTML=`
+    <span class="ghost-handle">≡</span>
+    <span class="ghost-name"></span>
+    <span class="ghost-qty"></span>`;
 
-  ghost.querySelectorAll("input,button").forEach(el=>{
-    el.tabIndex=-1;
-  });
+  ghost.querySelector(".ghost-name").textContent=nameValue;
+  ghost.querySelector(".ghost-qty").textContent=`×${qtyValue}`;
 
   const maxWidth=Math.max(180,window.innerWidth-16);
   const width=Math.min(rect.width,maxWidth);
 
   ghost.style.width=`${width}px`;
-  ghost.style.height=`${rect.height}px`;
-  ghost.style.left=`${Math.max(8,Math.min(rect.left,window.innerWidth-width-8))}px`;
-  ghost.style.top=`${rect.top}px`;
+  ghost.style.left="0";
+  ghost.style.top="0";
 
   document.body.appendChild(ghost);
 
@@ -3726,7 +4190,7 @@ function createDragGhost(row,e){
     ghost,
     width,
     offsetX:Math.max(0,Math.min(e.clientX-rect.left,width)),
-    offsetY:Math.max(0,Math.min(e.clientY-rect.top,rect.height))
+    offsetY:Math.max(0,Math.min(e.clientY-rect.top,46))
   };
 }
 
@@ -3736,122 +4200,343 @@ function moveDragGhost(state,e){
   const minLeft=8;
   const maxLeft=Math.max(minLeft,window.innerWidth-state.ghostWidth-8);
   const nextLeft=Math.max(minLeft,Math.min(e.clientX-state.offsetX,maxLeft));
-  const nextTop=e.clientY-state.offsetY;
+  const nextTop=Math.max(8,Math.min(e.clientY-state.offsetY,window.innerHeight-54));
 
-  state.ghost.style.left=`${nextLeft}px`;
-  state.ghost.style.top=`${nextTop}px`;
+  state.ghost.style.transform=`translate3d(${nextLeft}px,${nextTop}px,0)`;
 }
 
-function finishItemDrag(){
+function startActualItemDrag(state,e){
+  if(state.started) return;
+  const ghostInfo=createDragGhost(state.row,e);
+
+  state.started=true;
+  state.ghost=ghostInfo.ghost;
+  state.ghostWidth=ghostInfo.width;
+  state.offsetX=ghostInfo.offsetX;
+  state.offsetY=ghostInfo.offsetY;
+
+  state.row.classList.add("dragging");
+  document.body.classList.add("is-reordering");
+  moveDragGhost(state,e);
+}
+
+function finishItemDrag(options={}){
   if(!itemDragState) return;
 
-  const {row,section,group,handle,pointerId,ghost}=itemDragState;
+  const state=itemDragState;
+  const {
+    row,section,group,handle,pointerId,ghost,started
+  }=state;
+
+  itemDragState=null;
 
   try{
-    if(handle.hasPointerCapture && handle.hasPointerCapture(pointerId)){
+    if(handle?.hasPointerCapture && handle.hasPointerCapture(pointerId)){
       handle.releasePointerCapture(pointerId);
     }
   }catch(e){}
 
-  if(ghost && ghost.remove){
-    ghost.remove();
-  }
+  if(ghost?.remove) ghost.remove();
 
   document.body.classList.remove("is-reordering");
 
-  row.classList.remove("dragging","drag-over-before","drag-over-after");
-  section.querySelectorAll(".item").forEach(el=>{
-    el.classList.remove("drag-over-before","drag-over-after");
-  });
+  if(row){
+    row.classList.remove("dragging","drag-over-before","drag-over-after");
+  }
+
+  if(section){
+    section.querySelectorAll(".item").forEach(el=>{
+      el.classList.remove("drag-over-before","drag-over-after");
+    });
+  }
+
+  if(!started || options.cancel===true) return;
 
   const orderedIds=[...section.querySelectorAll(".item[data-item-id]")]
     .map(el=>el.dataset.itemId)
     .filter(Boolean);
 
   reorderVisibleItemsInGroup(group,orderedIds);
-  itemDragState=null;
-
   scheduleAutoSave();
   renderAll();
 }
 
-function attachItemReorder(handle,row,section,item){
-  handle.addEventListener("pointerdown",e=>{
-    if(e.button!==undefined && e.button!==0) return;
 
-    const ghostInfo=createDragGhost(row,e);
+function isMobileCoarsePointer(){
+  return !!(window.matchMedia && window.matchMedia("(hover: none) and (pointer: coarse)").matches);
+}
 
-    itemDragState={
-      row,
-      section,
-      group:item.group,
-      handle,
-      pointerId:e.pointerId,
-      ghost:ghostInfo.ghost,
-      ghostWidth:ghostInfo.width,
-      offsetX:ghostInfo.offsetX,
-      offsetY:ghostInfo.offsetY
-    };
+let mobileDragState=null;
+let desktopDragState=null;
 
-    row.classList.add("dragging");
-    document.body.classList.add("is-reordering");
+function makeMobileGhost(row){
+  const nameValue=row.querySelector('input[type="text"]')?.value || "持ち物";
+  const qtyValue=row.querySelector('input[type="number"]')?.value || "1";
 
-    try{handle.setPointerCapture(e.pointerId)}catch(err){}
-    e.preventDefault();
+  const ghost=document.createElement("div");
+  ghost.className="mobile-drag-ghost";
+  ghost.innerHTML=`
+    <span class="ghost-handle">≡</span>
+    <span class="ghost-name"></span>
+    <span class="ghost-qty"></span>`;
+
+  ghost.querySelector(".ghost-name").textContent=nameValue;
+  ghost.querySelector(".ghost-qty").textContent=`×${qtyValue}`;
+  document.body.appendChild(ghost);
+  return ghost;
+}
+
+function startMobileDrag(handle,row,section,item,point){
+  if(mobileDragState) return;
+
+  const rect=row.getBoundingClientRect();
+  const ghost=makeMobileGhost(row);
+
+  mobileDragState={
+    handle,row,section,item,ghost,
+    offsetY:Math.max(0,Math.min(point.clientY-rect.top,rect.height))
+  };
+
+  row.classList.add("mobile-drag-source");
+  document.body.classList.add("mobile-dragging");
+  moveMobileGhost(point.clientY);
+}
+
+function moveMobileGhost(clientY){
+  if(!mobileDragState) return;
+
+  const state=mobileDragState;
+  const ghostHeight=48;
+  const top=Math.max(8,Math.min(clientY-state.offsetY,window.innerHeight-ghostHeight-8));
+  state.ghost.style.transform=`translate3d(0,${top}px,0)`;
+
+  const rows=[...state.section.querySelectorAll(".item[data-item-id]")]
+    .filter(el=>el!==state.row);
+
+  let inserted=false;
+
+  for(const target of rows){
+    const rect=target.getBoundingClientRect();
+    if(clientY < rect.top + rect.height/2){
+      state.section.insertBefore(state.row,target);
+      inserted=true;
+      break;
+    }
+  }
+
+  if(!inserted){
+    const footer=state.section.querySelector(".group-add-wrap");
+    if(footer){
+      state.section.insertBefore(state.row,footer);
+    }else{
+      state.section.appendChild(state.row);
+    }
+  }
+
+  const edge=72;
+  if(clientY<edge){
+    window.scrollBy(0,-8);
+  }else if(clientY>window.innerHeight-edge){
+    window.scrollBy(0,8);
+  }
+}
+
+function finishMobileDrag(cancel=false){
+  if(!mobileDragState) return;
+
+  const state=mobileDragState;
+  mobileDragState=null;
+
+  state.row.classList.remove("mobile-drag-source");
+  document.body.classList.remove("mobile-dragging");
+  state.ghost?.remove();
+
+  if(cancel){
+    renderAll();
+    return;
+  }
+
+  const orderedIds=[...state.section.querySelectorAll(".item[data-item-id]")]
+    .map(el=>el.dataset.itemId)
+    .filter(Boolean);
+
+  reorderVisibleItemsInGroup(state.item.group,orderedIds);
+  scheduleAutoSave();
+  renderAll();
+}
+
+function clearDesktopDragMarks(section){
+  if(!section) return;
+  section.querySelectorAll(".item").forEach(el=>{
+    el.classList.remove("desktop-drag-over-before","desktop-drag-over-after");
   });
+}
 
-  handle.addEventListener("pointermove",e=>{
-    if(!itemDragState || itemDragState.pointerId!==e.pointerId) return;
+function finishDesktopDrag(){
+  if(!desktopDragState) return;
 
-    const state=itemDragState;
-    moveDragGhost(state,e);
+  const state=desktopDragState;
+  desktopDragState=null;
 
-    const target=document.elementFromPoint(e.clientX,e.clientY)?.closest(".item[data-item-id]");
+  state.row.classList.remove("desktop-drag-source");
+  clearDesktopDragMarks(state.section);
 
-    state.section.querySelectorAll(".item").forEach(el=>{
-      el.classList.remove("drag-over-before","drag-over-after");
-    });
+  const orderedIds=[...state.section.querySelectorAll(".item[data-item-id]")]
+    .map(el=>el.dataset.itemId)
+    .filter(Boolean);
 
-    if(target && target!==state.row && target.closest(".item-group")===state.section){
+  reorderVisibleItemsInGroup(state.item.group,orderedIds);
+  scheduleAutoSave();
+  renderAll();
+}
+
+function bindDesktopSectionDrop(section){
+  if(section.dataset.desktopDndBound==="1") return;
+  section.dataset.desktopDndBound="1";
+
+  section.addEventListener("dragover",e=>{
+    const state=desktopDragState;
+    if(!state || state.section!==section) return;
+
+    e.preventDefault();
+    if(e.dataTransfer) e.dataTransfer.dropEffect="move";
+
+    clearDesktopDragMarks(section);
+
+    const target=e.target.closest(".item[data-item-id]");
+
+    if(target && target!==state.row && target.closest(".item-group")===section){
       const rect=target.getBoundingClientRect();
       const before=e.clientY < rect.top + rect.height/2;
 
-      target.classList.add(before?"drag-over-before":"drag-over-after");
+      target.classList.add(before ? "desktop-drag-over-before" : "desktop-drag-over-after");
 
       if(before){
-        state.section.insertBefore(state.row,target);
+        section.insertBefore(state.row,target);
       }else{
-        state.section.insertBefore(state.row,target.nextSibling);
+        section.insertBefore(state.row,target.nextSibling);
       }
+      return;
     }
 
-    // Gentle auto-scroll while dragging near the screen edge.
-    const edge=90;
-    if(e.clientY<edge){
-      window.scrollBy(0,-12);
-    }else if(e.clientY>window.innerHeight-edge){
-      window.scrollBy(0,12);
+    const footer=section.querySelector(".group-add-wrap");
+    if(footer && e.clientY > footer.getBoundingClientRect().top-20){
+      section.insertBefore(state.row,footer);
     }
+  });
 
+  section.addEventListener("drop",e=>{
+    if(!desktopDragState || desktopDragState.section!==section) return;
     e.preventDefault();
+    clearDesktopDragMarks(section);
   });
+}
 
-  handle.addEventListener("pointerup",e=>{
-    if(itemDragState && itemDragState.pointerId===e.pointerId){
-      finishItemDrag();
-    }
-  });
+function attachItemReorder(handle,row,section,item){
+  if(isMobileCoarsePointer()){
+    handle.draggable=false;
 
-  handle.addEventListener("pointercancel",e=>{
-    if(itemDragState && itemDragState.pointerId===e.pointerId){
-      finishItemDrag();
-    }
-  });
+    let pressTimer=null;
+    let pendingTouchId=null;
+    let latestPoint=null;
+    let startX=0;
+    let startY=0;
 
-  // Keyboard alternative: focus the handle and use ↑ / ↓.
+    handle.addEventListener("touchstart",e=>{
+      if(!e.touches.length) return;
+
+      const touch=e.touches[0];
+      pendingTouchId=touch.identifier;
+      startX=touch.clientX;
+      startY=touch.clientY;
+      latestPoint={clientX:touch.clientX,clientY:touch.clientY};
+
+      clearTimeout(pressTimer);
+      pressTimer=setTimeout(()=>{
+        if(!latestPoint || pendingTouchId===null) return;
+
+        startMobileDrag(handle,row,section,item,latestPoint);
+
+        if(navigator.vibrate){
+          try{navigator.vibrate(18)}catch(err){}
+        }
+      },180);
+    },{passive:true});
+
+    handle.addEventListener("touchmove",e=>{
+      const touch=[...e.touches].find(t=>t.identifier===pendingTouchId);
+      if(!touch) return;
+
+      latestPoint={clientX:touch.clientX,clientY:touch.clientY};
+
+      if(!mobileDragState){
+        const dx=touch.clientX-startX;
+        const dy=touch.clientY-startY;
+
+        if(Math.hypot(dx,dy)>10){
+          clearTimeout(pressTimer);
+          pressTimer=null;
+          pendingTouchId=null;
+          latestPoint=null;
+        }
+        return;
+      }
+
+      e.preventDefault();
+      moveMobileGhost(touch.clientY);
+    },{passive:false});
+
+    handle.addEventListener("touchend",e=>{
+      clearTimeout(pressTimer);
+      pressTimer=null;
+
+      if(mobileDragState){
+        e.preventDefault();
+        finishMobileDrag(false);
+      }
+
+      pendingTouchId=null;
+      latestPoint=null;
+    },{passive:false});
+
+    handle.addEventListener("touchcancel",()=>{
+      clearTimeout(pressTimer);
+      pressTimer=null;
+      pendingTouchId=null;
+      latestPoint=null;
+
+      if(mobileDragState){
+        finishMobileDrag(true);
+      }
+    });
+
+  }else{
+    // PCはブラウザ標準のHTML5 Drag & Dropを使用。
+    handle.draggable=true;
+    bindDesktopSectionDrop(section);
+
+    handle.addEventListener("dragstart",e=>{
+      desktopDragState={row,section,item};
+      row.classList.add("desktop-drag-source");
+
+      if(e.dataTransfer){
+        e.dataTransfer.effectAllowed="move";
+        e.dataTransfer.setData("text/plain",item.id);
+
+        try{
+          e.dataTransfer.setDragImage(row,28,Math.min(24,row.offsetHeight/2));
+        }catch(err){}
+      }
+    });
+
+    handle.addEventListener("dragend",()=>{
+      finishDesktopDrag();
+    });
+  }
+
+  // Keyboard fallback
   handle.addEventListener("keydown",e=>{
     if(e.key!=="ArrowUp" && e.key!=="ArrowDown") return;
-
     e.preventDefault();
 
     const rows=[...section.querySelectorAll(".item[data-item-id]")];
@@ -3861,7 +4546,15 @@ function attachItemReorder(handle,row,section,item){
     if(e.key==="ArrowUp" && index>0){
       section.insertBefore(row,rows[index-1]);
     }else if(e.key==="ArrowDown" && index<rows.length-1){
-      section.insertBefore(rows[index+1],row);
+      const footer=section.querySelector(".group-add-wrap");
+      const next=rows[index+1].nextSibling;
+      if(next){
+        section.insertBefore(row,next);
+      }else if(footer){
+        section.insertBefore(row,footer);
+      }else{
+        section.appendChild(row);
+      }
     }else{
       return;
     }
@@ -3873,12 +4566,95 @@ function attachItemReorder(handle,row,section,item){
     reorderVisibleItemsInGroup(item.group,orderedIds);
     scheduleAutoSave();
     renderAll();
-
-    requestAnimationFrame(()=>{
-      const nextHandle=document.querySelector(`.item[data-item-id="${CSS.escape(item.id)}"] .drag-handle`);
-      if(nextHandle) nextHandle.focus();
-    });
   });
+}
+
+window.addEventListener("blur",()=>{
+  if(mobileDragState) finishMobileDrag(true);
+  if(desktopDragState) finishDesktopDrag();
+});
+
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden){
+    if(mobileDragState) finishMobileDrag(true);
+    if(desktopDragState) finishDesktopDrag();
+  }
+});
+
+
+function addItemDirectlyToGroup(group,itemName,qty=1){
+  const name=String(itemName||"").trim();
+  if(!name) return false;
+
+  currentItems.push(makeItem(group,name,qty,false));
+  scheduleAutoSave();
+  renderAll();
+
+  if(!getForm().name){
+    showStatus("旅行名を入力すると、この内容は自動保存されます。","warn");
+  }
+  return true;
+}
+
+function createGroupAddFooter(group){
+  const wrap=document.createElement("div");
+  wrap.className="group-add-wrap";
+
+  const toggle=document.createElement("button");
+  toggle.type="button";
+  toggle.className="group-add-toggle";
+  toggle.textContent=`＋ ${group}に持ち物を追加`;
+
+  const form=document.createElement("div");
+  form.className="group-add-form";
+  form.hidden=true;
+
+  const name=document.createElement("input");
+  name.type="text";
+  name.className="group-add-name";
+  name.placeholder="持ち物名";
+  name.lang="ja";
+  name.autocomplete="off";
+
+  const qty=document.createElement("input");
+  qty.type="number";
+  qty.className="group-add-qty";
+  qty.min="1";
+  qty.value="1";
+  qty.setAttribute("aria-label","数量");
+
+  const submit=document.createElement("button");
+  submit.type="button";
+  submit.className="btn btn-primary group-add-submit";
+  submit.textContent="追加";
+
+  const add=()=>{
+    const ok=addItemDirectlyToGroup(group,name.value,qty.value);
+    if(!ok){
+      name.focus();
+      return;
+    }
+  };
+
+  toggle.addEventListener("click",()=>{
+    form.hidden=!form.hidden;
+    toggle.setAttribute("aria-expanded",String(!form.hidden));
+    if(!form.hidden){
+      requestAnimationFrame(()=>name.focus());
+    }
+  });
+
+  submit.addEventListener("click",add);
+  name.addEventListener("keydown",e=>{
+    if(e.key==="Enter"){
+      e.preventDefault();
+      add();
+    }
+  });
+
+  form.append(name,qty,submit);
+  wrap.append(toggle,form);
+  return wrap;
 }
 
 function renderList(){
@@ -3887,24 +4663,38 @@ function renderList(){
     els.listArea.textContent="まだ持ち物リストはありません。旅行条件を入力して「持ち物リストを作る」を押してください。";
     return;
   }
+
   els.listArea.className="";
   els.listArea.innerHTML="";
-  const visible=filterMode==="unchecked"?currentItems.filter(i=>!i.checked):currentItems;
-  if(!visible.length){
-    els.listArea.innerHTML='<div class="empty">すべて準備済みです。出発前に数量と貴重品だけ最終確認してください。</div>';
-    return;
-  }
-  [...new Set(visible.map(i=>i.group))].forEach(group=>{
+
+  const visible=filterMode==="unchecked"
+    ? currentItems.filter(i=>!i.checked)
+    : currentItems;
+
+  const groups=[...new Set(currentItems.map(i=>i.group))];
+
+  groups.forEach(group=>{
     const section=document.createElement("section");
     section.className="item-group";
+
     const all=currentItems.filter(i=>i.group===group);
+    const groupVisible=visible.filter(i=>i.group===group);
     const done=all.filter(i=>i.checked).length;
+
     const head=document.createElement("div");
     head.className="group-head";
     head.innerHTML=`<h3>${esc(group)}</h3><span class="badge">${done} / ${all.length} 準備済み</span>`;
     section.appendChild(head);
 
-    visible.filter(i=>i.group===group).forEach(item=>{
+    if(filterMode==="unchecked" && groupVisible.length===0){
+      const empty=document.createElement("div");
+      empty.className="empty";
+      empty.style.padding="10px 0 4px";
+      empty.textContent="このグループの未準備品はありません。";
+      section.appendChild(empty);
+    }
+
+    groupVisible.forEach(item=>{
       const row=document.createElement("div");
       row.className="item"+(item.checked?" checked":"");
       row.dataset.itemId=item.id;
@@ -3917,7 +4707,8 @@ function renderList(){
       handle.title="押したまま上下にドラッグ。キーボードでは↑↓キーでも移動できます";
 
       const cb=document.createElement("input");
-      cb.type="checkbox";cb.checked=item.checked;
+      cb.type="checkbox";
+      cb.checked=item.checked;
       cb.addEventListener("change",()=>{
         item.checked=cb.checked;
         scheduleAutoSave();
@@ -3925,7 +4716,8 @@ function renderList(){
       });
 
       const name=document.createElement("input");
-      name.type="text";name.value=item.name;
+      name.type="text";
+      name.value=item.name;
       name.addEventListener("change",()=>{
         item.name=name.value.trim()||"名称未設定";
         scheduleAutoSave();
@@ -3933,7 +4725,9 @@ function renderList(){
       });
 
       const qty=document.createElement("input");
-      qty.type="number";qty.min=1;qty.value=item.qty;
+      qty.type="number";
+      qty.min=1;
+      qty.value=item.qty;
       qty.addEventListener("change",()=>{
         item.qty=Math.max(1,Number(qty.value)||1);
         qty.value=item.qty;
@@ -3942,20 +4736,19 @@ function renderList(){
       });
 
       const del=document.createElement("button");
-      del.className="btn btn-delete-mini";
-      del.textContent="削除";
-      del.addEventListener("click",()=>{
-        const ok=confirm(`「${item.name}」を削除しますか？`);
-        if(!ok) return;
-        currentItems=currentItems.filter(x=>x.id!==item.id);
-        scheduleAutoSave();
-        renderAll();
-      });
+      del.type="button";
+      del.className="btn btn-delete-mini item-delete-btn";
+      del.textContent="×";
+      del.dataset.deleteId=item.id;
+      del.setAttribute("aria-label",`${item.name}を削除`);
+      del.title="削除";
 
       row.append(handle,cb,name,qty,del);
       section.appendChild(row);
       attachItemReorder(handle,row,section,item);
     });
+
+    section.appendChild(createGroupAddFooter(group));
     els.listArea.appendChild(section);
   });
 }
@@ -4116,7 +4909,7 @@ function initTabs(){
 function makeBackupPayload(){
   return {
     app:"family-travel-packing-list",
-    version:10.11,
+    version:"10.12.4",
     exportedAt:new Date().toISOString(),
     trips:deepCopy(trips),
     lastTripId:currentTripId||null
@@ -4301,7 +5094,68 @@ $("updateNameFieldsBtn").addEventListener("click",()=>{renderChildAgeFields();re
 $("refreshPeopleBtn").addEventListener("click",()=>{refreshPeopleSelect();showStatus("追加先一覧を更新しました。","info")});
 $("generateBtn").addEventListener("click",generateItems);
 $("showUncheckedBtn").addEventListener("click",()=>{filterMode="unchecked";renderList()});
+
 $("showAllBtn").addEventListener("click",()=>{filterMode="all";renderList()});
+
+let pendingDeleteItemId=null;
+
+function closeDeleteConfirm(){
+  pendingDeleteItemId=null;
+  $("deleteConfirmModal").hidden=true;
+}
+
+function openDeleteConfirm(itemId){
+  const item=currentItems.find(x=>x.id===itemId);
+  if(!item) return;
+
+  pendingDeleteItemId=itemId;
+  $("deleteConfirmText").textContent=`「${item.name}」を削除します。`;
+  $("deleteConfirmModal").hidden=false;
+
+  requestAnimationFrame(()=>{
+    $("deleteConfirmCancel").focus();
+  });
+}
+
+els.listArea.addEventListener("click",e=>{
+  const del=e.target.closest(".item-delete-btn[data-delete-id]");
+  if(!del || !els.listArea.contains(del)) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  openDeleteConfirm(del.dataset.deleteId);
+});
+
+$("deleteConfirmCancel").addEventListener("click",closeDeleteConfirm);
+
+$("deleteConfirmYes").addEventListener("click",()=>{
+  if(!pendingDeleteItemId){
+    closeDeleteConfirm();
+    return;
+  }
+
+  const id=pendingDeleteItemId;
+  pendingDeleteItemId=null;
+  $("deleteConfirmModal").hidden=true;
+
+  currentItems=currentItems.filter(x=>x.id!==id);
+  scheduleAutoSave();
+  renderAll();
+});
+
+$("deleteConfirmModal").addEventListener("click",e=>{
+  if(e.target===$("deleteConfirmModal")){
+    closeDeleteConfirm();
+  }
+});
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape" && !$("deleteConfirmModal").hidden){
+    closeDeleteConfirm();
+  }
+});
+
 $("addItemBtn").addEventListener("click",addCustomItem);
 els.customItem.addEventListener("keydown",e=>{if(e.key==="Enter")addCustomItem()});
 $("saveNewBtn").addEventListener("click",saveNow);
@@ -4390,7 +5244,7 @@ if(currentTripId&&trips[currentTripId])loadTrip(currentTripId);
 else if(ids.length)loadTrip(ids[0]);
 else newTrip();
 
-/* ===== v10.11 背景テーマ拡張パッチ ===== */
+/* ===== v10.12.4 背景テーマ拡張パッチ ===== */
 Object.assign(HERO_THEME_CONFIG,{
   overseas:{label:"海外旅行",sky1:"#93c5fd",sky2:"#0ea5e9",ground:"#082f49",accent:"#f59e0b",accent2:"#f43f5e",soft:"#e0f2fe",leaf:"#67e8f9"},
   shinkansen:{label:"新幹線旅",sky1:"#dbeafe",sky2:"#3b82f6",ground:"#0f172a",accent:"#f8fafc",accent2:"#06b6d4",soft:"#eff6ff",leaf:"#93c5fd"},
@@ -4537,10 +5391,10 @@ function buildHeroArt(themeKey="generic",styleKey="photo"){
 
   return svg;
 }
-/* ===== /v10.11 背景テーマ拡張パッチ ===== */
+/* ===== /v10.12.4 背景テーマ拡張パッチ ===== */
 
 
-/* ===== v10.11 Notion風カバー ===== */
+/* ===== v10.12.4 Notion風カバー ===== */
 function updateCoverChoiceUI(){
   document.querySelectorAll(".cover-choice").forEach(btn=>{
     const auto=btn.dataset.coverMode==="auto";
@@ -4714,8 +5568,9 @@ $("removeCustomCoverBtn").addEventListener("click",async()=>{
 });
 
 window.addEventListener("beforeunload",clearCurrentCoverObjectUrl);
-/* ===== /v10.11 Notion風カバー ===== */
+/* ===== /v10.12.4 Notion風カバー ===== */
 
 </script>
+
 </body>
 </html>
