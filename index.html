@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="旅行もちもの">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>家族旅行 もちものリスト v10.2</title>
+<title>家族旅行 もちものリスト v10.3</title>
 <style>
 :root{
   --navy:#0f172a;
@@ -622,11 +622,11 @@ button{cursor:pointer}
 }
 .item.dragging{
   position:relative;
-  z-index:8;
-  background:#f8fafc;
+  z-index:2;
   border-radius:12px;
-  box-shadow:0 10px 24px rgba(15,23,42,.14);
-  opacity:.96;
+  background:#f8fafc;
+  opacity:.22;
+  box-shadow:inset 0 0 0 2px rgba(14,165,233,.16);
 }
 .item.dragging .drag-handle{
   background:#e0f2fe;
@@ -634,10 +634,38 @@ button{cursor:pointer}
   border-color:#7dd3fc;
 }
 .item.drag-over-before{
-  box-shadow:inset 0 3px 0 #0ea5e9;
+  box-shadow:inset 0 4px 0 #0ea5e9;
 }
 .item.drag-over-after{
-  box-shadow:inset 0 -3px 0 #0ea5e9;
+  box-shadow:inset 0 -4px 0 #0ea5e9;
+}
+.drag-ghost{
+  position:fixed;
+  z-index:9999;
+  margin:0;
+  pointer-events:none;
+  border:1px solid rgba(14,165,233,.35);
+  border-radius:14px;
+  background:rgba(255,255,255,.97);
+  box-shadow:0 18px 42px rgba(15,23,42,.24),0 4px 12px rgba(14,165,233,.14);
+  opacity:.96;
+  transform:scale(1.018) rotate(.25deg);
+  transform-origin:center;
+  will-change:left,top,transform;
+}
+.drag-ghost .drag-handle{
+  background:#e0f2fe;
+  color:#0369a1;
+  border-color:#7dd3fc;
+  box-shadow:0 0 0 3px rgba(14,165,233,.10);
+}
+.drag-ghost input,
+.drag-ghost button:not(.drag-handle){
+  pointer-events:none;
+}
+body.is-reordering{
+  user-select:none;
+  -webkit-user-select:none;
 }
 
 .item{
@@ -1475,7 +1503,7 @@ button{cursor:pointer}
     </div>
   </section>
 
-  <div class="footer">家族旅行 もちものリスト v10.2｜ブラウザだけで使える自分用旅行準備ツール</div>
+  <div class="footer">家族旅行 もちものリスト v10.3｜ブラウザだけで使える自分用旅行準備ツール</div>
 </div>
 
 <script>
@@ -2018,16 +2046,66 @@ function reorderVisibleItemsInGroup(group, orderedVisibleIds){
   });
 }
 
+
+function createDragGhost(row,e){
+  const rect=row.getBoundingClientRect();
+  const ghost=row.cloneNode(true);
+
+  ghost.classList.remove("dragging","drag-over-before","drag-over-after");
+  ghost.classList.add("drag-ghost");
+  ghost.removeAttribute("data-item-id");
+  ghost.setAttribute("aria-hidden","true");
+
+  ghost.querySelectorAll("input,button").forEach(el=>{
+    el.tabIndex=-1;
+  });
+
+  const maxWidth=Math.max(180,window.innerWidth-16);
+  const width=Math.min(rect.width,maxWidth);
+
+  ghost.style.width=`${width}px`;
+  ghost.style.height=`${rect.height}px`;
+  ghost.style.left=`${Math.max(8,Math.min(rect.left,window.innerWidth-width-8))}px`;
+  ghost.style.top=`${rect.top}px`;
+
+  document.body.appendChild(ghost);
+
+  return {
+    ghost,
+    width,
+    offsetX:Math.max(0,Math.min(e.clientX-rect.left,width)),
+    offsetY:Math.max(0,Math.min(e.clientY-rect.top,rect.height))
+  };
+}
+
+function moveDragGhost(state,e){
+  if(!state.ghost) return;
+
+  const minLeft=8;
+  const maxLeft=Math.max(minLeft,window.innerWidth-state.ghostWidth-8);
+  const nextLeft=Math.max(minLeft,Math.min(e.clientX-state.offsetX,maxLeft));
+  const nextTop=e.clientY-state.offsetY;
+
+  state.ghost.style.left=`${nextLeft}px`;
+  state.ghost.style.top=`${nextTop}px`;
+}
+
 function finishItemDrag(){
   if(!itemDragState) return;
 
-  const {row,section,group,handle,pointerId}=itemDragState;
+  const {row,section,group,handle,pointerId,ghost}=itemDragState;
 
   try{
     if(handle.hasPointerCapture && handle.hasPointerCapture(pointerId)){
       handle.releasePointerCapture(pointerId);
     }
   }catch(e){}
+
+  if(ghost && ghost.remove){
+    ghost.remove();
+  }
+
+  document.body.classList.remove("is-reordering");
 
   row.classList.remove("dragging","drag-over-before","drag-over-after");
   section.querySelectorAll(".item").forEach(el=>{
@@ -2049,15 +2127,22 @@ function attachItemReorder(handle,row,section,item){
   handle.addEventListener("pointerdown",e=>{
     if(e.button!==undefined && e.button!==0) return;
 
+    const ghostInfo=createDragGhost(row,e);
+
     itemDragState={
       row,
       section,
       group:item.group,
       handle,
-      pointerId:e.pointerId
+      pointerId:e.pointerId,
+      ghost:ghostInfo.ghost,
+      ghostWidth:ghostInfo.width,
+      offsetX:ghostInfo.offsetX,
+      offsetY:ghostInfo.offsetY
     };
 
     row.classList.add("dragging");
+    document.body.classList.add("is-reordering");
 
     try{handle.setPointerCapture(e.pointerId)}catch(err){}
     e.preventDefault();
@@ -2067,6 +2152,8 @@ function attachItemReorder(handle,row,section,item){
     if(!itemDragState || itemDragState.pointerId!==e.pointerId) return;
 
     const state=itemDragState;
+    moveDragGhost(state,e);
+
     const target=document.elementFromPoint(e.clientX,e.clientY)?.closest(".item[data-item-id]");
 
     state.section.querySelectorAll(".item").forEach(el=>{
