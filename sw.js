@@ -1,4 +1,4 @@
-const CACHE_NAME="travel-packing-v10-3";
+const CACHE_NAME="travel-packing-v10-11";
 const ASSETS=["./","./index.html","./manifest.webmanifest"];
 
 self.addEventListener("install",event=>{

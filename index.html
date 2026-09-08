@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="旅行もちもの">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>家族旅行 もちものリスト v10.3</title>
+<title>家族旅行 もちものリスト v10.11</title>
 <style>
 :root{
   --navy:#0f172a;
@@ -1211,6 +1211,595 @@ body.is-reordering{
   }
 }
 
+
+.travel-memo,
+.share-preview{
+  width:100%;
+  min-width:0;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:#fff;
+  color:var(--text);
+  padding:13px 14px;
+  font:inherit;
+  font-size:16px;
+  line-height:1.7;
+  resize:vertical;
+  outline:none;
+}
+.travel-memo:focus,
+.share-preview:focus{
+  border-color:#67e8f9;
+  box-shadow:0 0 0 3px rgba(14,165,233,.10);
+}
+.share-preview{
+  background:#f8fafc;
+  min-height:260px;
+  white-space:pre-wrap;
+}
+.share-help{
+  margin-top:7px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5;
+}
+.share-settings{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:12px;
+  margin-top:16px;
+}
+.share-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:14px;
+}
+#sharePersonField.is-disabled{
+  opacity:.48;
+}
+@media(max-width:620px){
+  .share-settings{
+    grid-template-columns:1fr;
+  }
+  .share-actions .btn{
+    flex:1 1 140px;
+  }
+  .share-preview{
+    min-height:300px;
+  }
+}
+
+
+.input-help{
+  margin-top:6px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5;
+}
+.child-ages-field{
+  grid-column:span 2;
+}
+.child-age-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.child-age-card{
+  min-width:0;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#f8fafc;
+}
+.child-age-card label{
+  display:block;
+  margin-bottom:6px;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:800;
+}
+.child-age-empty{
+  padding:12px 14px;
+  border:1px dashed var(--line);
+  border-radius:12px;
+  background:#f8fafc;
+  color:var(--muted);
+  font-size:13px;
+}
+@media(max-width:620px){
+  .child-ages-field{grid-column:1/-1}
+  .child-age-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:380px){
+  .child-age-grid{grid-template-columns:1fr}
+}
+
+
+.hero{
+  background-size:cover,cover;
+  background-position:center center,center center;
+  transition:background-image .35s ease, box-shadow .25s ease;
+}
+.hero:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(120deg,rgba(2,6,23,.42),rgba(2,6,23,.16) 48%,rgba(255,255,255,.02));
+  z-index:0;
+}
+.hero-grid{z-index:1}
+.hero-scene-note{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:12px;
+}
+.hero-scene-note .hero-note-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.16);
+  color:#f8fafc;
+  font-size:12px;
+  font-weight:800;
+  backdrop-filter:blur(6px);
+}
+.hero-scene-note .hero-note-chip strong{
+  color:#fff;
+  font-size:12px;
+}
+
+
+.hero-art-layer{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  overflow:hidden;
+  border-radius:inherit;
+}
+.hero-art-layer svg{
+  display:block;
+  width:100%;
+  height:100%;
+  min-width:100%;
+  min-height:100%;
+}
+.hero:before{
+  z-index:1;
+  background:linear-gradient(120deg,rgba(2,6,23,.34),rgba(2,6,23,.10) 52%,rgba(2,6,23,.18));
+}
+.hero:after{
+  z-index:1;
+  pointer-events:none;
+}
+.hero-grid{
+  z-index:2;
+}
+.hero h1,
+.hero p,
+.hero-chip,
+.hero-scene-note{
+  text-shadow:0 2px 10px rgba(2,6,23,.28);
+}
+
+
+.page-cover{
+  position:relative;
+  min-height:220px;
+  margin-top:14px;
+  border-radius:22px;
+  overflow:hidden;
+  background:linear-gradient(135deg,#dbeafe,#0ea5e9);
+  box-shadow:var(--shadow);
+}
+.cover-art-layer{
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+}
+.cover-art-layer svg,
+.cover-art-layer img{
+  display:block;
+  width:100%;
+  height:100%;
+}
+.cover-art-layer img{
+  object-fit:cover;
+}
+.cover-actions{
+  position:absolute;
+  right:14px;
+  bottom:14px;
+  z-index:3;
+}
+.cover-action-btn{
+  min-height:40px;
+  padding:8px 13px;
+  border:1px solid rgba(255,255,255,.55);
+  border-radius:10px;
+  background:rgba(15,23,42,.62);
+  color:#fff;
+  font-weight:850;
+  backdrop-filter:blur(10px);
+  box-shadow:0 6px 18px rgba(15,23,42,.18);
+}
+.cover-mode-badge{
+  position:absolute;
+  left:14px;
+  bottom:14px;
+  z-index:3;
+  padding:7px 10px;
+  border-radius:999px;
+  background:rgba(15,23,42,.54);
+  color:#fff;
+  font-size:12px;
+  font-weight:800;
+  backdrop-filter:blur(10px);
+}
+.cover-picker{
+  margin:10px 0 16px;
+  padding:18px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:#fff;
+  box-shadow:var(--shadow-sm);
+}
+.cover-picker[hidden]{display:none !important}
+.cover-picker-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:14px;
+}
+.cover-picker-head strong{
+  display:block;
+  color:var(--navy);
+  font-size:16px;
+}
+.cover-picker-head span{
+  display:block;
+  margin-top:4px;
+  color:var(--muted);
+  font-size:12px;
+}
+.cover-close-btn{
+  width:38px;
+  height:38px;
+  border:none;
+  border-radius:10px;
+  background:#f1f5f9;
+  color:#475569;
+  font-size:22px;
+  line-height:1;
+}
+.cover-preset-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+.cover-choice{
+  min-width:0;
+  padding:8px;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:#fff;
+  text-align:left;
+}
+.cover-choice:hover{
+  border-color:#7dd3fc;
+  background:#f8fafc;
+}
+.cover-choice.active{
+  border-color:#0ea5e9;
+  box-shadow:0 0 0 3px rgba(14,165,233,.10);
+}
+.cover-choice strong{
+  display:block;
+  margin-top:7px;
+  color:var(--navy);
+  font-size:13px;
+}
+.cover-choice small{
+  display:block;
+  margin-top:2px;
+  color:var(--muted);
+  font-size:10px;
+}
+.cover-thumb{
+  display:block;
+  height:62px;
+  border-radius:9px;
+  overflow:hidden;
+}
+.cover-thumb-auto{background:linear-gradient(135deg,#0f172a,#0f766e 58%,#38bdf8)}
+.cover-thumb-beach{background:linear-gradient(180deg,#93e7ff 0 48%,#0284c7 48% 72%,#fde68a 72%)}
+.cover-thumb-city{background:linear-gradient(135deg,#93c5fd,#1e3a8a 62%,#0f172a)}
+.cover-thumb-nature{background:linear-gradient(160deg,#c4f3d1,#22c55e 58%,#14532d)}
+.cover-thumb-hotspring{background:linear-gradient(155deg,#fde7c3,#f59e0b 55%,#7c2d12)}
+.cover-thumb-themepark{background:linear-gradient(145deg,#f5d0fe,#a855f7 58%,#4c1d95)}
+.cover-thumb-snow{background:linear-gradient(155deg,#eff6ff,#93c5fd 56%,#1e3a8a)}
+.cover-upload-box{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto auto;
+  align-items:center;
+  gap:10px;
+  margin-top:16px;
+  padding:14px;
+  border:1px dashed #cbd5e1;
+  border-radius:14px;
+  background:#f8fafc;
+}
+.cover-upload-box strong{
+  display:block;
+  color:var(--navy);
+  font-size:14px;
+}
+.cover-upload-box p{
+  margin:5px 0 0;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.5;
+}
+#heroArtLayer{display:none}
+.hero{
+  margin-top:12px;
+  background:linear-gradient(135deg,rgba(15,23,42,.99),rgba(15,118,110,.94));
+}
+@media(max-width:760px){
+  .page-cover{
+    min-height:160px;
+    margin-top:10px;
+    border-radius:16px;
+  }
+  .cover-preset-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .cover-upload-box{
+    grid-template-columns:1fr;
+  }
+  .cover-upload-box .btn{
+    width:100%;
+  }
+  .cover-thumb{height:54px}
+}
+
+
+/* ===== v10.11 タイトル一体型カバー ===== */
+.page-cover{
+  display:none !important;
+}
+
+.hero{
+  margin-top:14px;
+  min-height:255px;
+  padding:18px 22px 22px;
+  isolation:isolate;
+  background:#0f172a;
+}
+
+#heroArtLayer{
+  display:block !important;
+}
+
+.hero-art-layer svg,
+.hero-art-layer img{
+  display:block;
+  width:100%;
+  height:100%;
+  min-width:100%;
+  min-height:100%;
+}
+
+.hero-art-layer img{
+  object-fit:cover;
+  object-position:center;
+}
+
+.hero:before{
+  z-index:1;
+  background:
+    linear-gradient(
+      100deg,
+      rgba(2,6,23,.68) 0%,
+      rgba(2,6,23,.48) 46%,
+      rgba(2,6,23,.28) 72%,
+      rgba(2,6,23,.36) 100%
+    );
+}
+
+.hero-cover-toolbar{
+  position:relative;
+  z-index:3;
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+.hero-cover-toolbar .cover-mode-badge{
+  position:static;
+  padding:6px 9px;
+  background:rgba(15,23,42,.58);
+  border:1px solid rgba(255,255,255,.18);
+  font-size:11px;
+}
+
+.hero-cover-toolbar .cover-action-btn{
+  position:static;
+  min-height:34px;
+  padding:6px 10px;
+  border-radius:9px;
+  font-size:12px;
+  box-shadow:none;
+}
+
+.hero-grid{
+  position:relative;
+  z-index:2;
+  grid-template-columns:minmax(0,1fr) 205px;
+  gap:14px;
+  align-items:start;
+}
+
+.hero h1{
+  max-width:850px;
+}
+
+/* 進捗をコンパクト化 */
+.hero-progress{
+  width:100%;
+  max-width:205px;
+  justify-self:end;
+  align-self:start;
+  padding:10px 11px;
+  border-radius:14px;
+  background:rgba(15,23,42,.34);
+  border:1px solid rgba(255,255,255,.16);
+  backdrop-filter:blur(9px);
+}
+
+.hero-progress-label{
+  font-size:9px;
+  letter-spacing:.08em;
+}
+
+.hero-progress-value{
+  margin-top:2px;
+  font-size:28px;
+  line-height:1;
+}
+
+.hero-progress-bar{
+  margin-top:8px;
+  height:6px;
+}
+
+.hero-progress-foot{
+  margin-top:8px;
+  display:flex;
+  gap:6px;
+}
+
+.hero-stat{
+  flex:1 1 0;
+  min-width:0;
+  padding:6px 7px;
+  border-radius:9px;
+  background:rgba(255,255,255,.08);
+}
+
+.hero-stat span{
+  font-size:9px;
+  white-space:nowrap;
+}
+
+.hero-stat strong{
+  margin-top:1px;
+  font-size:14px;
+  line-height:1.15;
+}
+
+/* カバーピッカーはタイトル直下に表示 */
+.cover-picker{
+  margin:10px 0 16px;
+}
+
+/* 以前の独立カバー用要素は使わない */
+.cover-actions{
+  position:static;
+}
+
+@media(max-width:900px){
+  .hero{
+    min-height:0;
+  }
+
+  .hero-grid{
+    grid-template-columns:1fr;
+  }
+
+  .hero-progress{
+    width:100%;
+    max-width:none;
+    display:grid;
+    grid-template-columns:auto minmax(80px,1fr) auto;
+    align-items:center;
+    gap:10px;
+    padding:9px 10px;
+  }
+
+  .hero-progress-label{
+    display:none;
+  }
+
+  .hero-progress-value{
+    margin:0;
+    font-size:25px;
+  }
+
+  .hero-progress-bar{
+    margin:0;
+    height:6px;
+  }
+
+  .hero-progress-foot{
+    margin:0;
+    gap:5px;
+  }
+
+  .hero-stat{
+    padding:5px 7px;
+  }
+}
+
+@media(max-width:520px){
+  .hero{
+    padding:12px 13px 16px;
+  }
+
+  .hero-cover-toolbar{
+    justify-content:space-between;
+    margin-bottom:10px;
+  }
+
+  .hero-cover-toolbar .cover-mode-badge{
+    max-width:48%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .hero-cover-toolbar .cover-action-btn{
+    min-height:32px;
+    padding:5px 8px;
+    font-size:11px;
+  }
+
+  .hero-progress{
+    grid-template-columns:auto minmax(60px,1fr) auto;
+    gap:7px;
+  }
+
+  .hero-progress-value{
+    font-size:23px;
+  }
+
+  .hero-stat span{
+    font-size:8px;
+  }
+
+  .hero-stat strong{
+    font-size:13px;
+  }
+}
+/* ===== /v10.11 タイトル一体型カバー ===== */
+
 </style>
 </head>
 <body>
@@ -1230,13 +1819,19 @@ body.is-reordering{
     </div>
   </header>
 
-  <section class="hero">
+  <section class="hero" id="heroSection">
+    <div class="hero-art-layer" id="heroArtLayer" aria-hidden="true"></div>
+    <div class="hero-cover-toolbar">
+      <div class="cover-mode-badge" id="coverModeBadge">自動カバー</div>
+      <button class="cover-action-btn" id="changeCoverBtn" type="button">カバー画像を変更</button>
+    </div>
     <div class="hero-grid">
       <div>
         <span class="eyebrow">TRAVEL PREP DASHBOARD</span>
         <h1 id="heroTripName">旅行準備を、もっと軽やかに。</h1>
-        <p id="heroDescription">日数・季節・移動手段・家族構成に合わせて、必要な持ち物を整理。旅行ごとの保存や家族別の準備状況まで、1画面で確認できます。</p>
+        <p id="heroDescription">日数・旅行月・移動手段・家族構成に合わせて、必要な持ち物を整理。旅行ごとの保存や家族別の準備状況まで、1画面で確認できます。</p>
         <div class="hero-meta" id="heroMeta"></div>
+        <div class="hero-scene-note" id="heroSceneNote"></div>
       </div>
       <div class="hero-progress">
         <div class="hero-progress-label">PREPARATION</div>
@@ -1249,6 +1844,57 @@ body.is-reordering{
       </div>
     </div>
   </section>
+  <section class="cover-picker" id="coverPicker" hidden>
+    <div class="cover-picker-head">
+      <div>
+        <strong>カバー画像</strong>
+        <span>Notionのように、プリセットまたは好きな画像を選べます。</span>
+      </div>
+      <button class="cover-close-btn" id="closeCoverPickerBtn" type="button" aria-label="閉じる">×</button>
+    </div>
+
+    <div class="cover-preset-grid">
+      <button class="cover-choice" type="button" data-cover-mode="auto">
+        <span class="cover-thumb cover-thumb-auto"></span>
+        <strong>自動</strong><small>行き先に合わせる</small>
+      </button>
+      <button class="cover-choice" type="button" data-cover-preset="beach">
+        <span class="cover-thumb cover-thumb-beach"></span>
+        <strong>海</strong><small>リゾート</small>
+      </button>
+      <button class="cover-choice" type="button" data-cover-preset="city">
+        <span class="cover-thumb cover-thumb-city"></span>
+        <strong>街</strong><small>シティ</small>
+      </button>
+      <button class="cover-choice" type="button" data-cover-preset="nature">
+        <span class="cover-thumb cover-thumb-nature"></span>
+        <strong>高原</strong><small>自然</small>
+      </button>
+      <button class="cover-choice" type="button" data-cover-preset="hotspring">
+        <span class="cover-thumb cover-thumb-hotspring"></span>
+        <strong>温泉</strong><small>和・癒し</small>
+      </button>
+      <button class="cover-choice" type="button" data-cover-preset="themepark">
+        <span class="cover-thumb cover-thumb-themepark"></span>
+        <strong>レジャー</strong><small>テーマパーク</small>
+      </button>
+      <button class="cover-choice" type="button" data-cover-preset="snow">
+        <span class="cover-thumb cover-thumb-snow"></span>
+        <strong>雪</strong><small>ウィンター</small>
+      </button>
+    </div>
+
+    <div class="cover-upload-box">
+      <div>
+        <strong>好きな画像をアップロード</strong>
+        <p>JPG / PNG / WebPなど。画像はこのブラウザ内に保存され、外部サーバーへ送信しません。</p>
+      </div>
+      <label class="btn btn-primary" for="coverUploadInput">画像を選ぶ</label>
+      <input id="coverUploadInput" type="file" accept="image/*" hidden>
+      <button class="btn btn-outline" id="removeCustomCoverBtn" type="button">アップロード画像を削除</button>
+    </div>
+    <div id="coverStatus" class="status info">旅行ごとにカバー設定を保存できます。</div>
+  </section>
 
   <nav class="main-tabs" id="mainTabs" role="tablist" aria-label="旅行準備メニュー">
     <button class="main-tab active" type="button" role="tab" aria-selected="true" data-tab-target="setup">
@@ -1258,10 +1904,10 @@ body.is-reordering{
       <span class="tab-icon">2</span><span>持ち物</span>
     </button>
     <button class="main-tab" type="button" role="tab" aria-selected="false" data-tab-target="docs">
-      <span class="tab-icon">3</span><span>資料</span>
+      <span class="tab-icon">3</span><span>共有</span>
     </button>
     <button class="main-tab" type="button" role="tab" aria-selected="false" data-tab-target="review">
-      <span class="tab-icon">4</span><span>確認・比較</span>
+      <span class="tab-icon">4</span><span>まとめ・比較</span>
     </button>
   </nav>
 
@@ -1307,13 +1953,75 @@ body.is-reordering{
         </div>
 
         <div class="form-grid">
-          <div class="field"><label>旅行名</label><input id="tripName" placeholder="例：USJ旅行"></div>
-          <div class="field"><label>旅行日数</label><input id="days" type="number" min="1" max="30" value="2"></div>
+          <div class="field"><label>旅行名</label><input id="tripName" lang="ja" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" placeholder="例：おおさか旅行"><div class="input-help">日本語入力を優先する設定です。端末によってはキーボード側で「かな」への切替が必要です。</div></div>
+          <div class="field"><label>旅行日数</label><select id="days">
+            <option value="1">日帰り</option>
+            <option value="2">1泊2日</option>
+            <option value="3">2泊3日</option>
+            <option value="4">3泊4日</option>
+            <option value="5">4泊5日</option>
+            <option value="6">5泊6日</option>
+            <option value="7">6泊7日</option>
+            <option value="8">7泊8日</option>
+            <option value="9">8泊9日</option>
+            <option value="10">9泊10日</option>
+            <option value="11">10泊11日</option>
+            <option value="12">11泊12日</option>
+            <option value="13">12泊13日</option>
+            <option value="14">13泊14日</option>
+          </select></div>
           <div class="field"><label>行き先</label><input id="destination" placeholder="例：大阪"></div>
-          <div class="field"><label>季節</label><select id="season"><option>春</option><option>夏</option><option>秋</option><option>冬</option></select></div>
-          <div class="field"><label>大人の人数</label><input id="adults" type="number" min="0" max="20" value="2"></div>
-          <div class="field"><label>子どもの人数</label><input id="children" type="number" min="0" max="10" value="2"></div>
-          <div class="field"><label>子どもの年齢</label><input id="ages" placeholder="例：7,3"></div>
+          <div class="field"><label>旅行月</label><select id="travelMonth">
+            <option value="1">1月</option>
+            <option value="2">2月</option>
+            <option value="3">3月</option>
+            <option value="4">4月</option>
+            <option value="5">5月</option>
+            <option value="6">6月</option>
+            <option value="7">7月</option>
+            <option value="8">8月</option>
+            <option value="9">9月</option>
+            <option value="10">10月</option>
+            <option value="11">11月</option>
+            <option value="12">12月</option>
+          </select></div>
+          <div class="field"><label>トップ背景のテイスト</label><select id="heroStyle">
+            <option value="photo">写真風</option>
+            <option value="illustration">イラスト風</option>
+            <option value="poster">ポスター風</option>
+            <option value="minimal">ミニマル風</option>
+            <option value="night">夜景風</option>
+          </select><div class="input-help">行き先キーワードに応じて背景のモチーフが自動で切り替わります。</div></div>
+          <div class="field"><label>大人の人数</label><select id="adults">
+            <option value="1">1人</option>
+            <option value="2">2人</option>
+            <option value="3">3人</option>
+            <option value="4">4人</option>
+            <option value="5">5人</option>
+            <option value="6">6人</option>
+            <option value="7">7人</option>
+            <option value="8">8人</option>
+            <option value="9">9人</option>
+            <option value="10">10人</option>
+          </select></div>
+          <div class="field"><label>子どもの人数</label><select id="children">
+            <option value="0">0人</option>
+            <option value="1">1人</option>
+            <option value="2">2人</option>
+            <option value="3">3人</option>
+            <option value="4">4人</option>
+            <option value="5">5人</option>
+            <option value="6">6人</option>
+            <option value="7">7人</option>
+            <option value="8">8人</option>
+            <option value="9">9人</option>
+            <option value="10">10人</option>
+          </select></div>
+          <div class="field child-ages-field">
+            <label>子どもの年齢</label>
+            <div id="childAgeFields" class="child-age-grid"></div>
+            <div class="input-help">子どもの人数に合わせて年齢欄が自動で増減します。</div>
+          </div>
           <div class="field">
   <label>移動手段（複数選択可）</label>
   <div class="transport-options" id="transportOptions">
@@ -1343,7 +2051,7 @@ body.is-reordering{
           </div>
           <div id="peopleNames" class="people-grid"></div>
           <div class="family-actions">
-            <button class="btn btn-outline btn-sm" id="updateNameFieldsBtn">名前入力欄を更新</button>
+            <button class="btn btn-outline btn-sm" id="updateNameFieldsBtn">家族入力欄を更新</button>
             <button class="btn btn-outline btn-sm" id="refreshPeopleBtn">追加先一覧を更新</button>
           </div>
         </div>
@@ -1353,6 +2061,57 @@ body.is-reordering{
         </div>
       </section>
 
+
+      <section class="panel tab-section" data-tab-section="docs">
+        <div class="panel-head">
+          <div>
+            <h2>旅行メモ・共有</h2>
+            <p>集合時間やホテル情報などをメモし、必要な範囲だけ家族へ送れます。</p>
+          </div>
+          <span class="kicker">SHARE</span>
+        </div>
+
+        <div class="field">
+          <label>旅行メモ</label>
+          <textarea id="travelMemo" class="travel-memo" rows="6" placeholder="例：
+・7:00 出発
+・ホテルのチェックインは15:00
+・チケットはスマホで確認
+・子どもの上着を忘れない"></textarea>
+          <div class="share-help">入力内容は旅行データと一緒に自動保存されます。</div>
+        </div>
+
+        <div class="share-settings">
+          <div class="field">
+            <label>共有する内容</label>
+            <select id="shareScope">
+              <option value="all">全部（メモ＋持ち物）</option>
+              <option value="unchecked">未準備だけ</option>
+              <option value="memo">メモだけ</option>
+              <option value="person">家族別</option>
+            </select>
+          </div>
+          <div class="field" id="sharePersonField">
+            <label>共有する人</label>
+            <select id="sharePerson"></select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>共有用テキスト</label>
+          <textarea id="sharePreview" class="share-preview" rows="14" readonly></textarea>
+        </div>
+
+        <div class="share-actions">
+          <button class="btn btn-primary" id="shareTextBtn">送る・共有</button>
+          <button class="btn btn-outline" id="copyShareBtn">コピー</button>
+          <button class="btn btn-outline" id="downloadShareBtn">TXT保存</button>
+        </div>
+
+        <div id="shareStatus" class="status info">
+          スマホでは「送る・共有」からLINE・メール・メッセージなどへ送れます。
+        </div>
+      </section>
 
       <section class="panel tab-section" data-tab-section="docs">
         <div class="panel-head">
@@ -1423,7 +2182,7 @@ body.is-reordering{
       <section class="panel tab-section" data-tab-section="review">
         <div class="panel-head">
           <div>
-            <h2>家族ごとの準備状況</h2>
+            <h2>まとめ・比較（家族ごとの準備状況）</h2>
             <p>誰の準備がどこまで終わっているか、横並びで確認できます。</p>
           </div>
           <span class="kicker">STEP 4</span>
@@ -1493,17 +2252,17 @@ body.is-reordering{
     </div>
 
     <div id="backupStatus" class="status info">
-      ※ PDF・写真の関連資料はブラウザ内の別領域に保存されるため、このJSONバックアップには含まれません。
+      ※ PDF・写真の関連資料と、アップロードしたカバー画像はブラウザ内の別領域に保存されるため、このJSONバックアップには含まれません。
     </div>
 
     <div class="install-note">
       <strong>スマホで安定して使うには：</strong>
-      このv10を固定URLで公開し、そのURLをスマホのホーム画面へ追加するのがおすすめです。
+      このアプリを固定URLで公開し、そのURLをスマホのホーム画面へ追加するのがおすすめです。
       同じURLを同じブラウザで開けば、自動保存データを継続して使いやすくなります。
     </div>
   </section>
 
-  <div class="footer">家族旅行 もちものリスト v10.3｜ブラウザだけで使える自分用旅行準備ツール</div>
+  <div class="footer">家族旅行 もちものリスト v10.11｜ブラウザだけで使える自分用旅行準備ツール</div>
 </div>
 
 <script>
@@ -1513,16 +2272,18 @@ const LAST_TRIP_KEY="travelPackingLastTrip_v8";
 const $=id=>document.getElementById(id);
 const els={
   storageStatus:$("storageStatus"),tripSelect:$("tripSelect"),tripName:$("tripName"),
-  days:$("days"),destination:$("destination"),season:$("season"),adults:$("adults"),
-  children:$("children"),ages:$("ages"),saveStatus:$("saveStatus"),
+  days:$("days"),destination:$("destination"),travelMonth:$("travelMonth"),heroStyle:$("heroStyle"),adults:$("adults"),
+  children:$("children"),childAgeFields:$("childAgeFields"),saveStatus:$("saveStatus"),
   saveCountPill:$("saveCountPill"),savedTripsArea:$("savedTripsArea"),peopleNames:$("peopleNames"),
   addPerson:$("addPerson"),customItem:$("customItem"),customQty:$("customQty"),listArea:$("listArea"),
   compareArea:$("compareArea"),tripCompareArea:$("tripCompareArea"),sumTotal:$("sumTotal"),
   sumDone:$("sumDone"),sumRemain:$("sumRemain"),sumRate:$("sumRate"),smartTips:$("smartTips"),
-  tripSnapshot:$("tripSnapshot"),heroTripName:$("heroTripName"),heroDescription:$("heroDescription"),
-  heroMeta:$("heroMeta"),heroRate:$("heroRate"),heroRateBar:$("heroRateBar"),
+  tripSnapshot:$("tripSnapshot"),pageCover:$("heroSection"),coverArtLayer:$("heroArtLayer"),coverPicker:$("coverPicker"),coverModeBadge:$("coverModeBadge"),coverUploadInput:$("coverUploadInput"),coverStatus:$("coverStatus"),heroSection:$("heroSection"),heroArtLayer:$("heroArtLayer"),heroTripName:$("heroTripName"),heroDescription:$("heroDescription"),
+  heroMeta:$("heroMeta"),heroSceneNote:$("heroSceneNote"),heroRate:$("heroRate"),heroRateBar:$("heroRateBar"),
   heroDone:$("heroDone"),heroRemain:$("heroRemain"),backupStatus:$("backupStatus"),
-  attachmentInput:$("attachmentInput"),attachmentStatus:$("attachmentStatus"),attachmentArea:$("attachmentArea")
+  attachmentInput:$("attachmentInput"),attachmentStatus:$("attachmentStatus"),attachmentArea:$("attachmentArea"),
+  travelMemo:$("travelMemo"),shareScope:$("shareScope"),sharePerson:$("sharePerson"),
+  sharePreview:$("sharePreview"),shareStatus:$("shareStatus"),sharePersonField:$("sharePersonField")
 };
 
 let storageAvailable=testStorage();
@@ -1532,6 +2293,10 @@ let currentItems=[];
 let filterMode="all";
 let adultNames=[];
 let childNames=[];
+let childAges=[];
+let coverMode="auto";
+let coverPreset="beach";
+let currentCoverObjectUrl=null;
 let hasUnsavedNewTrip=false;
 let autosaveTimer=null;
 let isAutoSaving=false;
@@ -1539,16 +2304,22 @@ let isAutoSaving=false;
 
 const FILE_DB_NAME="travelPackingFiles_v1";
 const FILE_STORE="attachments";
+const COVER_STORE="covers";
 let fileDbPromise=null;
 
 function openFileDb(){
   if(fileDbPromise) return fileDbPromise;
   fileDbPromise=new Promise((resolve,reject)=>{
-    const req=indexedDB.open(FILE_DB_NAME,1);
+    const req=indexedDB.open(FILE_DB_NAME,2);
     req.onupgradeneeded=()=>{
       const db=req.result;
-      const store=db.createObjectStore(FILE_STORE,{keyPath:"id"});
-      store.createIndex("tripId","tripId",{unique:false});
+      if(!db.objectStoreNames.contains(FILE_STORE)){
+        const store=db.createObjectStore(FILE_STORE,{keyPath:"id"});
+        store.createIndex("tripId","tripId",{unique:false});
+      }
+      if(!db.objectStoreNames.contains(COVER_STORE)){
+        db.createObjectStore(COVER_STORE,{keyPath:"tripId"});
+      }
     };
     req.onsuccess=()=>resolve(req.result);
     req.onerror=()=>reject(req.error);
@@ -1610,6 +2381,47 @@ function formatBytes(bytes){
   if(bytes<1024*1024) return (bytes/1024).toFixed(1)+" KB";
   return (bytes/1024/1024).toFixed(1)+" MB";
 }
+
+async function saveCoverToDb(tripId,file){
+  const db=await openFileDb();
+  const record={
+    tripId,
+    name:file.name,
+    type:file.type||"image/jpeg",
+    size:file.size,
+    updatedAt:Date.now(),
+    blob:file
+  };
+  await new Promise((resolve,reject)=>{
+    const tx=db.transaction(COVER_STORE,"readwrite");
+    tx.objectStore(COVER_STORE).put(record);
+    tx.oncomplete=resolve;
+    tx.onerror=()=>reject(tx.error);
+  });
+}
+
+async function getCoverFromDb(tripId){
+  if(!tripId) return null;
+  const db=await openFileDb();
+  return await new Promise((resolve,reject)=>{
+    const tx=db.transaction(COVER_STORE,"readonly");
+    const req=tx.objectStore(COVER_STORE).get(tripId);
+    req.onsuccess=()=>resolve(req.result||null);
+    req.onerror=()=>reject(req.error);
+  });
+}
+
+async function deleteCoverFromDb(tripId){
+  if(!tripId) return;
+  const db=await openFileDb();
+  await new Promise((resolve,reject)=>{
+    const tx=db.transaction(COVER_STORE,"readwrite");
+    tx.objectStore(COVER_STORE).delete(tripId);
+    tx.oncomplete=resolve;
+    tx.onerror=()=>reject(tx.error);
+  });
+}
+
 async function renderAttachments(){
   els.attachmentArea.innerHTML="";
   if(!currentTripId||!trips[currentTripId]){
@@ -1751,31 +2563,664 @@ function transportText(value){
   const values=Array.isArray(value) ? value : (value ? [value] : []);
   return values.length ? values.join("＋") : "未設定";
 }
+
+function monthToSeason(month){
+  const m=Math.max(1,Math.min(12,Number(month)||1));
+  if([3,4,5].includes(m)) return "春";
+  if([6,7,8].includes(m)) return "夏";
+  if([9,10,11].includes(m)) return "秋";
+  return "冬";
+}
+
+function legacySeasonToMonth(season){
+  const map={春:4,夏:7,秋:10,冬:1};
+  return map[season] || (new Date().getMonth()+1);
+}
+
+function normalizeTravelMonth(form={}){
+  const raw=Number(form.month);
+  if(Number.isFinite(raw) && raw>=1 && raw<=12) return raw;
+  return legacySeasonToMonth(form.season);
+}
+
+
+function normalizeLegacyAges(form={}){
+  if(Array.isArray(form.childAges)){
+    return form.childAges.map(v=>{
+      const n=Number(v);
+      return Number.isFinite(n)?Math.max(0,Math.min(18,n)):0;
+    });
+  }
+
+  if(typeof form.ages==="string" && form.ages.trim()){
+    return form.ages.split(",").map(v=>{
+      const n=Number(v.trim());
+      return Number.isFinite(n)?Math.max(0,Math.min(18,n)):0;
+    });
+  }
+
+  return [];
+}
+
+function getChildAgeValues(){
+  const children=Math.max(0,Number(els.children.value)||0);
+
+  childAges=Array.from({length:children},(_,i)=>{
+    const select=els.childAgeFields?.querySelector(`[data-child-age-index="${i}"]`);
+    const n=select ? Number(select.value) : Number(childAges[i]);
+    return Number.isFinite(n)?Math.max(0,Math.min(18,n)):0;
+  });
+
+  return [...childAges];
+}
+
+function renderChildAgeFields(){
+  if(!els.childAgeFields) return;
+
+  const children=Math.max(0,Number(els.children.value)||0);
+  childAges=Array.from({length:children},(_,i)=>{
+    const n=Number(childAges[i]);
+    return Number.isFinite(n)?Math.max(0,Math.min(18,n)):0;
+  });
+
+  els.childAgeFields.innerHTML="";
+
+  if(children===0){
+    const empty=document.createElement("div");
+    empty.className="child-age-empty";
+    empty.textContent="子どもの人数が0人のため、年齢入力はありません。";
+    els.childAgeFields.appendChild(empty);
+    return;
+  }
+
+  for(let i=0;i<children;i++){
+    const card=document.createElement("div");
+    card.className="child-age-card";
+
+    const label=document.createElement("label");
+    label.htmlFor=`childAge_${i}`;
+    label.textContent=`子ども${i+1}`;
+
+    const select=document.createElement("select");
+    select.id=`childAge_${i}`;
+    select.dataset.childAgeIndex=String(i);
+
+    for(let age=0;age<=18;age++){
+      const opt=document.createElement("option");
+      opt.value=String(age);
+      opt.textContent=age===18 ? "18歳以上" : `${age}歳`;
+      select.appendChild(opt);
+    }
+
+    select.value=String(childAges[i]??0);
+    select.addEventListener("change",()=>{
+      childAges[i]=Number(select.value);
+      markChanged();
+      refreshPeopleSelect();
+      renderSharePreview();
+    });
+
+    card.append(label,select);
+    els.childAgeFields.appendChild(card);
+  }
+}
+
+function travelDaysLabel(days){
+  const d=Math.max(1,Number(days)||1);
+  return d===1 ? "日帰り" : `${d-1}泊${d}日`;
+}
+
+
+const HERO_STYLE_LABELS={
+  photo:"写真風",
+  illustration:"イラスト風",
+  poster:"ポスター風",
+  minimal:"ミニマル風",
+  night:"夜景風"
+};
+
+const HERO_THEME_CONFIG={
+  city:{label:"都市",sky1:"#9bd7ff",sky2:"#2563eb",ground:"#0f172a",accent:"#f59e0b",accent2:"#38bdf8",soft:"#dbeafe",leaf:"#34d399"},
+  beach:{label:"海・リゾート",sky1:"#93e7ff",sky2:"#0284c7",ground:"#0f766e",accent:"#fde68a",accent2:"#fb7185",soft:"#cffafe",leaf:"#22c55e"},
+  nature:{label:"自然・高原",sky1:"#c4f3d1",sky2:"#22c55e",ground:"#14532d",accent:"#84cc16",accent2:"#38bdf8",soft:"#ecfccb",leaf:"#15803d"},
+  hotspring:{label:"温泉",sky1:"#fde7c3",sky2:"#f59e0b",ground:"#7c2d12",accent:"#f97316",accent2:"#fca5a5",soft:"#ffedd5",leaf:"#b45309"},
+  themepark:{label:"テーマパーク",sky1:"#f5d0fe",sky2:"#a855f7",ground:"#4c1d95",accent:"#facc15",accent2:"#fb7185",soft:"#fae8ff",leaf:"#38bdf8"},
+  snow:{label:"雪・ウィンター",sky1:"#e0f2fe",sky2:"#60a5fa",ground:"#1e3a8a",accent:"#f8fafc",accent2:"#93c5fd",soft:"#eff6ff",leaf:"#bfdbfe"},
+  generic:{label:"旅行",sky1:"#cbd5e1",sky2:"#0ea5e9",ground:"#0f172a",accent:"#22c55e",accent2:"#f59e0b",soft:"#e2e8f0",leaf:"#38bdf8"}
+};
+
+function detectDestinationTheme(destination="",month=1){
+  const text=String(destination||"").toLowerCase();
+
+  const rules=[
+    {key:"themepark",words:["usj","ユニバ","ゆにば","ディズニー","でぃずにー","テーマパーク","遊園地","ニンテンドー","ランド","シー"]},
+    {key:"beach",words:["沖縄","おきなわ","ハワイ","海","ビーチ","宮古","石垣","リゾート","プール"]},
+    {key:"hotspring",words:["温泉","おんせん","草津","箱根","熱海","鬼怒川","有馬","別府","伊香保","湯"]},
+    {key:"snow",words:["スキー","雪","ゲレンデ","スノボ","冬山","苗場","蔵王","白馬"]},
+    {key:"nature",words:["那須","なす","軽井沢","高原","山","森","渓谷","キャンプ","湖","北海道","富良野","上高地","日光"]},
+    {key:"city",words:["東京","とうきょう","大阪","おおさか","京都","きょうと","横浜","よこはま","名古屋","なごや","福岡","ふくおか","神戸","こうべ","札幌","さっぽろ","仙台","せんだい","博多"]},
+  ];
+
+  for(const rule of rules){
+    if(rule.words.some(word=>text.includes(word.toLowerCase()))) return rule.key;
+  }
+
+  if([12,1,2].includes(Number(month)) && text) return "snow";
+  return "generic";
+}
+
+function svgDataUrl(svg){
+  return `url("data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}")`;
+}
+
+function baseHeroPalette(themeKey){
+  return HERO_THEME_CONFIG[themeKey] || HERO_THEME_CONFIG.generic;
+}
+
+function themeMotif(themeKey,p){
+  switch(themeKey){
+    case "city":
+      return {
+        photo:`<g opacity=".88">
+          <rect x="36" y="162" width="78" height="142" rx="5" fill="${p.ground}"/>
+          <rect x="110" y="132" width="76" height="172" rx="5" fill="${p.ground}" opacity=".94"/>
+          <rect x="180" y="174" width="70" height="130" rx="5" fill="${p.ground}" opacity=".92"/>
+          <rect x="240" y="116" width="92" height="188" rx="6" fill="${p.ground}" opacity=".98"/>
+          <rect x="328" y="152" width="62" height="152" rx="5" fill="${p.ground}" opacity=".9"/>
+          <rect x="392" y="188" width="58" height="116" rx="5" fill="${p.ground}" opacity=".94"/>
+          <rect x="450" y="138" width="96" height="166" rx="6" fill="${p.ground}" opacity=".97"/>
+          <g fill="${p.accent}" opacity=".65">
+            <rect x="126" y="148" width="8" height="8"/><rect x="142" y="148" width="8" height="8"/><rect x="126" y="166" width="8" height="8"/>
+            <rect x="258" y="134" width="8" height="8"/><rect x="276" y="134" width="8" height="8"/><rect x="258" y="152" width="8" height="8"/>
+            <rect x="468" y="156" width="8" height="8"/><rect x="486" y="156" width="8" height="8"/><rect x="504" y="156" width="8" height="8"/>
+          </g>
+        </g>`,
+        illustration:`<g>
+          <rect x="0" y="238" width="600" height="82" fill="${p.ground}" opacity=".96"/>
+          <rect x="58" y="160" width="72" height="144" rx="6" fill="${p.ground}"/>
+          <rect x="134" y="126" width="72" height="178" rx="6" fill="${p.ground}" opacity=".95"/>
+          <rect x="210" y="182" width="64" height="122" rx="6" fill="${p.ground}" opacity=".9"/>
+          <rect x="280" y="114" width="96" height="190" rx="6" fill="${p.ground}" opacity=".98"/>
+          <rect x="384" y="156" width="70" height="148" rx="6" fill="${p.ground}" opacity=".92"/>
+          <rect x="458" y="138" width="86" height="166" rx="6" fill="${p.ground}" opacity=".96"/>
+          <rect x="508" y="102" width="18" height="36" fill="${p.accent2}" opacity=".95"/>
+        </g>`,
+        poster:`<g>
+          <circle cx="476" cy="78" r="56" fill="${p.accent}" opacity=".92"/>
+          <rect x="34" y="178" width="92" height="126" fill="${p.ground}"/>
+          <rect x="118" y="132" width="86" height="172" fill="${p.ground}" opacity=".96"/>
+          <rect x="214" y="194" width="64" height="110" fill="${p.ground}" opacity=".88"/>
+          <rect x="282" y="110" width="106" height="194" fill="${p.ground}" opacity=".98"/>
+          <rect x="396" y="156" width="72" height="148" fill="${p.ground}" opacity=".94"/>
+          <rect x="474" y="142" width="96" height="162" fill="${p.ground}" opacity=".98"/>
+          <line x1="0" y1="246" x2="600" y2="246" stroke="${p.soft}" stroke-width="8" opacity=".28"/>
+        </g>`,
+        minimal:`<g>
+          <line x1="30" y1="250" x2="570" y2="250" stroke="${p.soft}" stroke-width="4" opacity=".58"/>
+          <rect x="60" y="172" width="64" height="92" rx="8" fill="none" stroke="${p.soft}" stroke-width="4" opacity=".85"/>
+          <rect x="142" y="138" width="72" height="126" rx="8" fill="none" stroke="${p.soft}" stroke-width="4" opacity=".85"/>
+          <rect x="230" y="196" width="56" height="68" rx="8" fill="none" stroke="${p.soft}" stroke-width="4" opacity=".8"/>
+          <rect x="300" y="126" width="90" height="138" rx="8" fill="none" stroke="${p.soft}" stroke-width="4" opacity=".88"/>
+          <rect x="406" y="160" width="64" height="104" rx="8" fill="none" stroke="${p.soft}" stroke-width="4" opacity=".8"/>
+          <rect x="484" y="144" width="78" height="120" rx="8" fill="none" stroke="${p.soft}" stroke-width="4" opacity=".88"/>
+        </g>`,
+        night:`<g>
+          <rect x="0" y="236" width="600" height="84" fill="${p.ground}" opacity=".98"/>
+          <circle cx="500" cy="74" r="38" fill="${p.accent}" opacity=".96"/>
+          <rect x="48" y="166" width="72" height="138" rx="6" fill="${p.soft}" opacity=".22"/>
+          <rect x="128" y="118" width="74" height="186" rx="6" fill="${p.soft}" opacity=".18"/>
+          <rect x="208" y="182" width="58" height="122" rx="6" fill="${p.soft}" opacity=".18"/>
+          <rect x="274" y="108" width="98" height="196" rx="6" fill="${p.soft}" opacity=".2"/>
+          <rect x="384" y="154" width="66" height="150" rx="6" fill="${p.soft}" opacity=".17"/>
+          <rect x="456" y="138" width="92" height="166" rx="6" fill="${p.soft}" opacity=".2"/>
+          <g fill="${p.accent}">
+            <rect x="142" y="140" width="7" height="7"/><rect x="158" y="140" width="7" height="7"/><rect x="174" y="140" width="7" height="7"/>
+            <rect x="294" y="132" width="7" height="7"/><rect x="310" y="132" width="7" height="7"/><rect x="326" y="132" width="7" height="7"/>
+            <rect x="474" y="150" width="7" height="7"/><rect x="490" y="150" width="7" height="7"/><rect x="506" y="150" width="7" height="7"/>
+          </g>
+        </g>`
+      };
+    case "beach":
+      return {
+        photo:`<g>
+          <rect x="0" y="196" width="600" height="124" fill="${p.sky2}" opacity=".88"/>
+          <path d="M0 188 C88 204 150 172 240 188 C344 206 430 172 600 192 L600 320 L0 320 Z" fill="${p.soft}" opacity=".96"/>
+          <path d="M430 114 C442 82 454 66 474 56 C468 82 456 112 440 134" stroke="${p.ground}" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <path d="M442 92 C466 82 484 82 506 90" stroke="${p.ground}" stroke-width="7" fill="none" stroke-linecap="round"/>
+          <path d="M438 82 C458 66 482 58 510 58" stroke="${p.ground}" stroke-width="7" fill="none" stroke-linecap="round"/>
+          <rect x="438" y="132" width="8" height="92" rx="4" fill="${p.ground}"/>
+          <circle cx="112" cy="74" r="38" fill="${p.accent}" opacity=".95"/>
+        </g>`,
+        illustration:`<g>
+          <rect x="0" y="168" width="600" height="62" fill="${p.accent2}" opacity=".22"/>
+          <rect x="0" y="196" width="600" height="124" fill="${p.sky2}" opacity=".86"/>
+          <path d="M0 218 C110 198 176 238 286 216 C398 194 474 234 600 214" stroke="${p.soft}" stroke-width="8" fill="none" opacity=".95"/>
+          <path d="M0 244 C90 224 172 262 276 246 C392 228 468 262 600 240" stroke="${p.soft}" stroke-width="8" fill="none" opacity=".82"/>
+          <circle cx="92" cy="78" r="34" fill="${p.accent}" opacity=".96"/>
+          <path d="M446 108 C456 86 468 68 484 56" stroke="${p.ground}" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <path d="M456 92 C482 74 510 72 538 84" stroke="${p.ground}" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <rect x="448" y="112" width="8" height="102" rx="4" fill="${p.ground}"/>
+        </g>`,
+        poster:`<g>
+          <circle cx="110" cy="78" r="46" fill="${p.accent}" opacity=".98"/>
+          <rect x="0" y="182" width="600" height="58" fill="${p.accent2}" opacity=".32"/>
+          <rect x="0" y="214" width="600" height="106" fill="${p.sky2}" opacity=".92"/>
+          <path d="M0 218 C124 190 188 238 292 216 C402 192 486 236 600 218" stroke="${p.soft}" stroke-width="10" fill="none" opacity=".96"/>
+          <path d="M444 114 C454 86 470 64 490 54" stroke="${p.ground}" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <path d="M452 96 C480 76 514 76 540 88" stroke="${p.ground}" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <rect x="448" y="116" width="10" height="106" rx="5" fill="${p.ground}"/>
+        </g>`,
+        minimal:`<g>
+          <circle cx="94" cy="78" r="34" fill="none" stroke="${p.soft}" stroke-width="5" opacity=".9"/>
+          <line x1="0" y1="196" x2="600" y2="196" stroke="${p.soft}" stroke-width="5" opacity=".7"/>
+          <path d="M0 228 C124 210 188 246 296 226 C408 208 490 244 600 228" stroke="${p.soft}" stroke-width="5" fill="none" opacity=".88"/>
+          <path d="M446 110 C456 88 468 70 484 56" stroke="${p.soft}" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M456 94 C482 78 510 78 534 88" stroke="${p.soft}" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <rect x="448" y="112" width="8" height="96" rx="4" fill="${p.soft}" opacity=".78"/>
+        </g>`,
+        night:`<g>
+          <rect x="0" y="198" width="600" height="122" fill="${p.ground}" opacity=".46"/>
+          <circle cx="470" cy="74" r="36" fill="${p.accent}" opacity=".92"/>
+          <path d="M0 220 C128 202 198 240 292 220 C410 198 488 240 600 220" stroke="${p.accent2}" stroke-width="9" fill="none" opacity=".56"/>
+          <path d="M0 244 C112 228 184 258 292 244 C402 230 476 258 600 242" stroke="${p.soft}" stroke-width="7" fill="none" opacity=".42"/>
+          <path d="M442 110 C454 88 468 70 484 58" stroke="${p.soft}" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <path d="M452 94 C478 78 510 78 534 88" stroke="${p.soft}" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <rect x="446" y="114" width="8" height="98" rx="4" fill="${p.soft}" opacity=".72"/>
+          <g fill="${p.soft}" opacity=".75"><circle cx="90" cy="52" r="2"/><circle cx="128" cy="72" r="2"/><circle cx="540" cy="40" r="2"/><circle cx="570" cy="62" r="2"/></g>
+        </g>`
+      };
+    case "nature":
+      return {
+        photo:`<g>
+          <path d="M0 208 L120 106 L212 208 Z" fill="${p.leaf}" opacity=".72"/>
+          <path d="M126 210 L268 84 L404 210 Z" fill="${p.leaf}" opacity=".84"/>
+          <path d="M286 212 L436 112 L600 212 Z" fill="${p.ground}" opacity=".74"/>
+          <path d="M0 214 C102 190 182 242 284 214 C384 186 466 242 600 212 L600 320 L0 320 Z" fill="${p.ground}" opacity=".86"/>
+          <g fill="${p.ground}" opacity=".94">
+            <path d="M80 236 l18 -36 l18 36z"/><rect x="94" y="236" width="8" height="34"/>
+            <path d="M154 246 l16 -30 l16 30z"/><rect x="166" y="246" width="8" height="28"/>
+            <path d="M488 244 l18 -34 l18 34z"/><rect x="500" y="244" width="8" height="30"/>
+          </g>
+        </g>`,
+        illustration:`<g>
+          <path d="M0 212 L118 110 L210 212 Z" fill="${p.leaf}" opacity=".7"/>
+          <path d="M110 212 L254 84 L394 212 Z" fill="${p.leaf}" opacity=".85"/>
+          <path d="M302 212 L446 124 L600 212 Z" fill="${p.ground}" opacity=".72"/>
+          <path d="M0 224 C104 202 180 244 282 222 C392 198 470 244 600 222 L600 320 L0 320 Z" fill="${p.ground}" opacity=".9"/>
+          <circle cx="476" cy="76" r="36" fill="${p.accent}" opacity=".94"/>
+          <g fill="${p.ground}">
+            <path d="M84 250 l14 -28 l14 28z"/><rect x="94" y="250" width="6" height="22"/>
+            <path d="M172 252 l12 -24 l12 24z"/><rect x="180" y="252" width="6" height="20"/>
+            <path d="M520 248 l14 -28 l14 28z"/><rect x="530" y="248" width="6" height="22"/>
+          </g>
+        </g>`,
+        poster:`<g>
+          <circle cx="486" cy="82" r="46" fill="${p.accent}" opacity=".96"/>
+          <path d="M0 216 L128 118 L220 216 Z" fill="${p.soft}" opacity=".6"/>
+          <path d="M118 214 L266 82 L406 214 Z" fill="${p.leaf}" opacity=".88"/>
+          <path d="M310 214 L456 128 L600 214 Z" fill="${p.ground}" opacity=".78"/>
+          <rect x="0" y="220" width="600" height="100" fill="${p.ground}" opacity=".94"/>
+          <line x1="0" y1="230" x2="600" y2="230" stroke="${p.soft}" stroke-width="8" opacity=".2"/>
+        </g>`,
+        minimal:`<g>
+          <path d="M36 224 L126 134 L216 224" fill="none" stroke="${p.soft}" stroke-width="5" opacity=".8"/>
+          <path d="M136 224 L276 100 L416 224" fill="none" stroke="${p.soft}" stroke-width="5" opacity=".9"/>
+          <path d="M314 224 L452 144 L588 224" fill="none" stroke="${p.soft}" stroke-width="5" opacity=".8"/>
+          <line x1="0" y1="232" x2="600" y2="232" stroke="${p.soft}" stroke-width="5" opacity=".7"/>
+          <circle cx="486" cy="82" r="26" fill="none" stroke="${p.soft}" stroke-width="5" opacity=".85"/>
+        </g>`,
+        night:`<g>
+          <circle cx="494" cy="76" r="34" fill="${p.accent}" opacity=".95"/>
+          <path d="M0 214 L122 112 L214 214 Z" fill="${p.soft}" opacity=".2"/>
+          <path d="M116 214 L258 82 L400 214 Z" fill="${p.soft}" opacity=".26"/>
+          <path d="M298 214 L442 126 L600 214 Z" fill="${p.soft}" opacity=".18"/>
+          <path d="M0 226 C106 206 180 246 286 224 C390 204 468 246 600 224 L600 320 L0 320 Z" fill="${p.ground}" opacity=".98"/>
+          <g fill="${p.accent}" opacity=".72"><circle cx="84" cy="48" r="2"/><circle cx="130" cy="70" r="2"/><circle cx="560" cy="44" r="2"/></g>
+        </g>`
+      };
+    case "hotspring":
+      return {
+        photo:`<g>
+          <path d="M0 214 L140 124 L254 214 Z" fill="${p.accent}" opacity=".42"/>
+          <path d="M182 214 L332 96 L486 214 Z" fill="${p.accent}" opacity=".58"/>
+          <path d="M0 234 C120 206 208 254 308 232 C410 210 474 252 600 230 L600 320 L0 320 Z" fill="${p.ground}" opacity=".9"/>
+          <rect x="210" y="174" width="154" height="84" rx="8" fill="${p.soft}" opacity=".95"/>
+          <polygon points="198,180 287,130 376,180" fill="${p.ground}" opacity=".86"/>
+          <rect x="226" y="198" width="28" height="22" fill="${p.accent2}" opacity=".65"/>
+          <rect x="268" y="198" width="28" height="22" fill="${p.accent2}" opacity=".65"/>
+          <rect x="310" y="198" width="28" height="22" fill="${p.accent2}" opacity=".65"/>
+          <path d="M404 176 C396 156 412 146 406 126" stroke="${p.soft}" stroke-width="8" fill="none" stroke-linecap="round" opacity=".82"/>
+          <path d="M432 170 C426 148 444 136 438 116" stroke="${p.soft}" stroke-width="8" fill="none" stroke-linecap="round" opacity=".72"/>
+        </g>`,
+        illustration:`<g>
+          <circle cx="478" cy="76" r="36" fill="${p.accent}" opacity=".94"/>
+          <path d="M0 220 L136 132 L248 220 Z" fill="${p.accent}" opacity=".38"/>
+          <path d="M170 220 L320 98 L472 220 Z" fill="${p.accent2}" opacity=".28"/>
+          <rect x="218" y="176" width="150" height="78" rx="10" fill="${p.soft}" opacity=".96"/>
+          <polygon points="206,182 293,134 380,182" fill="${p.ground}" opacity=".88"/>
+          <path d="M0 236 C118 212 200 254 300 236 C396 218 476 254 600 234 L600 320 L0 320 Z" fill="${p.ground}" opacity=".92"/>
+          <path d="M410 174 C402 156 418 144 412 124" stroke="${p.soft}" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <path d="M438 168 C432 148 448 136 442 118" stroke="${p.soft}" stroke-width="8" fill="none" stroke-linecap="round"/>
+        </g>`,
+        poster:`<g>
+          <circle cx="484" cy="82" r="44" fill="${p.accent}" opacity=".94"/>
+          <rect x="0" y="230" width="600" height="90" fill="${p.ground}" opacity=".94"/>
+          <path d="M0 218 L142 124 L250 218 Z" fill="${p.soft}" opacity=".22"/>
+          <path d="M184 218 L334 92 L490 218 Z" fill="${p.accent2}" opacity=".28"/>
+          <rect x="214" y="174" width="158" height="84" rx="10" fill="${p.soft}" opacity=".96"/>
+          <polygon points="204,182 292,130 382,182" fill="${p.ground}" opacity=".92"/>
+          <path d="M410 172 C402 154 418 142 412 122" stroke="${p.soft}" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <path d="M438 166 C432 146 448 134 442 116" stroke="${p.soft}" stroke-width="9" fill="none" stroke-linecap="round"/>
+        </g>`,
+        minimal:`<g>
+          <line x1="0" y1="236" x2="600" y2="236" stroke="${p.soft}" stroke-width="5" opacity=".8"/>
+          <rect x="220" y="178" width="148" height="74" rx="10" fill="none" stroke="${p.soft}" stroke-width="5" opacity=".9"/>
+          <path d="M210 182 L294 136 L378 182" fill="none" stroke="${p.soft}" stroke-width="5" opacity=".9"/>
+          <path d="M410 172 C402 154 418 142 412 122" stroke="${p.soft}" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M438 166 C432 146 448 134 442 116" stroke="${p.soft}" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <circle cx="486" cy="84" r="26" fill="none" stroke="${p.soft}" stroke-width="5" opacity=".9"/>
+        </g>`,
+        night:`<g>
+          <circle cx="492" cy="78" r="34" fill="${p.accent}" opacity=".92"/>
+          <path d="M0 222 L142 126 L252 222 Z" fill="${p.soft}" opacity=".18"/>
+          <path d="M184 220 L334 92 L490 220 Z" fill="${p.soft}" opacity=".22"/>
+          <rect x="218" y="178" width="152" height="80" rx="10" fill="${p.soft}" opacity=".16"/>
+          <polygon points="206,184 294,132 382,184" fill="${p.soft}" opacity=".18"/>
+          <rect x="0" y="236" width="600" height="84" fill="${p.ground}" opacity=".98"/>
+          <path d="M412 174 C404 156 420 144 414 124" stroke="${p.soft}" stroke-width="8" fill="none" stroke-linecap="round" opacity=".72"/>
+          <path d="M438 168 C432 148 448 136 442 118" stroke="${p.soft}" stroke-width="8" fill="none" stroke-linecap="round" opacity=".66"/>
+        </g>`
+      };
+    case "themepark":
+      return {
+        photo:`<g>
+          <circle cx="480" cy="84" r="42" fill="${p.accent}" opacity=".95"/>
+          <path d="M0 242 C118 210 210 252 308 236 C416 218 482 254 600 232 L600 320 L0 320 Z" fill="${p.ground}" opacity=".92"/>
+          <circle cx="124" cy="194" r="56" fill="none" stroke="${p.soft}" stroke-width="8" opacity=".88"/>
+          <circle cx="124" cy="194" r="6" fill="${p.soft}" opacity=".96"/>
+          <line x1="124" y1="138" x2="124" y2="250" stroke="${p.soft}" stroke-width="6" opacity=".84"/>
+          <line x1="68" y1="194" x2="180" y2="194" stroke="${p.soft}" stroke-width="6" opacity=".84"/>
+          <line x1="84" y1="154" x2="164" y2="234" stroke="${p.soft}" stroke-width="5" opacity=".78"/>
+          <line x1="164" y1="154" x2="84" y2="234" stroke="${p.soft}" stroke-width="5" opacity=".78"/>
+          <rect x="296" y="180" width="112" height="74" rx="8" fill="${p.soft}" opacity=".94"/>
+          <polygon points="288,182 324,150 352,182" fill="${p.soft}" opacity=".95"/>
+          <polygon points="350,182 384,134 418,182" fill="${p.soft}" opacity=".95"/>
+          <rect x="336" y="134" width="6" height="26" fill="${p.accent2}"/>
+          <rect x="392" y="118" width="6" height="26" fill="${p.accent2}"/>
+        </g>`,
+        illustration:`<g>
+          <circle cx="482" cy="82" r="40" fill="${p.accent}" opacity=".96"/>
+          <path d="M0 240 C114 214 206 254 304 238 C408 220 484 256 600 234 L600 320 L0 320 Z" fill="${p.ground}" opacity=".94"/>
+          <circle cx="122" cy="192" r="54" fill="none" stroke="${p.soft}" stroke-width="8" opacity=".9"/>
+          <circle cx="122" cy="192" r="6" fill="${p.soft}" opacity=".96"/>
+          <line x1="122" y1="138" x2="122" y2="246" stroke="${p.soft}" stroke-width="6"/>
+          <line x1="68" y1="192" x2="176" y2="192" stroke="${p.soft}" stroke-width="6"/>
+          <line x1="84" y1="154" x2="160" y2="230" stroke="${p.soft}" stroke-width="5"/>
+          <line x1="160" y1="154" x2="84" y2="230" stroke="${p.soft}" stroke-width="5"/>
+          <rect x="300" y="178" width="114" height="74" rx="8" fill="${p.soft}" opacity=".96"/>
+          <polygon points="292,180 326,148 356,180" fill="${p.soft}" opacity=".96"/>
+          <polygon points="350,180 388,132 426,180" fill="${p.soft}" opacity=".96"/>
+          <rect x="338" y="132" width="6" height="26" fill="${p.accent2}"/>
+          <rect x="394" y="116" width="6" height="26" fill="${p.accent2}"/>
+        </g>`,
+        poster:`<g>
+          <circle cx="480" cy="84" r="46" fill="${p.accent}" opacity=".98"/>
+          <rect x="0" y="236" width="600" height="84" fill="${p.ground}" opacity=".96"/>
+          <circle cx="120" cy="194" r="58" fill="none" stroke="${p.soft}" stroke-width="10" opacity=".9"/>
+          <line x1="120" y1="136" x2="120" y2="252" stroke="${p.soft}" stroke-width="7"/>
+          <line x1="62" y1="194" x2="178" y2="194" stroke="${p.soft}" stroke-width="7"/>
+          <rect x="300" y="176" width="116" height="76" rx="8" fill="${p.soft}" opacity=".98"/>
+          <polygon points="294,178 328,144 358,178" fill="${p.soft}"/>
+          <polygon points="350,178 390,128 430,178" fill="${p.soft}"/>
+          <line x1="0" y1="230" x2="600" y2="230" stroke="${p.accent2}" stroke-width="6" opacity=".26"/>
+        </g>`,
+        minimal:`<g>
+          <circle cx="122" cy="194" r="54" fill="none" stroke="${p.soft}" stroke-width="5" opacity=".92"/>
+          <circle cx="122" cy="194" r="5" fill="${p.soft}" opacity=".96"/>
+          <line x1="122" y1="140" x2="122" y2="248" stroke="${p.soft}" stroke-width="5"/>
+          <line x1="70" y1="194" x2="174" y2="194" stroke="${p.soft}" stroke-width="5"/>
+          <rect x="302" y="178" width="112" height="72" rx="8" fill="none" stroke="${p.soft}" stroke-width="5" opacity=".92"/>
+          <path d="M294 182 L328 150 L356 182" fill="none" stroke="${p.soft}" stroke-width="5"/>
+          <path d="M352 182 L388 134 L424 182" fill="none" stroke="${p.soft}" stroke-width="5"/>
+          <circle cx="486" cy="86" r="28" fill="none" stroke="${p.soft}" stroke-width="5" opacity=".92"/>
+        </g>`,
+        night:`<g>
+          <circle cx="490" cy="82" r="36" fill="${p.accent}" opacity=".94"/>
+          <rect x="0" y="236" width="600" height="84" fill="${p.ground}" opacity=".98"/>
+          <circle cx="122" cy="194" r="54" fill="none" stroke="${p.soft}" stroke-width="8" opacity=".42"/>
+          <line x1="122" y1="140" x2="122" y2="248" stroke="${p.soft}" stroke-width="6" opacity=".42"/>
+          <rect x="302" y="180" width="112" height="72" rx="8" fill="${p.soft}" opacity=".14"/>
+          <polygon points="294,182 328,148 356,182" fill="${p.soft}" opacity=".18"/>
+          <polygon points="352,182 388,134 424,182" fill="${p.soft}" opacity=".18"/>
+          <g fill="${p.soft}" opacity=".72"><circle cx="84" cy="52" r="2"/><circle cx="136" cy="64" r="2"/><circle cx="548" cy="48" r="2"/></g>
+        </g>`
+      };
+    case "snow":
+      return {
+        photo:`<g>
+          <path d="M0 218 L120 110 L220 218 Z" fill="${p.soft}" opacity=".76"/>
+          <path d="M122 218 L274 82 L420 218 Z" fill="${p.soft}" opacity=".92"/>
+          <path d="M312 220 L454 126 L600 220 Z" fill="${p.accent2}" opacity=".42"/>
+          <rect x="0" y="238" width="600" height="82" fill="${p.ground}" opacity=".8"/>
+          <g fill="${p.soft}" opacity=".9">
+            <path d="M86 248 l16 -28 l16 28z"/><rect x="98" y="248" width="6" height="20"/>
+            <path d="M160 252 l14 -24 l14 24z"/><rect x="170" y="252" width="6" height="18"/>
+            <path d="M512 248 l16 -28 l16 28z"/><rect x="524" y="248" width="6" height="20"/>
+          </g>
+          <g fill="${p.soft}" opacity=".92"><circle cx="86" cy="60" r="3"/><circle cx="154" cy="84" r="3"/><circle cx="460" cy="66" r="3"/><circle cx="530" cy="102" r="3"/></g>
+        </g>`,
+        illustration:`<g>
+          <circle cx="486" cy="78" r="34" fill="${p.accent}" opacity=".92"/>
+          <path d="M0 218 L116 114 L212 218 Z" fill="${p.soft}" opacity=".74"/>
+          <path d="M110 220 L266 84 L420 220 Z" fill="${p.soft}" opacity=".96"/>
+          <path d="M304 220 L452 128 L600 220 Z" fill="${p.accent2}" opacity=".44"/>
+          <rect x="0" y="238" width="600" height="82" fill="${p.ground}" opacity=".82"/>
+          <g fill="${p.soft}" opacity=".94"><circle cx="92" cy="56" r="3"/><circle cx="162" cy="86" r="3"/><circle cx="460" cy="68" r="3"/><circle cx="540" cy="98" r="3"/></g>
+        </g>`,
+        poster:`<g>
+          <circle cx="484" cy="80" r="44" fill="${p.accent}" opacity=".96"/>
+          <path d="M0 220 L116 116 L212 220 Z" fill="${p.soft}" opacity=".76"/>
+          <path d="M112 220 L268 82 L424 220 Z" fill="${p.soft}" opacity=".98"/>
+          <path d="M306 220 L456 128 L600 220 Z" fill="${p.accent2}" opacity=".46"/>
+          <rect x="0" y="236" width="600" height="84" fill="${p.ground}" opacity=".9"/>
+          <line x1="0" y1="230" x2="600" y2="230" stroke="${p.soft}" stroke-width="8" opacity=".18"/>
+        </g>`,
+        minimal:`<g>
+          <path d="M34 224 L122 136 L210 224" fill="none" stroke="${p.soft}" stroke-width="5" opacity=".84"/>
+          <path d="M132 224 L276 96 L418 224" fill="none" stroke="${p.soft}" stroke-width="5" opacity=".92"/>
+          <path d="M314 224 L456 144 L590 224" fill="none" stroke="${p.soft}" stroke-width="5" opacity=".82"/>
+          <line x1="0" y1="234" x2="600" y2="234" stroke="${p.soft}" stroke-width="5" opacity=".72"/>
+          <g stroke="${p.soft}" stroke-width="4" opacity=".88">
+            <line x1="88" y1="60" x2="88" y2="76"/><line x1="80" y1="68" x2="96" y2="68"/>
+            <line x1="156" y1="86" x2="156" y2="102"/><line x1="148" y1="94" x2="164" y2="94"/>
+          </g>
+        </g>`,
+        night:`<g>
+          <circle cx="492" cy="78" r="34" fill="${p.accent}" opacity=".9"/>
+          <path d="M0 220 L116 116 L212 220 Z" fill="${p.soft}" opacity=".18"/>
+          <path d="M112 220 L268 82 L424 220 Z" fill="${p.soft}" opacity=".24"/>
+          <path d="M306 220 L456 128 L600 220 Z" fill="${p.soft}" opacity=".16"/>
+          <rect x="0" y="238" width="600" height="82" fill="${p.ground}" opacity=".98"/>
+          <g fill="${p.soft}" opacity=".78"><circle cx="90" cy="58" r="2"/><circle cx="142" cy="80" r="2"/><circle cx="462" cy="68" r="2"/><circle cx="542" cy="100" r="2"/></g>
+        </g>`
+      };
+    default:
+      return {
+        photo:`<g>
+          <path d="M48 112 C92 74 160 74 200 118 C228 148 232 192 202 218 C176 242 136 246 106 230 C58 206 34 152 48 112 Z" fill="${p.soft}" opacity=".92"/>
+          <path d="M116 148 C160 168 206 196 250 228" stroke="${p.accent2}" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="8 16"/>
+          <circle cx="120" cy="144" r="12" fill="${p.accent}"/>
+          <rect x="390" y="142" width="124" height="104" rx="16" fill="${p.ground}" opacity=".84"/>
+          <rect x="412" y="132" width="80" height="20" rx="10" fill="${p.ground}" opacity=".84"/>
+          <rect x="418" y="186" width="68" height="16" rx="8" fill="${p.soft}" opacity=".9"/>
+          <rect x="418" y="210" width="40" height="16" rx="8" fill="${p.soft}" opacity=".9"/>
+        </g>`,
+        illustration:`<g>
+          <path d="M52 114 C96 78 160 78 198 118 C226 146 228 188 202 214 C176 238 138 244 108 228 C62 204 38 150 52 114 Z" fill="${p.soft}" opacity=".92"/>
+          <path d="M118 150 C160 170 206 198 250 230" stroke="${p.accent2}" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="8 16"/>
+          <circle cx="120" cy="146" r="14" fill="${p.accent}"/>
+          <rect x="392" y="144" width="124" height="102" rx="16" fill="${p.ground}" opacity=".88"/>
+          <rect x="414" y="134" width="80" height="18" rx="9" fill="${p.ground}" opacity=".88"/>
+        </g>`,
+        poster:`<g>
+          <circle cx="124" cy="144" r="20" fill="${p.accent}" opacity=".96"/>
+          <path d="M54 116 C96 76 162 76 202 120 C228 150 228 192 202 216 C174 240 136 246 108 230 C62 204 38 150 54 116 Z" fill="${p.soft}" opacity=".9"/>
+          <path d="M122 150 C164 170 206 196 252 230" stroke="${p.accent2}" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="10 16"/>
+          <rect x="390" y="142" width="126" height="104" rx="18" fill="${p.ground}" opacity=".94"/>
+          <line x1="0" y1="238" x2="600" y2="238" stroke="${p.soft}" stroke-width="6" opacity=".2"/>
+        </g>`,
+        minimal:`<g>
+          <path d="M56 118 C98 82 160 82 198 120 C224 148 224 188 198 212 C172 236 138 240 110 226 C66 204 44 154 56 118 Z" fill="none" stroke="${p.soft}" stroke-width="5" opacity=".92"/>
+          <path d="M122 152 C162 170 206 198 250 228" stroke="${p.soft}" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="8 14"/>
+          <circle cx="124" cy="148" r="12" fill="none" stroke="${p.soft}" stroke-width="5" opacity=".92"/>
+          <rect x="392" y="146" width="122" height="100" rx="16" fill="none" stroke="${p.soft}" stroke-width="5" opacity=".92"/>
+        </g>`,
+        night:`<g>
+          <circle cx="494" cy="84" r="34" fill="${p.accent}" opacity=".92"/>
+          <path d="M56 118 C98 82 160 82 198 120 C224 148 224 188 198 212 C172 236 138 240 110 226 C66 204 44 154 56 118 Z" fill="${p.soft}" opacity=".16"/>
+          <path d="M122 152 C162 170 206 198 250 228" stroke="${p.soft}" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="8 14" opacity=".52"/>
+          <rect x="392" y="146" width="122" height="100" rx="16" fill="${p.soft}" opacity=".14"/>
+          <g fill="${p.soft}" opacity=".72"><circle cx="88" cy="58" r="2"/><circle cx="144" cy="78" r="2"/><circle cx="540" cy="50" r="2"/></g>
+        </g>`
+      };
+  }
+}
+
+function buildHeroArt(themeKey="generic",styleKey="photo"){
+  const p=baseHeroPalette(themeKey);
+  const motifs=themeMotif(themeKey,p);
+  const art=motifs[styleKey] || motifs.photo || motifs.illustration;
+  const overlays={
+    photo:`<defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${p.sky1}"/>
+        <stop offset="55%" stop-color="${p.sky2}"/>
+        <stop offset="100%" stop-color="${p.ground}"/>
+      </linearGradient>
+      <filter id="blurGlow"><feGaussianBlur stdDeviation="18"/></filter>
+    </defs>
+    <rect width="600" height="320" fill="url(#bg)"/>
+    <g filter="url(#blurGlow)" opacity=".55">
+      <circle cx="84" cy="78" r="72" fill="${p.accent2}"/>
+      <circle cx="528" cy="44" r="80" fill="${p.soft}"/>
+      <circle cx="430" cy="252" r="110" fill="${p.accent}" opacity=".52"/>
+    </g>`,
+    illustration:`<defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${p.sky1}"/>
+        <stop offset="50%" stop-color="${p.sky2}"/>
+        <stop offset="100%" stop-color="${p.ground}"/>
+      </linearGradient>
+    </defs>
+    <rect width="600" height="320" fill="url(#bg)"/>
+    <rect x="0" y="0" width="600" height="320" fill="${p.soft}" opacity=".08"/>`,
+    poster:`<defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${p.sky2}"/>
+        <stop offset="100%" stop-color="${p.ground}"/>
+      </linearGradient>
+    </defs>
+    <rect width="600" height="320" fill="url(#bg)"/>
+    <circle cx="72" cy="58" r="58" fill="${p.accent2}" opacity=".44"/>
+    <circle cx="544" cy="262" r="90" fill="${p.soft}" opacity=".12"/>`,
+    minimal:`<defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${p.sky1}"/>
+        <stop offset="100%" stop-color="${p.ground}"/>
+      </linearGradient>
+    </defs>
+    <rect width="600" height="320" fill="url(#bg)"/>
+    <rect x="18" y="18" width="564" height="284" rx="24" fill="none" stroke="${p.soft}" stroke-width="3" opacity=".24"/>`,
+    night:`<defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#08111f"/>
+        <stop offset="52%" stop-color="${p.ground}"/>
+        <stop offset="100%" stop-color="#020617"/>
+      </linearGradient>
+      <filter id="nightGlow"><feGaussianBlur stdDeviation="10"/></filter>
+    </defs>
+    <rect width="600" height="320" fill="url(#bg)"/>
+    <g opacity=".42" filter="url(#nightGlow)">
+      <circle cx="520" cy="58" r="78" fill="${p.accent2}"/>
+      <circle cx="84" cy="96" r="64" fill="${p.sky2}"/>
+    </g>`
+  };
+
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 320" preserveAspectRatio="xMidYMid slice">
+    ${overlays[styleKey] || overlays.photo}
+    ${art}
+  </svg>`;
+
+  return svg;
+}
+
+function applyHeroBackground(form){
+  if(!els.heroSection) return;
+
+  const themeKey=detectDestinationTheme(form.destination,form.month);
+  const styleKey=form.heroStyle || "photo";
+  const theme=HERO_THEME_CONFIG[themeKey] || HERO_THEME_CONFIG.generic;
+  const styleLabel=HERO_STYLE_LABELS[styleKey] || "写真風";
+  els.heroSection.dataset.heroTheme=themeKey;
+  els.heroSection.dataset.heroStyle=styleKey;
+
+  els.heroSection.style.backgroundImage="linear-gradient(135deg,#0f172a,#0f766e)";
+  if(els.heroArtLayer){
+    els.heroArtLayer.innerHTML=buildHeroArt(themeKey,styleKey);
+  }
+  if(els.heroSceneNote){
+    els.heroSceneNote.innerHTML=`
+      <span class="hero-note-chip"><strong>背景テーマ</strong>${esc(theme.label)}</span>
+      <span class="hero-note-chip"><strong>テイスト</strong>${esc(styleLabel)}</span>`;
+  }
+}
+
 function getForm(){
+  const month=Math.max(1,Math.min(12,Number(els.travelMonth.value)||1));
   return{
     name:els.tripName.value.trim(),
     days:Math.max(1,Number(els.days.value)||1),
     destination:els.destination.value.trim(),
-    season:els.season.value,
-    adults:Math.max(0,Number(els.adults.value)||0),
+    month,
+    heroStyle:els.heroStyle ? els.heroStyle.value : "photo",
+    coverMode,
+    coverPreset,
+    season:monthToSeason(month),
+    adults:Math.max(1,Number(els.adults.value)||1),
     children:Math.max(0,Number(els.children.value)||0),
-    ages:els.ages.value.trim(),
+    ages:getChildAgeValues().join(","),
+    childAges:[...childAges],
     transport:getTransportValues(),
     adultNames:[...adultNames],
-    childNames:[...childNames]
+    childNames:[...childNames],
+    memo:els.travelMemo ? els.travelMemo.value : ""
   }
 }
 function setForm(form={}){
   els.tripName.value=form.name||"";
-  els.days.value=form.days||2;
+
+  const days=Math.max(1,Math.min(14,Number(form.days)||2));
+  els.days.value=String(days);
+
   els.destination.value=form.destination||"";
-  els.season.value=form.season||"春";
-  els.adults.value=form.adults??2;
-  els.children.value=form.children??0;
-  els.ages.value=form.ages||"";
+  els.travelMonth.value=String(normalizeTravelMonth(form));
+  if(els.heroStyle) els.heroStyle.value=form.heroStyle||"photo";
+  coverMode=form.coverMode||"auto";
+  coverPreset=form.coverPreset||"beach";
+
+  const adults=Math.max(1,Math.min(10,Number(form.adults??2)||1));
+  const children=Math.max(0,Math.min(10,Number(form.children??0)||0));
+  els.adults.value=String(adults);
+  els.children.value=String(children);
+
   setTransportValues(form.transport||["車"]);
   adultNames=Array.isArray(form.adultNames)?[...form.adultNames]:[];
   childNames=Array.isArray(form.childNames)?[...form.childNames]:[];
+  childAges=normalizeLegacyAges(form);
+
+  if(els.travelMemo) els.travelMemo.value=form.memo||"";
+
+  renderChildAgeFields();
   renderNameFields();
 }
 
@@ -1858,6 +3303,11 @@ function renderNameFields(){
     card.className="person-card";
     card.innerHTML='<div class="title">大人'+(i+1)+'の名前</div>';
     const input=document.createElement("input");
+    input.lang="ja";
+    input.inputMode="text";
+    input.autocomplete="off";
+    input.autocapitalize="off";
+    input.spellcheck=false;
     input.placeholder=i===0?"例：たろう":i===1?"例：はなこ":`例：大人${i+1}の名前`;
     input.value=adultNames[i];
     input.addEventListener("input",()=>{
@@ -1874,6 +3324,11 @@ function renderNameFields(){
     card.className="person-card";
     card.innerHTML='<div class="title">子ども'+(i+1)+'の名前</div>';
     const input=document.createElement("input");
+    input.lang="ja";
+    input.inputMode="text";
+    input.autocomplete="off";
+    input.autocapitalize="off";
+    input.spellcheck=false;
     input.placeholder=i===0?"例：はる":i===1?"例：ゆう":`例：子ども${i+1}の名前`;
     input.value=childNames[i];
     input.addEventListener("input",()=>{
@@ -1909,6 +3364,7 @@ function refreshPeopleSelect(){
     els.addPerson.appendChild(opt);
   });
   if([...els.addPerson.options].some(o=>o.value===current))els.addPerson.value=current;
+  if(typeof refreshSharePeopleSelect==="function") refreshSharePeopleSelect();
 }
 function refreshTripUI(){
   const ids=Object.keys(trips).sort((a,b)=>(trips[b].updatedAt||0)-(trips[a].updatedAt||0));
@@ -1932,7 +3388,7 @@ function refreshTripUI(){
       const box=document.createElement("div");
       box.className="trip-card";
       box.innerHTML=`<strong>${esc(trip.form?.name||"名前なし旅行")}</strong>
-        <div class="meta">${esc(trip.form?.destination||"-")} / ${trip.form?.days||"-"}日 / 持ち物 ${Array.isArray(trip.items)?trip.items.length:0}件</div>`;
+        <div class="meta">${esc(trip.form?.destination||"-")} / ${esc(travelDaysLabel(trip.form?.days||1))} / 持ち物 ${Array.isArray(trip.items)?trip.items.length:0}件</div>`;
       const btn=document.createElement("button");
       btn.className="btn btn-outline btn-sm";
       btn.textContent="この旅行を開く";
@@ -2008,12 +3464,208 @@ function generateItems(){
     showStatus("持ち物リストを作りました。旅行名を入力すると自動保存されます。","warn");
   }
 }
+
+function refreshSharePeopleSelect(){
+  if(!els.sharePerson) return;
+
+  const current=els.sharePerson.value;
+  const people=getPeople();
+
+  els.sharePerson.innerHTML="";
+  people.forEach(person=>{
+    const opt=document.createElement("option");
+    opt.value=person;
+    opt.textContent=person;
+    els.sharePerson.appendChild(opt);
+  });
+
+  if([...els.sharePerson.options].some(o=>o.value===current)){
+    els.sharePerson.value=current;
+  }
+
+  const personMode=els.shareScope?.value==="person";
+  els.sharePerson.disabled=!personMode;
+  els.sharePersonField?.classList.toggle("is-disabled",!personMode);
+}
+
+function shareHeaderLines(form){
+  const people=(Number(form.adults)||0)+(Number(form.children)||0);
+  return [
+    `【旅行】${form.name||"旅行準備"}`,
+    `行き先：${form.destination||"未設定"}`,
+    `旅行日数：${travelDaysLabel(form.days)}`,
+    `旅行月：${form.month?`${form.month}月`:"未設定"}`,
+    `移動：${transportText(form.transport)}`,
+    `参加：大人${Number(form.adults)||0}人 / 子ども${Number(form.children)||0}人（合計${people}人）`
+  ];
+}
+
+function itemLine(item,showChecked=true){
+  const mark=showChecked ? (item.checked?"☑":"☐") : "・";
+  const qty=Number(item.qty)||1;
+  return `${mark} ${item.name}${qty>1?` ×${qty}`:""}`;
+}
+
+function groupItemsForShare(items){
+  const map=new Map();
+  items.forEach(item=>{
+    if(!map.has(item.group)) map.set(item.group,[]);
+    map.get(item.group).push(item);
+  });
+  return map;
+}
+
+function buildShareText(){
+  const form=getForm();
+  const scope=els.shareScope?.value||"all";
+  const memo=(form.memo||"").trim();
+  const total=currentItems.length;
+  const done=currentItems.filter(i=>i.checked).length;
+  const remain=total-done;
+  const rate=total?Math.round(done/total*100):0;
+
+  if(scope==="memo"){
+    const lines=[
+      `【${form.name||"旅行準備"}｜メモ】`,
+      "",
+      memo||"（メモはまだありません）"
+    ];
+    return lines.join("\n");
+  }
+
+  let targetItems=currentItems;
+  let title="持ち物";
+
+  if(scope==="unchecked"){
+    targetItems=currentItems.filter(i=>!i.checked);
+    title="未準備";
+  }else if(scope==="person"){
+    const person=els.sharePerson?.value||"共通";
+    targetItems=currentItems.filter(i=>i.group===person);
+    title=`${person}の持ち物`;
+  }
+
+  const lines=[
+    ...shareHeaderLines(form),
+    "",
+    "【準備状況】",
+    `準備済み：${done}/${total}（${rate}%）`,
+    `未準備：${remain}`,
+  ];
+
+  if(memo){
+    lines.push("","【メモ】",memo);
+  }
+
+  lines.push("",`【${title}】`);
+
+  if(!targetItems.length){
+    lines.push(scope==="unchecked" ? "未準備の持ち物はありません。" : "持ち物はまだありません。");
+    return lines.join("\n");
+  }
+
+  const groups=groupItemsForShare(targetItems);
+  groups.forEach((items,group)=>{
+    lines.push("",`■ ${group}`);
+    items.forEach(item=>{
+      lines.push(itemLine(item,scope!=="unchecked"));
+    });
+  });
+
+  return lines.join("\n").trim();
+}
+
+function renderSharePreview(){
+  if(!els.sharePreview) return;
+  refreshSharePeopleSelect();
+  els.sharePreview.value=buildShareText();
+}
+
+function safeShareFilename(){
+  const form=getForm();
+  const base=(form.name||"旅行もちものリスト")
+    .replace(/[\\/:*?"<>|]/g,"_")
+    .trim() || "旅行もちものリスト";
+  return `${base}_共有用.txt`;
+}
+
+async function copyShareText(){
+  const text=buildShareText();
+
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(text);
+    }else{
+      const ta=document.createElement("textarea");
+      ta.value=text;
+      ta.style.position="fixed";
+      ta.style.left="-9999px";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      const ok=document.execCommand("copy");
+      ta.remove();
+      if(!ok) throw new Error("copy failed");
+    }
+
+    els.shareStatus.className="status saved";
+    els.shareStatus.textContent="共有用テキストをコピーしました。LINEやメールに貼り付けられます。";
+  }catch(e){
+    els.shareStatus.className="status warn";
+    els.shareStatus.textContent="自動コピーできませんでした。上の共有用テキストを長押ししてコピーしてください。";
+  }
+}
+
+async function shareTripText(){
+  const text=buildShareText();
+  const title=getForm().name ? `${getForm().name}｜旅行準備` : "旅行準備";
+
+  if(navigator.share){
+    try{
+      await navigator.share({title,text});
+      els.shareStatus.className="status saved";
+      els.shareStatus.textContent="共有メニューを開きました。送りたいアプリを選んでください。";
+      return;
+    }catch(e){
+      if(e && e.name==="AbortError"){
+        els.shareStatus.className="status info";
+        els.shareStatus.textContent="共有をキャンセルしました。";
+        return;
+      }
+    }
+  }
+
+  await copyShareText();
+  if(!navigator.share){
+    els.shareStatus.className="status info";
+    els.shareStatus.textContent="このブラウザでは共有メニューを直接開けないため、テキストをコピーしました。LINEやメールへ貼り付けてください。";
+  }
+}
+
+function downloadShareText(){
+  const text=buildShareText();
+  const blob=new Blob([text],{type:"text/plain;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=safeShareFilename();
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+
+  els.shareStatus.className="status saved";
+  els.shareStatus.textContent="共有用テキストをTXTファイルとして保存しました。";
+}
+
+
 function renderAll(){
   renderList();
   renderFamilyCompare();
   renderTripCompare();
   renderSummary();
   renderContext();
+  renderSharePreview();
 }
 
 let itemDragState=null;
@@ -2358,7 +4010,7 @@ function renderTripCompare(){
     const remain=total-done;
     const rate=total?Math.round(done/total*100):0;
     const people=(Number(form.adults)||0)+(Number(form.children)||0);
-    html+=`<tr><td><strong>${esc(form.name||"名前なし旅行")}</strong></td><td>${esc(form.destination||"-")}</td><td>${form.days||"-"}日</td><td>${people}人</td><td>${total}</td><td>${done}</td><td>${remain}</td><td>${rate}%</td></tr>`;
+    html+=`<tr><td><strong>${esc(form.name||"名前なし旅行")}</strong></td><td>${esc(form.destination||"-")}</td><td>${esc(travelDaysLabel(form.days||1))}</td><td>${people}人</td><td>${total}</td><td>${done}</td><td>${remain}</td><td>${rate}%</td></tr>`;
   });
   html+='</tbody></table></div>';
   els.tripCompareArea.innerHTML=html;
@@ -2374,23 +4026,25 @@ function renderContext(){
   els.heroTripName.textContent=f.name?f.name:"旅行準備を、もっと軽やかに。";
   els.heroDescription.textContent=f.name
     ?`${f.destination||"行き先未設定"}への旅行準備を管理中。持ち物の編集・家族別チェック・旅行比較まで、この画面で完結します。`
-    :"日数・季節・移動手段・家族構成に合わせて、必要な持ち物を整理。旅行ごとの保存や家族別の準備状況まで、1画面で確認できます。";
+    :"日数・旅行月・移動手段・家族構成に合わせて、必要な持ち物を整理。旅行ごとの保存や家族別の準備状況まで、1画面で確認できます。";
 
   const meta=[];
   if(f.destination)meta.push(f.destination);
-  meta.push(`${f.days}日`);
+  meta.push(travelDaysLabel(f.days));
   meta.push(`${people}人`);
-  meta.push(f.season);
+  meta.push(`${f.month}月`);
   meta.push(transportText(f.transport));
   els.heroMeta.innerHTML=meta.map(x=>`<span class="hero-chip">${esc(x)}</span>`).join("");
+  applyHeroBackground(f);
 
   const snapshot=[
     ["旅行名",f.name||"未設定"],
     ["行き先",f.destination||"未設定"],
-    ["日数",`${f.days}日`],
+    ["旅行日数",travelDaysLabel(f.days)],
     ["人数",`${people}人`],
-    ["季節",f.season],
-    ["移動",transportText(f.transport)]
+    ["旅行月",`${f.month}月`],
+    ["移動",transportText(f.transport)],
+    ["背景",HERO_STYLE_LABELS[f.heroStyle||"photo"]||"写真風"]
   ];
   els.tripSnapshot.innerHTML='<div class="summary-grid" style="grid-template-columns:1fr 1fr">'+snapshot.map(([k,v])=>`<div class="summary"><span>${esc(k)}</span><strong style="font-size:16px">${esc(v)}</strong></div>`).join("")+'</div>';
 
@@ -2462,7 +4116,7 @@ function initTabs(){
 function makeBackupPayload(){
   return {
     app:"family-travel-packing-list",
-    version:10,
+    version:10.11,
     exportedAt:new Date().toISOString(),
     trips:deepCopy(trips),
     lastTripId:currentTripId||null
@@ -2521,7 +4175,7 @@ async function importBackup(file){
     els.backupStatus.textContent=`復元が完了しました。旅行 ${count}件 を読み込みました。`;
   }catch(e){
     els.backupStatus.className="status danger";
-    els.backupStatus.textContent="バックアップを読み込めませんでした。v10で書き出したJSONファイルか確認してください。";
+    els.backupStatus.textContent="バックアップを読み込めませんでした。このアプリで書き出したJSONファイルか確認してください。";
   }
 }
 
@@ -2578,7 +4232,7 @@ function newTrip(){
   adultNames=[];
   childNames=[];
   hasUnsavedNewTrip=false;
-  setForm({name:"",days:2,destination:"",season:"春",adults:2,children:0,ages:"",transport:["車"],adultNames:[],childNames:[]});
+  setForm({name:"",days:2,destination:"",month:new Date().getMonth()+1,heroStyle:"photo",coverMode:"auto",coverPreset:"beach",adults:2,children:0,ages:"",childAges:[],transport:["車"],adultNames:[],childNames:[],memo:""});
   refreshPeopleSelect();
   renderAll();
   refreshTripUI();
@@ -2591,6 +4245,7 @@ function deleteTrip(){
   const deletingTripId=currentTripId;
   delete trips[currentTripId];
   deleteAttachmentsForTrip(deletingTripId).catch(()=>{});
+  deleteCoverFromDb(deletingTripId).catch(()=>{});
   currentTripId=null;
   writeStorage();
   refreshTripUI();
@@ -2608,16 +4263,27 @@ function addCustomItem(){
   if(!getForm().name)showStatus("旅行名を入力すると、この内容は自動保存されます。","warn");
 }
 
-["tripName","days","destination","adults","children","ages"].forEach(id=>{
-  $(id).addEventListener("input",()=>{
-    if(id==="adults"||id==="children"){
-      renderNameFields();
-      refreshPeopleSelect();
-    }
-    markChanged();
-  });
+["tripName","destination"].forEach(id=>{
+  $(id).addEventListener("input",markChanged);
 });
-$("season").addEventListener("change",markChanged);
+
+$("days").addEventListener("change",markChanged);
+
+$("adults").addEventListener("change",()=>{
+  renderNameFields();
+  refreshPeopleSelect();
+  markChanged();
+});
+
+$("children").addEventListener("change",()=>{
+  renderChildAgeFields();
+  renderNameFields();
+  refreshPeopleSelect();
+  markChanged();
+});
+
+$("travelMonth").addEventListener("change",markChanged);
+$("heroStyle").addEventListener("change",markChanged);
 
 
 ["transportCar","transportTrain","transportPlane"].forEach(id=>{
@@ -2631,7 +4297,7 @@ $("season").addEventListener("change",markChanged);
   });
 });
 
-$("updateNameFieldsBtn").addEventListener("click",()=>{renderNameFields();refreshPeopleSelect();showStatus("名前入力欄を更新しました。","info")});
+$("updateNameFieldsBtn").addEventListener("click",()=>{renderChildAgeFields();renderNameFields();refreshPeopleSelect();showStatus("家族の入力欄を更新しました。","info")});
 $("refreshPeopleBtn").addEventListener("click",()=>{refreshPeopleSelect();showStatus("追加先一覧を更新しました。","info")});
 $("generateBtn").addEventListener("click",generateItems);
 $("showUncheckedBtn").addEventListener("click",()=>{filterMode="unchecked";renderList()});
@@ -2676,6 +4342,22 @@ els.attachmentInput.addEventListener("change",async()=>{
 });
 
 
+
+els.travelMemo.addEventListener("input",()=>{
+  markChanged();
+  renderSharePreview();
+});
+
+els.shareScope.addEventListener("change",()=>{
+  refreshSharePeopleSelect();
+  renderSharePreview();
+});
+
+els.sharePerson.addEventListener("change",renderSharePreview);
+$("shareTextBtn").addEventListener("click",shareTripText);
+$("copyShareBtn").addEventListener("click",copyShareText);
+$("downloadShareBtn").addEventListener("click",downloadShareText);
+
 $("exportBackupBtn").addEventListener("click",exportBackup);
 $("importBackupInput").addEventListener("change",async()=>{
   const file=$("importBackupInput").files?.[0];
@@ -2707,6 +4389,333 @@ const ids=Object.keys(trips).sort((a,b)=>(trips[b].updatedAt||0)-(trips[a].updat
 if(currentTripId&&trips[currentTripId])loadTrip(currentTripId);
 else if(ids.length)loadTrip(ids[0]);
 else newTrip();
+
+/* ===== v10.11 背景テーマ拡張パッチ ===== */
+Object.assign(HERO_THEME_CONFIG,{
+  overseas:{label:"海外旅行",sky1:"#93c5fd",sky2:"#0ea5e9",ground:"#082f49",accent:"#f59e0b",accent2:"#f43f5e",soft:"#e0f2fe",leaf:"#67e8f9"},
+  shinkansen:{label:"新幹線旅",sky1:"#dbeafe",sky2:"#3b82f6",ground:"#0f172a",accent:"#f8fafc",accent2:"#06b6d4",soft:"#eff6ff",leaf:"#93c5fd"},
+  drive:{label:"ドライブ旅",sky1:"#bfdbfe",sky2:"#0ea5e9",ground:"#1e293b",accent:"#f59e0b",accent2:"#22c55e",soft:"#e0f2fe",leaf:"#86efac"},
+  hotel:{label:"ホテルステイ",sky1:"#ddd6fe",sky2:"#7c3aed",ground:"#2e1065",accent:"#f5d0fe",accent2:"#f59e0b",soft:"#f5f3ff",leaf:"#c4b5fd"},
+  glamping:{label:"グランピング",sky1:"#fde68a",sky2:"#f97316",ground:"#3f3f46",accent:"#fef3c7",accent2:"#22c55e",soft:"#fff7ed",leaf:"#86efac"},
+  aquarium:{label:"水族館",sky1:"#a5f3fc",sky2:"#0891b2",ground:"#083344",accent:"#67e8f9",accent2:"#60a5fa",soft:"#ecfeff",leaf:"#22d3ee"},
+  zoo:{label:"動物園",sky1:"#bbf7d0",sky2:"#16a34a",ground:"#14532d",accent:"#fcd34d",accent2:"#fb7185",soft:"#f0fdf4",leaf:"#4ade80"},
+  autumn:{label:"紅葉",sky1:"#fed7aa",sky2:"#ea580c",ground:"#7c2d12",accent:"#facc15",accent2:"#ef4444",soft:"#ffedd5",leaf:"#fb923c"},
+  spring:{label:"春のおでかけ",sky1:"#fce7f3",sky2:"#f472b6",ground:"#701a75",accent:"#f9a8d4",accent2:"#a7f3d0",soft:"#fdf2f8",leaf:"#fbcfe8"},
+  christmas:{label:"クリスマス・冬イベント",sky1:"#d1fae5",sky2:"#059669",ground:"#052e16",accent:"#ef4444",accent2:"#f8fafc",soft:"#ecfdf5",leaf:"#22c55e"}
+});
+
+function mapThemeMotifBase(themeKey){
+  switch(themeKey){
+    case "overseas": return "city";
+    case "shinkansen": return "city";
+    case "drive": return "nature";
+    case "hotel": return "city";
+    case "glamping": return "nature";
+    case "aquarium": return "beach";
+    case "zoo": return "nature";
+    case "autumn": return "nature";
+    case "spring": return "nature";
+    case "christmas": return "themepark";
+    default: return themeKey;
+  }
+}
+
+function detectDestinationTheme(destination="",month=1){
+  const text=String(destination||"").toLowerCase();
+  const rules=[
+    {key:"christmas",words:["クリスマス","いるみ","イルミ","イルミネーション","冬イベント","christmas","xmas"]},
+    {key:"overseas",words:["海外","かいがい","韓国","ソウル","台湾","台北","香港","ハワイ","グアム","シンガポール","バリ","パリ","ロンドン","ニューヨーク"]},
+    {key:"shinkansen",words:["新幹線","しんかんせん","のぞみ","はやぶさ","こまち","やまびこ","つばさ","かがやき"]},
+    {key:"drive",words:["ドライブ","車旅","くるま旅","ロードトリップ","サービスエリア","道の駅"]},
+    {key:"hotel",words:["ホテル","ホテルステイ","ラグジュアリー","ステイ","宿泊","リゾートホテル"]},
+    {key:"glamping",words:["グランピング","コテージ","テント","キャンプ場"]},
+    {key:"aquarium",words:["水族館","すいぞくかん","アクアリウム","イルカ","クラゲ"]},
+    {key:"zoo",words:["動物園","どうぶつえん","サファリ","牧場"]},
+    {key:"autumn",words:["紅葉","もみじ","秋旅","紅葉狩り"]},
+    {key:"spring",words:["春","お花見","桜","さくら","菜の花","春休み"]},
+    {key:"themepark",words:["usj","ユニバ","ゆにば","ディズニー","でぃずにー","テーマパーク","遊園地","ニンテンドー","ランド","シー"]},
+    {key:"beach",words:["沖縄","おきなわ","海","ビーチ","宮古","石垣","リゾート","プール"]},
+    {key:"hotspring",words:["温泉","おんせん","草津","箱根","熱海","鬼怒川","有馬","別府","伊香保","湯"]},
+    {key:"snow",words:["スキー","雪","ゲレンデ","スノボ","冬山","苗場","蔵王","白馬"]},
+    {key:"nature",words:["那須","なす","軽井沢","高原","山","森","渓谷","キャンプ","湖","北海道","富良野","上高地","日光"]},
+    {key:"city",words:["東京","とうきょう","大阪","おおさか","京都","きょうと","横浜","よこはま","名古屋","なごや","福岡","ふくおか","神戸","こうべ","札幌","さっぽろ","仙台","せんだい","博多"]}
+  ];
+  for(const rule of rules){
+    if(rule.words.some(word=>text.includes(word.toLowerCase()))) return rule.key;
+  }
+
+  const m=Number(month);
+  if(m===12 && text) return "christmas";
+  if([3,4].includes(m) && text) return "spring";
+  if([10,11].includes(m) && text) return "autumn";
+  if([12,1,2].includes(m) && text) return "snow";
+  return "generic";
+}
+
+function buildHeroArt(themeKey="generic",styleKey="photo"){
+  const p=baseHeroPalette(themeKey);
+  const baseKey=mapThemeMotifBase(themeKey);
+  const motifs=themeMotif(baseKey,p);
+  const art=motifs[styleKey] || motifs.photo || motifs.illustration;
+
+  const overlays={
+    photo:`<defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${p.sky1}"/>
+        <stop offset="55%" stop-color="${p.sky2}"/>
+        <stop offset="100%" stop-color="${p.ground}"/>
+      </linearGradient>
+      <filter id="blurGlow"><feGaussianBlur stdDeviation="18"/></filter>
+    </defs>
+    <rect width="600" height="320" fill="url(#bg)"/>
+    <g filter="url(#blurGlow)" opacity=".55">
+      <circle cx="84" cy="78" r="72" fill="${p.accent2}"/>
+      <circle cx="528" cy="44" r="80" fill="${p.soft}"/>
+      <circle cx="430" cy="252" r="110" fill="${p.accent}" opacity=".52"/>
+    </g>`,
+    illustration:`<defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${p.sky1}"/>
+        <stop offset="50%" stop-color="${p.sky2}"/>
+        <stop offset="100%" stop-color="${p.ground}"/>
+      </linearGradient>
+    </defs>
+    <rect width="600" height="320" fill="url(#bg)"/>
+    <rect x="0" y="0" width="600" height="320" fill="${p.soft}" opacity=".08"/>`,
+    poster:`<defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${p.sky2}"/>
+        <stop offset="100%" stop-color="${p.ground}"/>
+      </linearGradient>
+    </defs>
+    <rect width="600" height="320" fill="url(#bg)"/>
+    <circle cx="72" cy="58" r="58" fill="${p.accent2}" opacity=".44"/>
+    <circle cx="544" cy="262" r="90" fill="${p.soft}" opacity=".12"/>`,
+    minimal:`<defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${p.sky1}"/>
+        <stop offset="100%" stop-color="${p.ground}"/>
+      </linearGradient>
+    </defs>
+    <rect width="600" height="320" fill="url(#bg)"/>
+    <rect x="18" y="18" width="564" height="284" rx="24" fill="none" stroke="${p.soft}" stroke-width="3" opacity=".24"/>`,
+    night:`<defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#08111f"/>
+        <stop offset="52%" stop-color="${p.ground}"/>
+        <stop offset="100%" stop-color="#020617"/>
+      </linearGradient>
+      <filter id="nightGlow"><feGaussianBlur stdDeviation="10"/></filter>
+    </defs>
+    <rect width="600" height="320" fill="url(#bg)"/>
+    <g opacity=".42" filter="url(#nightGlow)">
+      <circle cx="520" cy="58" r="78" fill="${p.accent2}"/>
+      <circle cx="84" cy="96" r="64" fill="${p.sky2}"/>
+    </g>`
+  };
+
+  const extras={
+    overseas:`<g opacity=".95"><circle cx="104" cy="88" r="14" fill="${p.accent}"/><path d="M120 104 C176 74 242 86 280 132" stroke="${p.soft}" stroke-width="7" fill="none" stroke-linecap="round" stroke-dasharray="8 12"/></g>`,
+    shinkansen:`<g opacity=".95"><rect x="110" y="232" width="310" height="20" rx="10" fill="${p.soft}" opacity=".18"/><path d="M138 206 h220 c24 0 48 6 68 14 c-20 8-44 14-68 14 h-220 c-8 0-14-6-14-14 s6-14 14-14z" fill="${p.accent}" opacity=".22"/></g>`,
+    drive:`<g opacity=".92"><path d="M0 250 H600" stroke="${p.soft}" stroke-width="6" stroke-dasharray="18 18" opacity=".42"/></g>`,
+    hotel:`<g opacity=".92"><rect x="430" y="118" width="86" height="22" rx="11" fill="${p.accent}" opacity=".24"/></g>`,
+    glamping:`<g opacity=".95"><circle cx="452" cy="176" r="16" fill="${p.accent}" opacity=".96"/><g opacity=".34"><circle cx="452" cy="176" r="34" fill="${p.accent}"/><circle cx="452" cy="176" r="52" fill="${p.accent}"/></g></g>`,
+    aquarium:`<g opacity=".9"><circle cx="116" cy="86" r="18" fill="${p.soft}" opacity=".4"/><circle cx="154" cy="118" r="12" fill="${p.soft}" opacity=".32"/><circle cx="492" cy="92" r="12" fill="${p.soft}" opacity=".3"/></g>`,
+    zoo:`<g opacity=".94"><circle cx="132" cy="134" r="16" fill="${p.soft}" opacity=".2"/><circle cx="176" cy="134" r="16" fill="${p.soft}" opacity=".2"/></g>`,
+    autumn:`<g opacity=".9"><circle cx="150" cy="154" r="22" fill="${p.accent2}" opacity=".38"/><circle cx="214" cy="154" r="22" fill="${p.accent}" opacity=".38"/></g>`,
+    spring:`<g opacity=".9"><circle cx="160" cy="156" r="22" fill="${p.accent}" opacity=".28"/><circle cx="220" cy="156" r="22" fill="${p.accent2}" opacity=".28"/></g>`,
+    christmas:`<g opacity=".95"><circle cx="300" cy="98" r="10" fill="${p.accent2}"/><circle cx="270" cy="178" r="6" fill="${p.accent}" opacity=".9"/><circle cx="326" cy="196" r="6" fill="${p.accent}" opacity=".9"/></g>`
+  };
+
+  const extraArt=extras[themeKey] || "";
+
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 320" preserveAspectRatio="xMidYMid slice">
+    ${overlays[styleKey] || overlays.photo}
+    ${art}
+    ${extraArt}
+  </svg>`;
+
+  return svg;
+}
+/* ===== /v10.11 背景テーマ拡張パッチ ===== */
+
+
+/* ===== v10.11 Notion風カバー ===== */
+function updateCoverChoiceUI(){
+  document.querySelectorAll(".cover-choice").forEach(btn=>{
+    const auto=btn.dataset.coverMode==="auto";
+    const preset=btn.dataset.coverPreset;
+    const active=(auto && coverMode==="auto") || (preset && coverMode==="preset" && preset===coverPreset);
+    btn.classList.toggle("active",active);
+  });
+}
+
+function clearCurrentCoverObjectUrl(){
+  if(currentCoverObjectUrl){
+    try{URL.revokeObjectURL(currentCoverObjectUrl)}catch(e){}
+    currentCoverObjectUrl=null;
+  }
+}
+
+async function renderPageCover(form=getForm()){
+  if(!els.coverArtLayer) return;
+
+  clearCurrentCoverObjectUrl();
+  const tripAtStart=currentTripId;
+  const styleKey=form.heroStyle||"photo";
+
+  if(coverMode==="custom" && tripAtStart){
+    try{
+      const record=await getCoverFromDb(tripAtStart);
+      if(tripAtStart!==currentTripId) return;
+      if(record?.blob){
+        currentCoverObjectUrl=URL.createObjectURL(record.blob);
+        const img=document.createElement("img");
+        img.src=currentCoverObjectUrl;
+        img.alt="";
+        els.coverArtLayer.innerHTML="";
+        els.coverArtLayer.appendChild(img);
+        els.coverModeBadge.textContent="アップロード画像";
+        updateCoverChoiceUI();
+        return;
+      }
+    }catch(e){}
+  }
+
+  if(coverMode==="preset"){
+    const key=HERO_THEME_CONFIG[coverPreset] ? coverPreset : "beach";
+    els.coverArtLayer.innerHTML=buildHeroArt(key,styleKey);
+    els.coverModeBadge.textContent=`プリセット：${HERO_THEME_CONFIG[key]?.label||"カバー"}`;
+    updateCoverChoiceUI();
+    return;
+  }
+
+  const themeKey=detectDestinationTheme(form.destination,form.month);
+  els.coverArtLayer.innerHTML=buildHeroArt(themeKey,styleKey);
+  els.coverModeBadge.textContent=`自動：${HERO_THEME_CONFIG[themeKey]?.label||"旅行"}`;
+  updateCoverChoiceUI();
+}
+
+function applyHeroBackground(form){
+  if(!els.heroSection) return;
+
+  const themeKey=detectDestinationTheme(form.destination,form.month);
+  const styleKey=form.heroStyle||"photo";
+  const styleLabel=HERO_STYLE_LABELS[styleKey]||"写真風";
+
+  els.heroSection.style.backgroundImage="linear-gradient(135deg,#0f172a,#0f766e)";
+  if(els.heroArtLayer) els.heroArtLayer.innerHTML="";
+
+  renderPageCover(form);
+
+  if(els.heroSceneNote){
+    let coverText="";
+    if(coverMode==="custom"){
+      coverText="アップロード画像";
+    }else if(coverMode==="preset"){
+      coverText=HERO_THEME_CONFIG[coverPreset]?.label||"プリセット";
+    }else{
+      coverText=`自動：${HERO_THEME_CONFIG[themeKey]?.label||"旅行"}`;
+    }
+    els.heroSceneNote.innerHTML=`
+      <span class="hero-note-chip"><strong>カバー</strong>${esc(coverText)}</span>
+      <span class="hero-note-chip"><strong>テイスト</strong>${esc(styleLabel)}</span>`;
+  }
+}
+
+function setCoverStatus(text,type="info"){
+  if(!els.coverStatus) return;
+  els.coverStatus.className=`status ${type}`;
+  els.coverStatus.textContent=text;
+}
+
+$("changeCoverBtn").addEventListener("click",()=>{
+  els.coverPicker.hidden=!els.coverPicker.hidden;
+  if(!els.coverPicker.hidden){
+    updateCoverChoiceUI();
+    els.coverPicker.scrollIntoView({behavior:"smooth",block:"nearest"});
+  }
+});
+
+$("closeCoverPickerBtn").addEventListener("click",()=>{
+  els.coverPicker.hidden=true;
+});
+
+document.querySelectorAll(".cover-choice").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    if(btn.dataset.coverMode==="auto"){
+      coverMode="auto";
+      markChanged();
+      renderPageCover(getForm());
+      setCoverStatus("行き先に合わせてカバーを自動で切り替えます。","saved");
+      return;
+    }
+
+    if(btn.dataset.coverPreset){
+      coverMode="preset";
+      coverPreset=btn.dataset.coverPreset;
+      markChanged();
+      renderPageCover(getForm());
+      setCoverStatus(`「${btn.querySelector("strong")?.textContent||"プリセット"}」のカバーを選びました。`,"saved");
+    }
+  });
+});
+
+els.coverUploadInput.addEventListener("change",async()=>{
+  const file=els.coverUploadInput.files?.[0];
+  els.coverUploadInput.value="";
+  if(!file) return;
+
+  if(!file.type.startsWith("image/")){
+    setCoverStatus("画像ファイルを選んでください。","warn");
+    return;
+  }
+
+  if(file.size>15*1024*1024){
+    setCoverStatus("画像が大きすぎます。15MB以下の画像を選んでください。","warn");
+    return;
+  }
+
+  if(!getForm().name){
+    setCoverStatus("先に旅行名を入力してください。旅行名を保存してからカバー画像を追加できます。","warn");
+    els.tripName.focus();
+    return;
+  }
+
+  if(!currentTripId || !trips[currentTripId]){
+    smartAutoSave();
+  }
+
+  if(!currentTripId || !trips[currentTripId]){
+    setCoverStatus("旅行を保存できませんでした。先に旅行名を保存してください。","warn");
+    return;
+  }
+
+  try{
+    await saveCoverToDb(currentTripId,file);
+    coverMode="custom";
+    scheduleAutoSave();
+    await renderPageCover(getForm());
+    setCoverStatus(`「${file.name}」をこの旅行のカバーに設定しました。`,"saved");
+    els.coverPicker.hidden=true;
+  }catch(e){
+    setCoverStatus("カバー画像の保存に失敗しました。別の画像で試してください。","danger");
+  }
+});
+
+$("removeCustomCoverBtn").addEventListener("click",async()=>{
+  if(currentTripId){
+    try{await deleteCoverFromDb(currentTripId)}catch(e){}
+  }
+  coverMode="auto";
+  scheduleAutoSave();
+  await renderPageCover(getForm());
+  setCoverStatus("アップロード画像を削除し、自動カバーに戻しました。","saved");
+});
+
+window.addEventListener("beforeunload",clearCurrentCoverObjectUrl);
+/* ===== /v10.11 Notion風カバー ===== */
+
 </script>
 </body>
 </html>
