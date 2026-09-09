@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="旅行もちもの">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>家族旅行 もちものリスト v10.12.4</title>
+<title>家族旅行 もちものリスト v10.12.7</title>
 <style>
 :root{
   --navy:#0f172a;
@@ -1569,7 +1569,7 @@ body.is-reordering{
 }
 
 
-/* ===== v10.12.4 タイトル一体型カバー ===== */
+/* ===== v10.12.7 タイトル一体型カバー ===== */
 .page-cover{
   display:none !important;
 }
@@ -1798,10 +1798,10 @@ body.is-reordering{
     font-size:13px;
   }
 }
-/* ===== /v10.12.4 タイトル一体型カバー ===== */
+/* ===== /v10.12.7 タイトル一体型カバー ===== */
 
 
-/* ===== v10.12.4 持ち物1行化 + 並び替え安定化 ===== */
+/* ===== v10.12.7 持ち物1行化 + 並び替え安定化 ===== */
 .item-delete-btn{
   width:36px;
   height:36px;
@@ -1916,10 +1916,10 @@ body.is-reordering{
     padding:0;
   }
 }
-/* ===== /v10.12.4 ===== */
+/* ===== /v10.12.7 ===== */
 
 
-/* ===== v10.12.4 スマホ専用ドラッグ安定化 ===== */
+/* ===== v10.12.7 スマホ専用ドラッグ安定化 ===== */
 .drag-handle{
   touch-action:none !important;
   -webkit-user-select:none;
@@ -2002,10 +2002,10 @@ body.mobile-dragging .drag-handle{
     cursor:grab;
   }
 }
-/* ===== /v10.12.4 ===== */
+/* ===== /v10.12.7 ===== */
 
 
-/* ===== v10.12.4 グループ別持ち物追加 ===== */
+/* ===== v10.12.7 グループ別持ち物追加 ===== */
 .group-add-wrap{
   margin-top:10px;
   padding-top:10px;
@@ -2096,10 +2096,10 @@ body.mobile-dragging .drag-handle{
     font-size:12px;
   }
 }
-/* ===== /v10.12.4 ===== */
+/* ===== /v10.12.7 ===== */
 
 
-/* ===== v10.12.4 削除ボタン操作修正 ===== */
+/* ===== v10.12.7 削除ボタン操作修正 ===== */
 .item{
   position:relative;
 }
@@ -2129,10 +2129,10 @@ body.mobile-dragging .drag-handle{
     border-radius:10px !important;
   }
 }
-/* ===== /v10.12.4 ===== */
+/* ===== /v10.12.7 ===== */
 
 
-/* ===== v10.12.4 PCドラッグ + 削除タップ安定化 ===== */
+/* ===== v10.12.7 PCドラッグ + 削除タップ安定化 ===== */
 .drag-handle[draggable="true"]{
   cursor:grab;
 }
@@ -2160,10 +2160,10 @@ body.mobile-dragging .drag-handle{
 .item-delete-btn::before{
   pointer-events:none !important;
 }
-/* ===== /v10.12.4 ===== */
+/* ===== /v10.12.7 ===== */
 
 
-/* ===== v10.12.4 削除ボタン共通クリック方式 ===== */
+/* ===== v10.12.7 削除ボタン共通クリック方式 ===== */
 .item-delete-btn{
   position:relative !important;
   z-index:100 !important;
@@ -2174,10 +2174,10 @@ body.mobile-dragging .drag-handle{
 .item-delete-btn::before{
   content:none !important;
 }
-/* ===== /v10.12.4 ===== */
+/* ===== /v10.12.7 ===== */
 
 
-/* ===== v10.12.4 アプリ内削除確認 ===== */
+/* ===== v10.12.7 アプリ内削除確認 ===== */
 .delete-modal-backdrop{
   position:fixed;
   inset:0;
@@ -2256,7 +2256,207 @@ body.mobile-dragging .drag-handle{
     grid-template-columns:1fr;
   }
 }
-/* ===== /v10.12.4 ===== */
+/* ===== /v10.12.7 ===== */
+
+
+/* ===== v10.12.7 スマホ1行固定 + 更新確認 ===== */
+.build-badge{
+  display:inline-flex;
+  align-items:center;
+  margin-left:5px;
+  padding:2px 6px;
+  border-radius:999px;
+  background:#e0f2fe;
+  color:#0369a1;
+  font-size:10px;
+  font-style:normal;
+  font-weight:850;
+  vertical-align:middle;
+}
+
+@media(max-width:600px){
+  .item-group{
+    overflow:hidden;
+  }
+
+  .item{
+    display:grid !important;
+    grid-template-columns:36px 24px minmax(0,1fr) 42px 36px !important;
+    grid-template-rows:44px !important;
+    column-gap:5px !important;
+    row-gap:0 !important;
+    align-items:center !important;
+    width:100% !important;
+    min-width:0 !important;
+    padding:6px 0 !important;
+  }
+
+  .item > *{
+    min-width:0 !important;
+    margin-top:0 !important;
+    margin-bottom:0 !important;
+  }
+
+  .item .drag-handle{
+    grid-column:1 !important;
+    grid-row:1 !important;
+    width:36px !important;
+    height:36px !important;
+    min-width:36px !important;
+  }
+
+  .item input[type="checkbox"]{
+    grid-column:2 !important;
+    grid-row:1 !important;
+    width:20px !important;
+    height:20px !important;
+    justify-self:center !important;
+  }
+
+  .item input[type="text"]{
+    grid-column:3 !important;
+    grid-row:1 !important;
+    width:100% !important;
+    height:40px !important;
+    padding:7px 8px !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+  }
+
+  .item input[type="number"]{
+    grid-column:4 !important;
+    grid-row:1 !important;
+    width:42px !important;
+    height:40px !important;
+    min-width:42px !important;
+    padding:6px 2px !important;
+  }
+
+  .item .item-delete-btn{
+    grid-column:5 !important;
+    grid-row:1 !important;
+    width:36px !important;
+    height:36px !important;
+    min-width:36px !important;
+    min-height:36px !important;
+    padding:0 !important;
+    justify-self:end !important;
+    align-self:center !important;
+    margin:0 !important;
+    font-size:21px !important;
+  }
+}
+/* ===== /v10.12.7 ===== */
+
+
+/* ===== v10.12.7 長い持ち物名を自動改行 ===== */
+.item-name-field{
+  width:100%;
+  min-width:0;
+  min-height:40px;
+  padding:9px 10px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#fff;
+  color:var(--text);
+  font:inherit;
+  font-size:16px;
+  line-height:1.4;
+  resize:none;
+  overflow:hidden;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  box-sizing:border-box;
+}
+
+.item-name-field:focus{
+  outline:none;
+  border-color:#67e8f9;
+  box-shadow:0 0 0 3px rgba(14,165,233,.10);
+}
+
+.item.checked .item-name-field{
+  text-decoration:line-through;
+  color:#94a3b8;
+}
+
+@media(max-width:600px){
+  .item{
+    grid-template-rows:minmax(44px,auto) !important;
+    align-items:center !important;
+  }
+
+  .item .item-name-field{
+    grid-column:3 !important;
+    grid-row:1 !important;
+    width:100% !important;
+    min-width:0 !important;
+    min-height:40px !important;
+    height:auto;
+    padding:8px 8px !important;
+    font-size:16px !important;
+    line-height:1.35 !important;
+  }
+
+  .item .drag-handle,
+  .item input[type="checkbox"],
+  .item input[type="number"],
+  .item .item-delete-btn{
+    align-self:center !important;
+  }
+}
+/* ===== /v10.12.7 ===== */
+
+
+/* ===== v10.12.7 複数行に合わせて行全体を自動伸長 ===== */
+.item-group{
+  overflow:visible !important;
+}
+
+.item{
+  grid-template-rows:auto !important;
+  grid-auto-rows:auto !important;
+  min-height:44px;
+  overflow:visible !important;
+}
+
+.item-name-field{
+  display:block;
+  height:auto;
+  min-height:40px;
+  max-height:none !important;
+  overflow:hidden !important;
+  field-sizing:content;
+}
+
+@media(max-width:600px){
+  .item{
+    grid-template-rows:auto !important;
+    grid-auto-rows:auto !important;
+    min-height:44px !important;
+    height:auto !important;
+    overflow:visible !important;
+    align-items:center !important;
+  }
+
+  .item .item-name-field{
+    min-height:40px !important;
+    height:auto;
+    max-height:none !important;
+    overflow:hidden !important;
+    align-self:stretch !important;
+  }
+
+  .item .drag-handle,
+  .item input[type="checkbox"],
+  .item input[type="number"],
+  .item .item-delete-btn{
+    align-self:center !important;
+  }
+}
+/* ===== /v10.12.7 ===== */
 
 </style>
 </head>
@@ -2268,7 +2468,7 @@ body.mobile-dragging .drag-handle{
       <div class="brand-mark">旅</div>
       <div class="brand-copy">
         <strong>家族旅行 もちものリスト</strong>
-        <span>旅行準備を、家族ごと・旅行ごとにスマート管理</span>
+        <span>旅行準備を、家族ごと・旅行ごとにスマート管理 <em class="build-badge">v10.12.7</em></span>
       </div>
     </div>
     <div class="top-actions">
@@ -2711,7 +2911,7 @@ body.mobile-dragging .drag-handle{
     </div>
   </section>
 
-  <div class="footer">家族旅行 もちものリスト v10.12.4｜ブラウザだけで使える自分用旅行準備ツール</div>
+  <div class="footer">家族旅行 もちものリスト v10.12.7｜ブラウザだけで使える自分用旅行準備ツール</div>
 </div>
 
 
@@ -4163,7 +4363,7 @@ function reorderVisibleItemsInGroup(group, orderedVisibleIds){
 
 function createDragGhost(row,e){
   const rect=row.getBoundingClientRect();
-  const nameValue=row.querySelector('input[type="text"]')?.value || "持ち物";
+  const nameValue=row.querySelector(".item-name-field")?.value || row.querySelector('input[type="text"]')?.value || "持ち物";
   const qtyValue=row.querySelector('input[type="number"]')?.value || "1";
 
   const ghost=document.createElement("div");
@@ -4270,7 +4470,7 @@ let mobileDragState=null;
 let desktopDragState=null;
 
 function makeMobileGhost(row){
-  const nameValue=row.querySelector('input[type="text"]')?.value || "持ち物";
+  const nameValue=row.querySelector(".item-name-field")?.value || row.querySelector('input[type="text"]')?.value || "持ち物";
   const qtyValue=row.querySelector('input[type="number"]')?.value || "1";
 
   const ghost=document.createElement("div");
@@ -4657,6 +4857,24 @@ function createGroupAddFooter(group){
   return wrap;
 }
 
+function autoGrowItemName(el){
+  if(!el) return;
+
+  // 一度高さをゼロに戻して、折り返し後の実高さを正確に測る。
+  el.style.height="0px";
+
+  const nextHeight=Math.max(40,el.scrollHeight+2);
+  el.style.height=nextHeight+"px";
+}
+
+let itemNameResizeTimer=null;
+window.addEventListener("resize",()=>{
+  clearTimeout(itemNameResizeTimer);
+  itemNameResizeTimer=setTimeout(()=>{
+    document.querySelectorAll(".item-name-field").forEach(autoGrowItemName);
+  },80);
+});
+
 function renderList(){
   if(!currentItems.length){
     els.listArea.className="empty";
@@ -4715,13 +4933,19 @@ function renderList(){
         renderAll();
       });
 
-      const name=document.createElement("input");
-      name.type="text";
+      const name=document.createElement("textarea");
+      name.className="item-name-field";
+      name.rows=1;
       name.value=item.name;
+      name.setAttribute("aria-label",`${item.name}の持ち物名`);
+      name.addEventListener("input",()=>{
+        autoGrowItemName(name);
+      });
       name.addEventListener("change",()=>{
         item.name=name.value.trim()||"名称未設定";
+        name.value=item.name;
         scheduleAutoSave();
-        renderAll();
+        autoGrowItemName(name);
       });
 
       const qty=document.createElement("input");
@@ -4745,6 +4969,7 @@ function renderList(){
 
       row.append(handle,cb,name,qty,del);
       section.appendChild(row);
+      requestAnimationFrame(()=>autoGrowItemName(name));
       attachItemReorder(handle,row,section,item);
     });
 
@@ -4909,7 +5134,7 @@ function initTabs(){
 function makeBackupPayload(){
   return {
     app:"family-travel-packing-list",
-    version:"10.12.4",
+    version:"10.12.7",
     exportedAt:new Date().toISOString(),
     trips:deepCopy(trips),
     lastTripId:currentTripId||null
@@ -5244,7 +5469,7 @@ if(currentTripId&&trips[currentTripId])loadTrip(currentTripId);
 else if(ids.length)loadTrip(ids[0]);
 else newTrip();
 
-/* ===== v10.12.4 背景テーマ拡張パッチ ===== */
+/* ===== v10.12.7 背景テーマ拡張パッチ ===== */
 Object.assign(HERO_THEME_CONFIG,{
   overseas:{label:"海外旅行",sky1:"#93c5fd",sky2:"#0ea5e9",ground:"#082f49",accent:"#f59e0b",accent2:"#f43f5e",soft:"#e0f2fe",leaf:"#67e8f9"},
   shinkansen:{label:"新幹線旅",sky1:"#dbeafe",sky2:"#3b82f6",ground:"#0f172a",accent:"#f8fafc",accent2:"#06b6d4",soft:"#eff6ff",leaf:"#93c5fd"},
@@ -5391,10 +5616,10 @@ function buildHeroArt(themeKey="generic",styleKey="photo"){
 
   return svg;
 }
-/* ===== /v10.12.4 背景テーマ拡張パッチ ===== */
+/* ===== /v10.12.7 背景テーマ拡張パッチ ===== */
 
 
-/* ===== v10.12.4 Notion風カバー ===== */
+/* ===== v10.12.7 Notion風カバー ===== */
 function updateCoverChoiceUI(){
   document.querySelectorAll(".cover-choice").forEach(btn=>{
     const auto=btn.dataset.coverMode==="auto";
@@ -5568,7 +5793,7 @@ $("removeCustomCoverBtn").addEventListener("click",async()=>{
 });
 
 window.addEventListener("beforeunload",clearCurrentCoverObjectUrl);
-/* ===== /v10.12.4 Notion風カバー ===== */
+/* ===== /v10.12.7 Notion風カバー ===== */
 
 </script>
 
