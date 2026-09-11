@@ -1,7 +1,7 @@
 {
-  "name": "家族旅行 もちものリスト",
-  "short_name": "もちものリスト",
-  "description": "家族ごとに旅行の持ち物を整理・チェックできる旅行準備アプリ",
+  "name": "TRIP READY｜旅じたく",
+  "short_name": "TRIP READY",
+  "description": "家族旅行の持ち物を、旅行日数や家族ごとにスマートに管理できる旅じたくアプリ",
   "lang": "ja",
   "id": "./",
   "start_url": "./",
@@ -9,7 +9,7 @@
   "display": "standalone",
   "orientation": "any",
   "background_color": "#f4f8ff",
-  "theme_color": "#123e70",
+  "theme_color": "#0b2f5b",
   "icons": [
     {
       "src": "pwa-192.png",

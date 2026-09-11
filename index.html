@@ -3,11 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#123e70">
-<title>家族旅行 もちものリスト v10.21.3</title>
+<meta name="theme-color" content="#0b2f5b">
+<title>TRIP READY｜旅じたく</title>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="pwa-192.png">
-<link rel="icon" href="pwa-192.png" sizes="192x192">
 <style>
 :root{
   --bg:#f5f9ff;--panel:#fff;--text:#25324a;--muted:#70819b;--line:#dfe8f5;
@@ -527,12 +525,19 @@ body{background:#f7fbff;color:#29445f}
         <span class="suitcase-body"><span class="suitcase-band band-left"></span><span class="suitcase-band band-right"></span><span class="suitcase-tag"></span></span>
       </div>
       <div class="dashboard-title-copy">
-        <h1>旅行の持ち物アプリ</h1>
-        <p>家族ごとに持ち物を管理</p>
+        <h1>TRIP READY <span class="brand-jp">旅じたく</span></h1>
+        <p>家族旅行の準備を、スマートに。</p>
         <div class="active-trip-name" id="heroTitle">家族旅行</div>
         <div class="dashboard-meta" id="heroMeta"></div>
       </div>
     </div>
+    <section class="trip-context-bar top-trip-context" id="tripContextBar" aria-label="現在の旅行情報">
+      <div class="trip-context-title">
+        <span class="trip-context-kicker">旅行情報</span>
+        <strong id="contextTripName">家族旅行</strong>
+      </div>
+      <div class="trip-context-chips" id="tripContextChips"></div>
+    </section>
     <div class="overall-status">
       <div class="overall-title">全体の準備状況</div>
       <div class="overall-progress-row">
@@ -547,10 +552,11 @@ body{background:#f7fbff;color:#29445f}
   </section>
 
   <div class="topbar">
-    <div class="brand-mini"><span class="mini-dot"></span>Family Trip Packing</div>
+    <div class="brand-mini"><span class="mini-dot"></span>SHIN NOTE LAB / TRAVEL TOOL</div>
     <div class="trip-switch">
       <select id="tripSelect" aria-label="旅行を選択"></select>
       <button class="btn btn-soft" id="newTripBtn">＋ 新しい旅行</button>
+      <button class="btn btn-soft top-filter-btn" id="filterBtn" type="button" hidden aria-pressed="false">未準備のみ</button>
     </div>
   </div>
 
@@ -586,7 +592,7 @@ body{background:#f7fbff;color:#29445f}
     </section>
 
     <section class="tab" id="tab-packing">
-      <div class="section-head"><h2 class="title-with-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-suitcase"></use></svg>持ち物</h2><div class="btn-row"><span class="progress-pill" id="overallProgress">0 / 0 準備済み</span><button class="btn btn-soft" id="filterBtn">未準備だけ表示</button></div></div>
+      <span id="overallProgress" hidden aria-hidden="true">0 / 0 準備済み</span>
       <div id="listArea" class="empty"><div class="empty-state">旅行設定を保存して「持ち物を自動生成」を押してください。</div></div>
       <section class="packing-hint" aria-label="使い方のヒント">
         <div class="hint-copy">
@@ -692,10 +698,10 @@ function normalizeTrip(raw){
   while(t.childGenders.length<t.children)t.childGenders.push('neutral');
   t.adultGenders=t.adultGenders.slice(0,t.adults).map(normalizeGender);t.childGenders=t.childGenders.slice(0,t.children).map(normalizeGender);
   if(!Array.isArray(t.groups))t.groups=[];
-  t.groups=t.groups.map((g,i)=>({id:g.id||uid(),name:g.name||g.title||`グループ${i+1}`,type:g.type||'person',items:Array.isArray(g.items)?g.items.map(it=>({id:it.id||uid(),name:it.name||it.label||'',qty:String(it.qty??it.quantity??1),done:Boolean(it.done??it.checked)})):[]}));
+  t.groups=t.groups.map((g,i)=>({id:g.id||uid(),name:g.name||g.title||`グループ${i+1}`,type:g.type||'person',profile:g.profile||null,items:Array.isArray(g.items)?g.items.map(it=>{const name=it.name||it.label||'';const qty=String(it.qty??it.quantity??1);return{id:it.id||uid(),name,qty,done:Boolean(it.done??it.checked),autoQty:typeof it.autoQty==='boolean'?it.autoQty:(isDynamicQtyItem(name)&&qty==='1')}}):[]}));
   return t;
 }
-function loadTrips(){try{const parsed=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');if(Array.isArray(parsed))trips=parsed.map(normalizeTrip)}catch(e){console.warn(e)}if(!trips.length)trips=[makeTrip('家族旅行')];currentTripId=localStorage.getItem(LAST_KEY);if(!trips.some(t=>t.id===currentTripId))currentTripId=trips[0].id;saveTrips()}
+function loadTrips(){try{const parsed=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');if(Array.isArray(parsed))trips=parsed.map(normalizeTrip)}catch(e){console.warn(e)}if(!trips.length)trips=[makeTrip('家族旅行')];currentTripId=localStorage.getItem(LAST_KEY);if(!trips.some(t=>t.id===currentTripId))currentTripId=trips[0].id;trips.forEach(syncAutoQuantities);saveTrips()}
 
 function initSelects(){
   const days=$('#tripDays');days.innerHTML='<option>日帰り</option>'+Array.from({length:13},(_,i)=>`<option>${i+1}泊${i+2}日</option>`).join('');
@@ -725,7 +731,7 @@ function renderPeopleInputs(preserveDraft=true){
 function refreshPersonPreview(card){if(!card)return;const role=card.dataset.profileRole;const target=card.querySelector('[data-profile-preview]');if(!target)return;if(role==='adult'){const gender=card.querySelector('select[data-adult-gender-index]')?.value||'neutral';target.innerHTML=avatarSvg(profileIconKind('adult',gender,null))}else{const gender=card.querySelector('select[data-child-gender-index]')?.value||'neutral';const age=card.querySelector('select[data-age-index]')?.value||0;target.innerHTML=avatarSvg(profileIconKind('child',gender,age))}}
 function syncExistingGroupNames(t){if(!t.groups?.length)return;const names=namedPeople(t);const personGroups=t.groups.filter(g=>g.type!=='common');personGroups.forEach((g,i)=>{if(names[i])g.name=names[i]})}
 function syncExistingGroupProfiles(t){if(!t.groups?.length)return;let pi=0;t.groups.forEach(g=>{if(g.type==='common')return;const isChild=pi>=t.adults;const ci=pi-t.adults;g.type=isChild?'child':'adult';g.profile=isChild?{role:'child',gender:normalizeGender(t.childGenders?.[ci]),age:t.childAges?.[ci]??0,index:ci}:{role:'adult',gender:normalizeGender(t.adultGenders?.[pi]),age:null,index:pi};pi++})}
-function gatherSettings(){const t=currentTrip();if(!t)return;t.name=$('#tripName').value.trim()||'家族旅行';t.days=$('#tripDays').value;t.destination=$('#destination').value.trim();t.month=Number($('#tripMonth').value);t.adults=Number($('#adultCount').value);t.children=Number($('#childCount').value);const adultNames=$$('#adultNames input[data-adult-name-index]').map((x,i)=>x.value.trim()||`大人${i+1}`);const childNames=$$('#childProfiles input[data-child-name-index]').map((x,i)=>x.value.trim()||`子ども${i+1}`);t.adultGenders=$$('#adultNames select[data-adult-gender-index]').map(x=>normalizeGender(x.value));t.childAges=$$('#childProfiles select[data-age-index]').map(x=>x.value);t.childGenders=$$('#childProfiles select[data-child-gender-index]').map(x=>normalizeGender(x.value));t.transport=$$('input[name="transport"]:checked').map(x=>x.value);t.familyNames=[...adultNames,...childNames];t.memo=$('#tripMemo').value;t.updatedAt=Date.now();syncExistingGroupNames(t);syncExistingGroupProfiles(t);saveTrips();renderTripSelect();renderHero();renderShareGroup();renderSharePreview();renderSummary()}
+function gatherSettings(){const t=currentTrip();if(!t)return;t.name=$('#tripName').value.trim()||'家族旅行';t.days=$('#tripDays').value;t.destination=$('#destination').value.trim();t.month=Number($('#tripMonth').value);t.adults=Number($('#adultCount').value);t.children=Number($('#childCount').value);const adultNames=$$('#adultNames input[data-adult-name-index]').map((x,i)=>x.value.trim()||`大人${i+1}`);const childNames=$$('#childProfiles input[data-child-name-index]').map((x,i)=>x.value.trim()||`子ども${i+1}`);t.adultGenders=$$('#adultNames select[data-adult-gender-index]').map(x=>normalizeGender(x.value));t.childAges=$$('#childProfiles select[data-age-index]').map(x=>x.value);t.childGenders=$$('#childProfiles select[data-child-gender-index]').map(x=>normalizeGender(x.value));t.transport=$$('input[name="transport"]:checked').map(x=>x.value);t.familyNames=[...adultNames,...childNames];t.memo=$('#tripMemo').value;t.updatedAt=Date.now();syncExistingGroupNames(t);syncExistingGroupProfiles(t);syncAutoQuantities(t);saveTrips();renderTripSelect();renderHero();renderTripContext();renderShareGroup();renderSharePreview();renderSummary()}
 
 function seasonFromMonth(m){m=Number(m);if([3,4,5].includes(m))return'春';if([6,7,8].includes(m))return'夏';if([9,10,11].includes(m))return'秋';return'冬'}
 function destinationTheme(dest,t){const d=(dest||'').toLowerCase();if(/海外|hawaii|guam|韓国|台湾|usa|america|europe/.test(d))return'overseas';if(/新幹線|東京|京都|大阪|駅/.test(d)&&t.transport?.includes('電車'))return'shinkansen';if(/海|ビーチ|沖縄|湘南|伊豆/.test(d))return'beach';if(/温泉|箱根|草津|鬼怒川|湯/.test(d))return'hotspring';if(/usj|ディズニー|テーマパーク|遊園地|もてぎ/.test(d))return'themepark';if(/水族館/.test(d))return'aquarium';if(/動物園/.test(d))return'zoo';if(/グランピング|キャンプ/.test(d))return'glamping';if(/ホテル|リゾート/.test(d))return'hotel';if(seasonFromMonth(t.month)==='冬')return'snow';if(seasonFromMonth(t.month)==='秋')return'autumn';if(seasonFromMonth(t.month)==='春')return'spring';if(t.transport?.includes('車'))return'drive';return'city'}
@@ -737,12 +743,65 @@ function svgForTheme(theme,taste){
 }
 async function renderHero(){const t=currentTrip();if(!t)return;updateProgress();$('#heroTitle').textContent=t.name||'家族旅行';const meta=[];if(t.destination)meta.push(`行き先　${t.destination}`);meta.push(`日程　${t.days}`);meta.push(`${t.month}月・${seasonFromMonth(t.month)}`);if(t.transport?.length)meta.push(t.transport.join('＋'));$('#heroMeta').innerHTML=meta.map(x=>`<span class="hero-chip">${esc(x)}</span>`).join('');}
 
+function tripDayCount(label){
+  const s=String(label||'');
+  if(s.includes('日帰り'))return 1;
+  const m=s.match(/(\d+)泊(\d+)日/);
+  if(m)return Math.max(1,Number(m[2])||1);
+  const d=s.match(/(\d+)日/);
+  return d?Math.max(1,Number(d[1])||1):1;
+}
+function isDynamicQtyItem(name){
+  return ['着替え','下着・靴下','子ども用飲み物・おやつ','ビニール袋'].includes(String(name||'').trim());
+}
+function autoQtyForItem(name,t,profile){
+  const n=String(name||'').trim();
+  const days=tripDayCount(t?.days);
+  if(n==='着替え')return profile?.role==='child'?Math.max(1,days+1):days;
+  if(n==='下着・靴下')return profile?.role==='child'?Math.max(1,days+1):days;
+  if(n==='子ども用飲み物・おやつ')return days;
+  if(n==='ビニール袋')return Math.max(2,days);
+  return 1;
+}
+function generatedItem(name,t,profile){
+  const autoQty=isDynamicQtyItem(name);
+  return {id:uid(),name,qty:String(autoQty?autoQtyForItem(name,t,profile):1),done:false,autoQty};
+}
+function syncAutoQuantities(t){
+  if(!t?.groups?.length)return false;
+  let changed=false;
+  t.groups.forEach((g,gi)=>{
+    const profile=groupProfileFor(g,gi,t);
+    (g.items||[]).forEach(it=>{
+      if(it.autoQty===true){
+        const next=String(autoQtyForItem(it.name,t,profile));
+        if(it.qty!==next){it.qty=next;changed=true}
+      }
+    });
+  });
+  return changed;
+}
+function renderTripContext(activeTab){
+  const bar=$('#tripContextBar');
+  const t=currentTrip();
+  if(!bar||!t)return;
+  bar.hidden=false;
+  $('#contextTripName').textContent=t.name||'家族旅行';
+  const chips=[
+    ['行き先',t.destination||'未設定'],
+    ['日程',t.days||'未設定'],
+    ['時期',`${t.month||'-'}月・${seasonFromMonth(t.month)}`]
+  ];
+  if(t.transport?.length)chips.push(['移動',t.transport.join('＋')]);
+  $('#tripContextChips').innerHTML=chips.map(([k,v])=>`<span class="trip-context-chip"><small>${esc(k)}</small><b>${esc(v)}</b></span>`).join('');
+}
+
 function baseItems(){return ['財布','スマートフォン','充電器','モバイルバッテリー','健康保険証・資格確認書','予約情報','ハンカチ・ティッシュ','常備薬','ビニール袋']}
 function adultItems(){return ['着替え','下着・靴下','歯ブラシ','スキンケア用品','メガネ・コンタクト用品','寝間着']}
 function childItems(age){let a=Number(age);let arr=['着替え','下着・靴下','歯ブラシ','寝間着','お気に入りのおもちゃ'];if(!Number.isNaN(a)&&a<=5)arr.push('おむつ・おしりふき','食事用エプロン');if(!Number.isNaN(a)&&a<=10)arr.push('子ども用飲み物・おやつ');return arr}
 function extras(t){let out=[];const s=seasonFromMonth(t.month);if(s==='夏')out.push('日焼け止め','帽子','虫よけ');if(s==='冬')out.push('防寒着','手袋・マフラー','使い捨てカイロ');if(s==='春'||s==='秋')out.push('薄手の上着');if(t.transport.includes('車'))out.push('ETCカード','車内用ごみ袋');if(t.transport.includes('電車'))out.push('乗車券・ICカード','駅弁・飲み物');if(t.transport.includes('飛行機'))out.push('搭乗券・予約番号','機内持ち込み用バッグ');return [...new Set(out)]}
 function namedPeople(t){const names=(t.familyNames||[]).slice();const target=t.adults+t.children;while(names.length<target)names.push(names.length<t.adults?`大人${names.length+1}`:`子ども${names.length-t.adults+1}`);return names.slice(0,target)}
-function generateGroups(){gatherSettings();const t=currentTrip();const people=namedPeople(t);const groups=[];groups.push({id:uid(),name:'共通',type:'common',items:[...baseItems(),...extras(t)].map(n=>({id:uid(),name:n,qty:'1',done:false}))});people.forEach((name,i)=>{const isChild=i>=t.adults;const ci=i-t.adults;const age=isChild?t.childAges[ci]:null;const gender=isChild?normalizeGender(t.childGenders?.[ci]):normalizeGender(t.adultGenders?.[i]);groups.push({id:uid(),name,type:isChild?'child':'adult',profile:isChild?{role:'child',gender,age,index:ci}:{role:'adult',gender,age:null,index:i},items:(isChild?childItems(age):adultItems()).map(n=>({id:uid(),name:n,qty:'1',done:false}))})});t.groups=groups;t.updatedAt=Date.now();saveTrips();renderAll();toast('持ち物リストを作成しました')}
+function generateGroups(){gatherSettings();const t=currentTrip();const people=namedPeople(t);const groups=[];const commonProfile={role:'common',gender:'neutral',age:null};groups.push({id:uid(),name:'共通',type:'common',items:[...baseItems(),...extras(t)].map(n=>generatedItem(n,t,commonProfile))});people.forEach((name,i)=>{const isChild=i>=t.adults;const ci=i-t.adults;const age=isChild?t.childAges[ci]:null;const gender=isChild?normalizeGender(t.childGenders?.[ci]):normalizeGender(t.adultGenders?.[i]);const profile=isChild?{role:'child',gender,age,index:ci}:{role:'adult',gender,age:null,index:i};groups.push({id:uid(),name,type:isChild?'child':'adult',profile,items:(isChild?childItems(age):adultItems()).map(n=>generatedItem(n,t,profile))})});t.groups=groups;t.updatedAt=Date.now();saveTrips();renderAll();toast(`${t.days}に合わせて数量も自動設定しました`)}
 function groupProfileFor(g,gi,t){if(g.type==='common')return{role:'common',gender:'neutral',age:null};if(g.profile)return{role:g.profile.role||g.type,gender:normalizeGender(g.profile.gender),age:g.profile.age};let pi=0;for(let i=0;i<gi;i++)if(t.groups[i]?.type!=='common')pi++;const isChild=pi>=t.adults;const ci=pi-t.adults;return isChild?{role:'child',gender:normalizeGender(t.childGenders?.[ci]),age:t.childAges?.[ci]??0}:{role:'adult',gender:normalizeGender(t.adultGenders?.[pi]),age:null}}
 function groupIcon(i,g){const t=currentTrip();const p=groupProfileFor(g,i,t);const kind=p.role==='common'?'common':profileIconKind(p.role,p.gender,p.age);return `<span class="group-avatar ${p.role==='common'?'common-avatar':p.role==='child'?'child-avatar':p.gender==='female'?'mama-avatar':'papa-avatar'}" aria-hidden="true">${avatarSvg(kind)}</span>`}
 
@@ -757,11 +816,11 @@ function itemHtml(g,it){return `<div class="item-row" draggable="true" data-grou
 function findItem(gid,iid){const t=currentTrip();const g=t.groups.find(x=>x.id===gid);return {g,it:g?.items.find(x=>x.id===iid)}}
 function autoGrowItemName(el){if(!el)return;el.style.height='auto';el.style.height=Math.max(32,el.scrollHeight)+'px'}
 function autoGrowAll(){$$('.item-name').forEach(autoGrowItemName)}
-function updateProgress(){const t=currentTrip();const all=(t?.groups||[]).flatMap(g=>g.items);const done=all.filter(x=>x.done).length;const undone=all.length-done;const pct=all.length?Math.round(done/all.length*100):0;$('#overallProgress').textContent=`${done} / ${all.length} 準備済み`;$('#topDone').textContent=done;$('#topTotal').textContent=all.length;$('#topUndone').textContent=undone;$('#topRate').textContent=`${pct}%`;$('#topProgressFill').style.width=`${pct}%`;$('#filterBtn').textContent=filterUnready?'全部表示':'未準備だけ'}
+function updateProgress(){const t=currentTrip();const all=(t?.groups||[]).flatMap(g=>g.items);const done=all.filter(x=>x.done).length;const undone=all.length-done;const pct=all.length?Math.round(done/all.length*100):0;$('#overallProgress').textContent=`${done} / ${all.length} 準備済み`;$('#topDone').textContent=done;$('#topTotal').textContent=all.length;$('#topUndone').textContent=undone;$('#topRate').textContent=`${pct}%`;$('#topProgressFill').style.width=`${pct}%`;$('#filterBtn').textContent=filterUnready?'すべて表示':'未準備のみ';$('#filterBtn').setAttribute('aria-pressed',filterUnready?'true':'false')}
 function bindListEvents(){const area=$('#listArea');
   area.addEventListener('click',e=>{const del=e.target.closest('.delete-btn');if(del){const row=del.closest('.item-row');const {g,it}=findItem(row.dataset.groupId,row.dataset.itemId);pendingDelete={gid:g.id,iid:it.id,name:it.name};$('#deleteTargetName').textContent=it.name;openModal('#deleteModal');return}const add=e.target.closest('[data-add-toggle]');if(add){openAddBox(add.dataset.addToggle);return}const addGo=e.target.closest('[data-add-confirm]');if(addGo){addItem(addGo.dataset.addConfirm);}});
-  area.addEventListener('change',e=>{const row=e.target.closest('.item-row');if(!row)return;const {it}=findItem(row.dataset.groupId,row.dataset.itemId);if(!it)return;if(e.target.classList.contains('item-check')){it.done=e.target.checked;saveTrips();renderPacking()}else if(e.target.classList.contains('qty')){it.qty=e.target.value;saveTrips();renderSharePreview();renderSummary()}});
-  area.addEventListener('input',e=>{const row=e.target.closest('.item-row');if(!row)return;const {it}=findItem(row.dataset.groupId,row.dataset.itemId);if(!it)return;if(e.target.classList.contains('item-name')){it.name=e.target.value;autoGrowItemName(e.target);saveTrips();renderSharePreview()}});
+  area.addEventListener('change',e=>{const row=e.target.closest('.item-row');if(!row)return;const {it}=findItem(row.dataset.groupId,row.dataset.itemId);if(!it)return;if(e.target.classList.contains('item-check')){it.done=e.target.checked;saveTrips();renderPacking()}else if(e.target.classList.contains('qty')){it.qty=e.target.value;it.autoQty=false;saveTrips();renderSharePreview();renderSummary()}});
+  area.addEventListener('input',e=>{const row=e.target.closest('.item-row');if(!row)return;const {it}=findItem(row.dataset.groupId,row.dataset.itemId);if(!it)return;if(e.target.classList.contains('item-name')){it.name=e.target.value;if(!isDynamicQtyItem(it.name))it.autoQty=false;autoGrowItemName(e.target);saveTrips();renderSharePreview()}});
   area.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('.add-name')){e.preventDefault();addItem(e.target.closest('.add-box').dataset.groupId)}});
   // PC: HTML5 Drag & Drop. Start only when drag handle was the pointer origin.
   let dragAllowed=false;area.addEventListener('mousedown',e=>{dragAllowed=!!e.target.closest('.drag-handle')});area.addEventListener('mouseup',()=>dragAllowed=false);area.addEventListener('dragstart',e=>{const row=e.target.closest('.item-row');if(!row||!dragAllowed){e.preventDefault();return}row.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',JSON.stringify({gid:row.dataset.groupId,iid:row.dataset.itemId}))});
@@ -772,7 +831,7 @@ function bindListEvents(){const area=$('#listArea');
   area.addEventListener('touchstart',onTouchStart,{passive:true});area.addEventListener('touchmove',onTouchMove,{passive:false});area.addEventListener('touchend',onTouchEnd,{passive:true});area.addEventListener('touchcancel',cancelTouch,{passive:true});
 }
 function openAddBox(gid){const slot=$(`[data-add-slot="${CSS.escape(gid)}"]`);if(!slot)return;if(slot.innerHTML){slot.innerHTML='';return}slot.innerHTML=`<div class="add-box" data-group-id="${esc(gid)}"><input class="add-name" inputmode="text" placeholder="持ち物名"><input class="add-qty" inputmode="numeric" value="1" aria-label="数量"><button data-add-confirm="${esc(gid)}">追加</button></div>`;slot.querySelector('.add-name').focus()}
-function addItem(gid){const card=$(`.group-card[data-group-id="${CSS.escape(gid)}"]`);const box=card?.querySelector('.add-box');const name=box?.querySelector('.add-name')?.value.trim();const qty=box?.querySelector('.add-qty')?.value||'1';if(!name){toast('持ち物名を入力してください');return}const g=currentTrip().groups.find(x=>x.id===gid);g.items.push({id:uid(),name,qty,done:false});saveTrips();renderPacking();toast(`${g.name}に追加しました`)}
+function addItem(gid){const card=$(`.group-card[data-group-id="${CSS.escape(gid)}"]`);const box=card?.querySelector('.add-box');const name=box?.querySelector('.add-name')?.value.trim();const qty=box?.querySelector('.add-qty')?.value||'1';if(!name){toast('持ち物名を入力してください');return}const g=currentTrip().groups.find(x=>x.id===gid);g.items.push({id:uid(),name,qty,done:false,autoQty:false});saveTrips();renderPacking();toast(`${g.name}に追加しました`)}
 function moveItem(fromGid,iid,toGid,targetIid){if(fromGid!==toGid){toast('並び替えは同じグループ内でできます');renderPacking();return}const g=currentTrip().groups.find(x=>x.id===fromGid);const from=g.items.findIndex(x=>x.id===iid),to=g.items.findIndex(x=>x.id===targetIid);if(from<0||to<0||from===to)return;const [it]=g.items.splice(from,1);g.items.splice(to,0,it);saveTrips();renderPacking()}
 function onTouchStart(e){const handle=e.target.closest('.drag-handle');if(!handle)return;const row=handle.closest('.item-row');const touch=e.touches[0];touchState={row,gid:row.dataset.groupId,iid:row.dataset.itemId,startX:touch.clientX,startY:touch.clientY,active:false,timer:setTimeout(()=>activateTouchDrag(row,touch),180)}}
 function activateTouchDrag(row,touch){if(!touchState)return;touchState.active=true;row.classList.add('dragging');const ghost=document.createElement('div');ghost.className='touch-ghost';ghost.textContent=row.querySelector('.item-name').value||'持ち物';document.body.appendChild(ghost);touchState.ghost=ghost;positionGhost(touch.clientX,touch.clientY)}
@@ -809,15 +868,15 @@ async function renderAttachments(){if(!db)return;const t=currentTrip();const lis
 async function openAttachment(id){const a=await idbGet('attachments',id);if(!a)return;const url=URL.createObjectURL(a.blob);window.open(url,'_blank');setTimeout(()=>URL.revokeObjectURL(url),60000)}
 async function deleteAttachment(id){await idbDelete('attachments',id);renderAttachments();toast('資料を削除しました')}
 
-function exportJson(){const payload={version:'10.18.0',exportedAt:new Date().toISOString(),trips};downloadBlob(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),`家族旅行もちものバックアップ_${new Date().toISOString().slice(0,10)}.json`)}
+function exportJson(){const payload={version:'10.22.0',exportedAt:new Date().toISOString(),trips};downloadBlob(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),`家族旅行もちものバックアップ_${new Date().toISOString().slice(0,10)}.json`)}
 async function importJson(file){try{const txt=await file.text();const obj=JSON.parse(txt);const arr=Array.isArray(obj)?obj:obj.trips;if(!Array.isArray(arr))throw new Error('形式が違います');trips=arr.map(normalizeTrip);if(!trips.length)throw new Error('旅行データがありません');currentTripId=trips[0].id;saveTrips();renderAll();toast('バックアップを復元しました')}catch(e){alert('JSONを読み込めませんでした。\n'+e.message)}}
 function deleteTrip(){const t=currentTrip();if(!t)return;if(!confirm(`「${t.name}」を削除しますか？`))return;trips=trips.filter(x=>x.id!==t.id);if(!trips.length)trips=[makeTrip('家族旅行')];currentTripId=trips[0].id;saveTrips();renderAll();toast('旅行を削除しました')}
 
-function switchTab(name){$$('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));$$('.tab').forEach(t=>t.classList.toggle('active',t.id===`tab-${name}`));if(name==='share')renderSharePreview();if(name==='summary')renderSummary();setTimeout(autoGrowAll,0)}
-function renderAll(){renderTripSelect();renderSettings();renderPacking();renderSummary();renderAttachments();renderSharePreview()}
+function switchTab(name){$$('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));$$('.tab').forEach(t=>t.classList.toggle('active',t.id===`tab-${name}`));const filter=$('#filterBtn');if(filter)filter.hidden=name!=='packing';renderTripContext(name);if(name==='share')renderSharePreview();if(name==='summary')renderSummary();setTimeout(autoGrowAll,0)}
+function renderAll(){renderTripSelect();renderSettings();renderPacking();renderSummary();renderAttachments();renderSharePreview();renderTripContext()}
 function bindEvents(){
   $$('.tab-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));$('#tripSelect').addEventListener('change',e=>{currentTripId=e.target.value;saveTrips();renderAll()});$('#newTripBtn').addEventListener('click',()=>{const t=makeTrip(`旅行${trips.length+1}`);trips.push(t);currentTripId=t.id;saveTrips();renderAll();switchTab('settings')});
-  $('#adultCount').addEventListener('change',()=>renderPeopleInputs(true));$('#childCount').addEventListener('change',()=>renderPeopleInputs(true));$('#adultNames').addEventListener('change',e=>{if(e.target.matches('select[data-adult-gender-index]'))refreshPersonPreview(e.target.closest('.person-card'))});$('#childProfiles').addEventListener('change',e=>{if(e.target.matches('select[data-age-index],select[data-child-gender-index]'))refreshPersonPreview(e.target.closest('.person-card'))});$('#saveSettingsBtn').addEventListener('click',()=>{gatherSettings();renderAll();toast('設定を保存しました')});$('#generateBtn').addEventListener('click',generateGroups);$('#filterBtn').addEventListener('click',()=>{filterUnready=!filterUnready;renderPacking()});
+  $('#tripDays').addEventListener('change',()=>{const hadGroups=!!currentTrip()?.groups?.length;gatherSettings();renderPacking();renderTripContext();if(hadGroups)toast(`${currentTrip().days}に合わせて数量を更新しました`)});$('#destination').addEventListener('change',()=>{gatherSettings();renderTripContext()});$('#tripMonth').addEventListener('change',()=>{gatherSettings();renderTripContext()});$('#adultCount').addEventListener('change',()=>renderPeopleInputs(true));$('#childCount').addEventListener('change',()=>renderPeopleInputs(true));$('#adultNames').addEventListener('change',e=>{if(e.target.matches('select[data-adult-gender-index]'))refreshPersonPreview(e.target.closest('.person-card'))});$('#childProfiles').addEventListener('change',e=>{if(e.target.matches('select[data-age-index],select[data-child-gender-index]'))refreshPersonPreview(e.target.closest('.person-card'))});$('#saveSettingsBtn').addEventListener('click',()=>{gatherSettings();renderAll();toast('設定を保存しました')});$('#generateBtn').addEventListener('click',generateGroups);$('#filterBtn').addEventListener('click',()=>{filterUnready=!filterUnready;renderPacking()});
   $('#tripMemo').addEventListener('input',()=>{const t=currentTrip();t.memo=$('#tripMemo').value;saveTrips();renderSharePreview()});$('#shareMode').addEventListener('change',()=>{renderShareGroup();renderSharePreview()});$('#shareGroup').addEventListener('change',renderSharePreview);$('#nativeShareBtn').addEventListener('click',doShare);$('#copyShareBtn').addEventListener('click',async()=>{await navigator.clipboard.writeText(shareText());toast('コピーしました')});$('#saveTxtBtn').addEventListener('click',saveTxt);
   $('#exportBtn').addEventListener('click',exportJson);$('#importFile').addEventListener('change',e=>{if(e.target.files[0])importJson(e.target.files[0]);e.target.value=''});$('#deleteTripBtn').addEventListener('click',deleteTrip);
   $('#confirmDeleteBtn').addEventListener('click',deletePendingItem);$('#cancelDeleteBtn').addEventListener('click',()=>{pendingDelete=null;closeModal('#deleteModal')});$('#deleteModal').addEventListener('click',e=>{if(e.target.id==='deleteModal'){pendingDelete=null;closeModal('#deleteModal')}});
@@ -1225,3 +1284,401 @@ body{
 }
 </style>
 
+
+
+<style>
+/* ===== v10.22.0 : day-based auto quantities (context moved in v10.22.1) ===== */
+.trip-context-bar{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  margin:-2px 0 16px;
+  padding:12px 15px;
+  border:1px solid #bfd6ee;
+  border-radius:14px;
+  background:linear-gradient(135deg,#0b315f 0%,#104a8d 58%,#1268c9 100%);
+  color:#fff;
+  box-shadow:0 10px 24px rgba(9,55,108,.18);
+}
+.trip-context-bar[hidden]{display:none!important}
+.trip-context-title{display:flex;flex-direction:column;gap:2px;min-width:150px;padding-right:16px;border-right:1px solid rgba(255,255,255,.18)}
+.trip-context-kicker{font-size:8px;letter-spacing:.18em;font-weight:850;color:#9fc9f7}
+.trip-context-title strong{font-size:14px;line-height:1.25;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}
+.trip-context-chips{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.trip-context-chip{display:inline-flex;align-items:center;gap:7px;min-height:30px;padding:6px 10px;border:1px solid rgba(255,255,255,.16);border-radius:9px;background:rgba(255,255,255,.09);backdrop-filter:blur(5px)}
+.trip-context-chip small{font-size:9px;color:#bcd9f8;font-weight:750;white-space:nowrap}
+.trip-context-chip b{font-size:11px;color:#fff;font-weight:800;white-space:nowrap}
+.qty{font-weight:800!important;color:#174f8f!important}
+@media(max-width:640px){
+  .trip-context-bar{display:block;margin:0 0 12px;padding:11px 12px;border-radius:12px}
+  .trip-context-title{min-width:0;padding:0 0 8px;border-right:0;border-bottom:1px solid rgba(255,255,255,.16)}
+  .trip-context-title strong{max-width:100%;font-size:13px}
+  .trip-context-chips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:8px}
+  .trip-context-chip{min-width:0;padding:6px 8px}
+  .trip-context-chip small{font-size:8px}
+  .trip-context-chip b{font-size:10px;overflow:hidden;text-overflow:ellipsis}
+}
+</style>
+
+
+
+<style id="top-trip-context-v10221">
+/* ===== v10.22.1 : trip details moved beside app title ===== */
+.dashboard-head{
+  display:grid!important;
+  grid-template-columns:minmax(350px,1.02fr) minmax(430px,1.22fr) minmax(350px,.92fr)!important;
+  align-items:center!important;
+  gap:22px!important;
+  min-height:166px!important;
+  padding:20px 24px!important;
+}
+.dashboard-brand{min-width:0!important}
+.top-trip-context{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  justify-content:center!important;
+  gap:10px!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:2px 0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:var(--shin-text,#17395f)!important;
+  box-shadow:none!important;
+}
+.top-trip-context[hidden]{display:flex!important}
+.top-trip-context .trip-context-title{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:baseline!important;
+  gap:10px!important;
+  min-width:0!important;
+  padding:0!important;
+  border:0!important;
+}
+.top-trip-context .trip-context-kicker{
+  flex:0 0 auto!important;
+  font-size:10px!important;
+  line-height:1!important;
+  letter-spacing:.08em!important;
+  font-weight:900!important;
+  color:#2b6db5!important;
+}
+.top-trip-context .trip-context-title strong{
+  min-width:0!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  font-size:16px!important;
+  line-height:1.25!important;
+  color:#0b2f5b!important;
+  font-weight:900!important;
+}
+.top-trip-context .trip-context-chips{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;
+  width:100%!important;
+  min-width:0!important;
+}
+.top-trip-context .trip-context-chip{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:8px!important;
+  min-width:0!important;
+  min-height:38px!important;
+  padding:8px 11px!important;
+  border:1px solid #c9ddf2!important;
+  border-radius:11px!important;
+  background:linear-gradient(180deg,#f8fbff,#edf5ff)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95)!important;
+  backdrop-filter:none!important;
+}
+.top-trip-context .trip-context-chip small{
+  flex:0 0 auto!important;
+  font-size:10px!important;
+  color:#6682a0!important;
+  font-weight:800!important;
+  white-space:nowrap!important;
+}
+.top-trip-context .trip-context-chip b{
+  min-width:0!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  font-size:12px!important;
+  color:#123f75!important;
+  font-weight:900!important;
+}
+/* the former standalone context bar no longer occupies space below tabs */
+.tabs + .trip-context-bar{margin-top:0!important}
+@media(max-width:1180px){
+  .dashboard-head{
+    grid-template-columns:minmax(320px,1fr) minmax(390px,1.15fr)!important;
+    gap:16px!important;
+  }
+  .overall-status{grid-column:1/-1!important;width:100%!important;min-width:0!important}
+}
+@media(max-width:760px){
+  .dashboard-head{
+    grid-template-columns:1fr!important;
+    gap:12px!important;
+    padding:15px!important;
+  }
+  .dashboard-brand{order:1!important}
+  .top-trip-context{order:2!important;padding:4px 0 2px!important}
+  .overall-status{order:3!important;grid-column:auto!important;margin:0!important}
+  .top-trip-context .trip-context-title{gap:8px!important}
+  .top-trip-context .trip-context-title strong{font-size:14px!important}
+  .top-trip-context .trip-context-chips{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}
+  .top-trip-context .trip-context-chip{min-height:35px!important;padding:7px 9px!important}
+  .top-trip-context .trip-context-chip small{font-size:9px!important}
+  .top-trip-context .trip-context-chip b{font-size:11px!important}
+}
+@media(max-width:430px){
+  .top-trip-context .trip-context-chips{grid-template-columns:1fr 1fr!important}
+  .top-trip-context .trip-context-chip{gap:6px!important;padding:7px 8px!important}
+}
+</style>
+
+
+
+<style id="layout-v10222">
+/* ===== v10.22.2 : compact dashboard + branded header + unobtrusive packing filter ===== */
+.dashboard-head{
+  grid-template-columns:minmax(280px,.86fr) minmax(500px,1.62fr) minmax(215px,.50fr)!important;
+  gap:16px!important;
+  min-height:148px!important;
+  padding:17px 20px!important;
+  align-items:center!important;
+}
+.dashboard-brand{gap:14px!important;align-items:center!important}
+.suitcase-logo{width:68px!important;height:68px!important;flex-basis:68px!important}
+.dashboard-title-copy h1{
+  display:flex!important;align-items:baseline!important;gap:9px!important;flex-wrap:wrap!important;
+  font-size:29px!important;line-height:1.05!important;letter-spacing:.015em!important;color:#0b2f5b!important;
+}
+.dashboard-title-copy h1 .brand-jp{
+  font-size:16px!important;font-weight:850!important;letter-spacing:.06em!important;color:#2d73c7!important;
+}
+.dashboard-title-copy>p{font-size:12px!important;margin:7px 0 0!important;color:#68819d!important}
+.active-trip-name,.dashboard-meta{display:none!important}
+
+.top-trip-context{gap:8px!important;padding:0!important}
+.top-trip-context .trip-context-title{gap:9px!important}
+.top-trip-context .trip-context-kicker{font-size:9px!important;color:#2b6db5!important}
+.top-trip-context .trip-context-title strong{font-size:15px!important}
+.top-trip-context .trip-context-chips{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:6px!important;
+}
+.top-trip-context .trip-context-chip{
+  min-height:35px!important;padding:7px 9px!important;border-radius:10px!important;
+  background:linear-gradient(180deg,#f8fbff,#edf5ff)!important;
+}
+.top-trip-context .trip-context-chip small{font-size:9px!important}
+.top-trip-context .trip-context-chip b{font-size:11px!important}
+
+.overall-status{
+  min-width:0!important;width:100%!important;padding:12px 13px 11px!important;border-radius:14px!important;
+}
+.overall-title{font-size:12px!important;margin-bottom:8px!important;white-space:nowrap!important}
+.overall-progress-row{grid-template-columns:minmax(70px,1fr) 45px!important;gap:8px!important}
+.overall-track{height:10px!important}
+.overall-progress-row strong{font-size:23px!important;text-align:right!important}
+.overall-foot{margin-top:7px!important;font-size:9px!important;gap:5px!important}
+.overall-foot span{white-space:nowrap!important}
+
+/* Tabs stay compact so the packing list starts higher. */
+.tabs{margin:10px 0 11px!important}
+
+/* Packing filter lives in the already-existing trip switch row. */
+.top-filter-btn{
+  flex:0 0 auto!important;
+  min-height:38px!important;height:38px!important;
+  padding:0 11px!important;
+  border-radius:10px!important;
+  border:1px solid #bcd4f0!important;
+  background:#edf5ff!important;
+  color:#175aaa!important;
+  font-size:11px!important;
+  font-weight:850!important;
+  box-shadow:none!important;
+  white-space:nowrap!important;
+}
+.top-filter-btn[aria-pressed="true"]{
+  background:linear-gradient(135deg,#174b87,#236fc9)!important;
+  border-color:#174f94!important;
+  color:#fff!important;
+}
+.top-filter-btn[hidden]{display:none!important}
+#tab-packing>.section-head{display:none!important}
+#tab-packing{padding-top:0!important}
+#listArea{margin-top:0!important}
+
+@media(max-width:1180px){
+  .dashboard-head{
+    grid-template-columns:minmax(250px,.80fr) minmax(390px,1.40fr) minmax(205px,.55fr)!important;
+    gap:12px!important;
+    padding:16px!important;
+  }
+  .dashboard-title-copy h1{font-size:25px!important}.dashboard-title-copy h1 .brand-jp{font-size:14px!important}
+  .top-trip-context .trip-context-chips{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .overall-status{grid-column:auto!important}
+}
+@media(max-width:900px){
+  .dashboard-head{
+    grid-template-columns:minmax(0,1fr) minmax(200px,240px)!important;
+    grid-template-rows:auto auto!important;
+    gap:10px 12px!important;
+    min-height:auto!important;
+  }
+  .dashboard-brand{grid-column:1!important;grid-row:1!important}
+  .overall-status{grid-column:2!important;grid-row:1!important;align-self:center!important}
+  .top-trip-context{grid-column:1/-1!important;grid-row:2!important}
+  .top-trip-context .trip-context-chips{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+}
+@media(max-width:640px){
+  .dashboard-head{grid-template-columns:1fr!important;grid-template-rows:auto!important;gap:8px!important;padding:12px!important}
+  .dashboard-brand{grid-column:1!important;grid-row:auto!important;gap:10px!important}
+  .suitcase-logo{width:54px!important;height:54px!important;flex-basis:54px!important}
+  .dashboard-title-copy h1{font-size:21px!important;gap:7px!important}.dashboard-title-copy h1 .brand-jp{font-size:12px!important}
+  .dashboard-title-copy>p{font-size:10px!important;margin-top:4px!important}
+  .top-trip-context{grid-column:1!important;grid-row:auto!important;gap:6px!important}
+  .top-trip-context .trip-context-title strong{font-size:13px!important}
+  .top-trip-context .trip-context-chips{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px!important}
+  .top-trip-context .trip-context-chip{min-height:31px!important;padding:6px 7px!important}
+  .top-trip-context .trip-context-chip small{font-size:8px!important}.top-trip-context .trip-context-chip b{font-size:10px!important}
+  .overall-status{grid-column:1!important;grid-row:auto!important;padding:10px 11px!important}
+  .overall-title{font-size:11px!important;margin-bottom:6px!important}
+  .overall-progress-row{grid-template-columns:1fr 42px!important}.overall-progress-row strong{font-size:21px!important}
+  .overall-foot{font-size:8px!important;margin-top:6px!important}
+  .topbar{margin:8px 0!important;align-items:stretch!important}
+  .trip-switch{display:grid!important;grid-template-columns:minmax(0,1fr) auto auto!important;gap:5px!important;width:100%!important}
+  .trip-switch select{min-width:0!important;width:100%!important}
+  .trip-switch .btn{min-height:36px!important;height:36px!important;padding:0 8px!important;font-size:10px!important}
+  .top-filter-btn{padding:0 8px!important;font-size:9px!important}
+  .tabs{margin:7px 0 9px!important}
+}
+@media(max-width:390px){
+  .trip-switch{grid-template-columns:minmax(0,1fr) auto auto!important}
+  #newTripBtn{padding:0 6px!important;font-size:9px!important}
+  .top-filter-btn{padding:0 6px!important;font-size:9px!important}
+}
+</style>
+
+
+
+<style id="trip-tags-v10223">
+/* ===== v10.22.3 : stylish travel info tags ===== */
+.top-trip-context{
+  gap:10px!important;
+}
+.top-trip-context .trip-context-title{
+  gap:11px!important;
+  align-items:center!important;
+}
+.top-trip-context .trip-context-kicker{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:24px!important;
+  padding:0 10px!important;
+  border-radius:999px!important;
+  background:linear-gradient(135deg,#eaf3ff,#dcecff)!important;
+  border:1px solid #c6dcf7!important;
+  color:#2769b7!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  letter-spacing:.08em!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9)!important;
+}
+.top-trip-context .trip-context-title strong{
+  font-size:16px!important;
+  color:#0f3967!important;
+  letter-spacing:.01em!important;
+}
+.top-trip-context .trip-context-chips{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:10px!important;
+  align-items:stretch!important;
+}
+.top-trip-context .trip-context-chip{
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  gap:4px!important;
+  min-width:0!important;
+  min-height:60px!important;
+  padding:14px 14px 12px!important;
+  border-radius:18px!important;
+  border:1px solid #cfe1f4!important;
+  background:linear-gradient(180deg,#ffffff 0%,#f3f8ff 100%)!important;
+  box-shadow:0 10px 22px rgba(27,86,154,.08), inset 0 1px 0 rgba(255,255,255,.95)!important;
+  overflow:hidden!important;
+}
+.top-trip-context .trip-context-chip::before{
+  content:"";
+  position:absolute;
+  left:14px;
+  top:10px;
+  width:28px;
+  height:4px;
+  border-radius:999px;
+  background:linear-gradient(90deg,#1e60bd,#63a5ff);
+}
+.top-trip-context .trip-context-chip::after{
+  content:"";
+  position:absolute;
+  inset:auto -12px -26px auto;
+  width:72px;
+  height:72px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(106,166,255,.16) 0%,rgba(106,166,255,0) 68%);
+  pointer-events:none;
+}
+.top-trip-context .trip-context-chip small{
+  display:block!important;
+  margin-top:2px!important;
+  font-size:10px!important;
+  font-weight:800!important;
+  letter-spacing:.06em!important;
+  color:#6a86a5!important;
+  white-space:nowrap!important;
+}
+.top-trip-context .trip-context-chip b{
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  margin-top:2px!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  color:#123f75!important;
+  font-size:17px!important;
+  line-height:1.2!important;
+  font-weight:900!important;
+}
+@media(max-width:1180px){
+  .top-trip-context .trip-context-chips{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  .top-trip-context .trip-context-chip{min-height:56px!important;padding:12px 13px 11px!important}
+  .top-trip-context .trip-context-chip b{font-size:15px!important}
+}
+@media(max-width:640px){
+  .top-trip-context .trip-context-title{gap:8px!important}
+  .top-trip-context .trip-context-kicker{min-height:22px!important;padding:0 8px!important;font-size:9px!important}
+  .top-trip-context .trip-context-title strong{font-size:14px!important}
+  .top-trip-context .trip-context-chips{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
+  .top-trip-context .trip-context-chip{min-height:52px!important;padding:11px 11px 10px!important;border-radius:15px!important}
+  .top-trip-context .trip-context-chip::before{left:11px!important;top:8px!important;width:22px!important;height:3px!important}
+  .top-trip-context .trip-context-chip small{font-size:8px!important}
+  .top-trip-context .trip-context-chip b{font-size:13px!important}
+}
+</style>
