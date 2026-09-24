@@ -1,4 +1,4 @@
-const CACHE_NAME = "travel-packing-v10.23.3";
+const CACHE_NAME = "travel-packing-v10.23.4";
 const APP_SHELL = [
   "./",
   "./index.html",

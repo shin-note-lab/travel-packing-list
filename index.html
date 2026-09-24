@@ -492,6 +492,8 @@ body{background:#f7fbff;color:#29445f}
 .items{position:relative!important;z-index:1!important;overflow:hidden!important}
 .add-box{position:relative!important;z-index:1!important}
 </style>
+
+
 </head>
 <body>
 
@@ -1189,7 +1191,7 @@ function parsePackingList(raw){
     if(!current)addGroup('共通');
     const stripped=stripPackingMarker(plain);if(!stripped.text)continue;
     const q=extractPackingQty(stripped.text);if(!q.text)continue;
-    current.items.push({id:uid(),name:q.text,qty:String(q.qty||'1'),done:stripped.done,autoQty:!q.explicit&&isDynamicQtyItem(q.text),_explicitQty:q.explicit});
+    current.items.push({id:uid(),name:q.text,qty:String(q.qty||'1'),done:false,autoQty:!q.explicit&&isDynamicQtyItem(q.text),_explicitQty:q.explicit});
   }
   return groups.filter(g=>g.items.length).map((g,gi)=>{
     const profile=g.type==='common'?{role:'common',gender:'neutral',age:null}:(g.profile||inferImportedGroupMeta(g.name,t).profile);
@@ -1250,8 +1252,11 @@ function applyImportedPacking(mode='append'){
       ig.items.forEach(it=>{const key=normalizeGroupKey(it.name);if(seen.has(key)){skipped++;return}target.items.push(it);seen.add(key);added++});
     });
   }
+  // Import is treated as a fresh preparation list: clear every check state,
+  // including items that already existed before an append import.
+  (t.groups||[]).forEach(g=>(g.items||[]).forEach(it=>{it.done=false}));
   t.updatedAt=Date.now();saveTrips();renderAll();closePackingImport();switchTab('packing');
-  toast(mode==='replace'?`${total}項目の持ち物に入れ替えました`:`${added}項目を追加しました${skipped?`（重複${skipped}件は除外）`:''}`);
+  toast(mode==='replace'?`${total}項目の持ち物に入れ替え、チェックをすべて外しました`:`${added}項目を追加し、チェックをすべて外しました${skipped?`（重複${skipped}件は除外）`:''}`);
 }
 
 function openDb(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,DB_VERSION);req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains('attachments')){const s=d.createObjectStore('attachments',{keyPath:'id'});s.createIndex('tripId','tripId')}if(!d.objectStoreNames.contains('covers'))d.createObjectStore('covers',{keyPath:'tripId'})};req.onsuccess=()=>{db=req.result;resolve(db)};req.onerror=()=>reject(req.error)})}
@@ -2365,4 +2370,48 @@ body{
 #cloudJoinPassInput{text-transform:uppercase;font-weight:900;letter-spacing:.10em;font-size:17px;text-align:center}
 .cloud-status-card[data-state="ready"] .cloud-status-dot{background:#2f80ed;box-shadow:0 0 0 4px rgba(47,128,237,.12)}
 @media(max-width:640px){.cloud-join{padding:15px 12px 16px}.cloud-invite-card{padding:12px;border-radius:14px}.cloud-pass-input{text-align:center!important}}
+</style>
+
+<style id="compact-trip-toolbar-v10234">
+/* ===== v10.23.4 : compact mobile trip/action toolbar ===== */
+@media(max-width:640px){
+  .topbar{
+    min-height:0!important;
+    margin:7px 0 5px!important;
+  }
+  .trip-switch{
+    width:100%!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,.72fr) minmax(0,.72fr)!important;
+    grid-template-areas:
+      "trip trip cloud"
+      "new import filter"!important;
+    gap:6px!important;
+    align-items:stretch!important;
+  }
+  .trip-switch #tripSelect{grid-area:trip!important;min-width:0!important;width:100%!important}
+  .trip-switch #cloudBtn{grid-area:cloud!important;min-width:0!important;width:100%!important}
+  .trip-switch #newTripBtn{grid-area:new!important;min-width:0!important;width:100%!important;grid-column:auto!important;grid-row:auto!important}
+  .trip-switch #importPackingBtn{grid-area:import!important;min-width:0!important;width:100%!important;grid-column:auto!important;grid-row:auto!important}
+  .trip-switch #filterBtn{grid-area:filter!important;min-width:0!important;width:100%!important;grid-column:auto!important;grid-row:auto!important}
+  .trip-switch select,.trip-switch .btn{
+    height:35px!important;
+    min-height:35px!important;
+    padding:0 7px!important;
+    font-size:9.5px!important;
+    border-radius:10px!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+  .trip-switch #tripSelect{font-size:11px!important;padding-inline:10px!important}
+  .trip-switch #newTripBtn{font-size:9.5px!important}
+  .trip-switch #cloudBtn,.trip-switch #importPackingBtn,.trip-switch #filterBtn{font-size:9px!important}
+  .tabs{margin:5px 0 8px!important}
+}
+@media(max-width:390px){
+  .trip-switch{gap:5px!important;grid-template-columns:minmax(0,1fr) minmax(0,.70fr) minmax(0,.70fr)!important}
+  .trip-switch select,.trip-switch .btn{padding:0 5px!important;font-size:8.7px!important}
+  .trip-switch #tripSelect{font-size:10.5px!important;padding-inline:8px!important}
+}
 </style>
