@@ -1,8 +1,9 @@
-const CACHE_NAME = "travel-packing-v10.22.6";
+const CACHE_NAME = "travel-packing-v10.23.3";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
+  "./cloud-config.js",
   "./pwa-192.png",
   "./pwa-512.png"
 ];

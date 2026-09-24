@@ -556,6 +556,7 @@ body{background:#f7fbff;color:#29445f}
     <div class="trip-switch">
       <select id="tripSelect" aria-label="旅行を選択"></select>
       <button class="btn btn-soft" id="newTripBtn">＋ 新しい旅行</button>
+      <button class="btn btn-soft cloud-open-btn" id="cloudBtn" type="button"><span class="cloud-dot" aria-hidden="true"></span><span id="cloudBtnLabel">共同編集</span></button>
       <button class="btn btn-soft top-import-btn" id="importPackingBtn" type="button" hidden>リスト取込</button>
       <button class="btn btn-soft top-filter-btn" id="filterBtn" type="button" hidden aria-pressed="false">未準備のみ</button>
     </div>
@@ -720,18 +721,83 @@ body{background:#f7fbff;color:#29445f}
       <span>テキストを入力すると、取り込み内容を確認できます。</span>
     </div>
     <div class="packing-import-footer">
-      <p class="hint">追記では同じグループ名へ追加し、同名の持ち物は重複追加しません。入れ替えでは現在の持ち物リストを置き換えます。</p>
-      <div class="btn-row packing-import-buttons">
-        <button class="btn btn-soft" type="button" id="cancelPackingImportBtn">キャンセル</button>
-        <button class="btn btn-soft" type="button" id="replacePackingImportBtn">現在のリストと入れ替え</button>
-        <button class="btn btn-primary" type="button" id="appendPackingImportBtn">現在のリストへ追記</button>
+      <div class="packing-import-mode-row">
+        <label class="packing-import-mode" for="packingImportMode">
+          <span>取り込み方法</span>
+          <select id="packingImportMode">
+            <option value="append">現在のリストへ追記</option>
+            <option value="replace">現在のリストと入れ替え</option>
+          </select>
+        </label>
+        <button class="btn btn-primary packing-import-confirm" type="button" id="confirmPackingImportBtn">この内容で取り込む</button>
+      </div>
+      <div class="packing-import-footer-sub">
+        <p class="hint">追記では同じグループへ追加し、同名の持ち物は重複しません。</p>
+        <button class="btn btn-soft packing-import-cancel" type="button" id="cancelPackingImportBtn">キャンセル</button>
       </div>
     </div>
   </div>
 </div>
 
+<div class="modal" id="cloudModal" aria-hidden="true">
+  <div class="dialog cloud-dialog" role="dialog" aria-modal="true" aria-labelledby="cloudTitle">
+    <div class="cloud-head">
+      <div><span class="cloud-kicker">REALTIME COLLABORATION</span><h3 id="cloudTitle">リアルタイム共同編集</h3></div>
+      <button class="cloud-close" type="button" id="closeCloudBtn" aria-label="閉じる">×</button>
+    </div>
+    <div class="cloud-status-card" id="cloudStatusCard" aria-live="polite">
+      <span class="cloud-status-dot"></span>
+      <div><b id="cloudStatusTitle">ローカル保存</b><small id="cloudStatusText">この端末だけに保存されています。</small></div>
+    </div>
+
+    <section class="cloud-setup" id="cloudSetupBox">
+      <div class="cloud-section-title">Supabase接続設定</div>
+      <p class="hint">初回だけ設定します。公開用は <code>cloud-config.js</code> に同じ値を入れると、共有相手は設定不要です。</p>
+      <div class="field"><label for="cloudUrlInput">Project URL</label><input id="cloudUrlInput" type="url" inputmode="url" placeholder="https://xxxxx.supabase.co"></div>
+      <div class="field" style="margin-top:10px"><label for="cloudKeyInput">Publishable key</label><input id="cloudKeyInput" type="password" autocomplete="off" placeholder="sb_publishable_... または legacy anon key"></div>
+      <p class="cloud-security-note">※ Secret key / service_role key は絶対に入力しないでください。</p>
+      <div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" id="saveCloudConfigBtn" type="button">この端末に接続設定を保存</button></div>
+    </section>
+
+    <section class="cloud-join" id="cloudJoinBox" hidden>
+      <div class="cloud-section-title">共有された旅行に参加</div>
+      <p class="hint">共有URLは確認できました。送られてきたパスコードを入力すると、この旅行の共同編集に参加できます。</p>
+      <div class="field"><label for="cloudJoinPassInput">共有パスコード</label><input id="cloudJoinPassInput" type="text" inputmode="text" autocomplete="one-time-code" autocapitalize="characters" placeholder="ABCDE-F0123" maxlength="16"></div>
+      <button class="btn btn-primary cloud-start" id="joinCloudBtn" type="button">この旅行に参加</button>
+    </section>
+
+    <section class="cloud-actions" id="cloudActionsBox" hidden>
+      <div class="cloud-section-title">この旅行を共有</div>
+      <div id="cloudLocalActions">
+        <p class="hint">旅行情報・メモ・持ち物・チェック状態をクラウドへ保存し、共有リンクを開いた人とリアルタイム同期します。</p>
+        <button class="btn btn-primary cloud-start" id="startCloudShareBtn" type="button">この旅行で共同編集を開始</button>
+      </div>
+      <div id="cloudSharedActions" hidden>
+        <div class="cloud-trip-row"><span>対象</span><b id="cloudTripName">旅行</b><span class="cloud-role" id="cloudRoleBadge">編集者</span></div>
+        <div class="cloud-invite-card">
+          <div class="cloud-auto-badge">自動作成済み</div>
+          <label class="cloud-link-label" for="cloudInviteLink">共有URL</label>
+          <div class="cloud-link-row"><input id="cloudInviteLink" type="text" readonly><button class="btn btn-soft" id="copyCloudLinkBtn" type="button">URLをコピー</button></div>
+          <label class="cloud-link-label cloud-pass-label" for="cloudSharePass">共有パスコード</label>
+          <div class="cloud-link-row cloud-pass-row"><input id="cloudSharePass" class="cloud-pass-input" type="text" readonly><button class="btn btn-soft" id="copyCloudPassBtn" type="button">パスをコピー</button></div>
+          <button class="btn btn-primary cloud-copy-invite" id="copyCloudInviteBtn" type="button">URL＋パスをまとめてコピー</button>
+          <p class="hint cloud-invite-hint">URLとパスコードは共同編集開始時に自動生成されます。相手には両方を送ってください。</p>
+        </div>
+        <div class="btn-row cloud-secondary-actions">
+          <button class="btn btn-soft" id="pullCloudBtn" type="button">クラウドから再読込</button>
+          <button class="btn btn-soft" id="rotateCloudLinkBtn" type="button">招待リンクを再発行</button>
+          <button class="btn btn-danger" id="leaveCloudBtn" type="button">共同編集を終了</button>
+        </div>
+      </div>
+      <p class="hint cloud-attachment-note">PDF・写真の関連資料は端末内保存のままで、共同編集の同期対象には含まれません。</p>
+    </section>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
+<script src="./cloud-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (() => {
 'use strict';
@@ -741,13 +807,17 @@ const DB_NAME='travelPackingFiles_v1';
 const DB_VERSION=2;
 let trips=[];let currentTripId=null;let filterUnready=false;let pendingDelete=null;let db=null;
 let touchState=null;
+const CLOUD_CONFIG_KEY='tripReadyCloudConfig_v1';
+let cloudClient=null,cloudUser=null,cloudChannel=null,cloudInitialized=false,cloudApplying=false;
+const cloudSyncTimers=new Map(),cloudDirty=new Set(),cloudBases=new Map(),cloudVersions=new Map(),cloudSyncing=new Set();
+let cloudConnectionState='local';
 
 const $=s=>document.querySelector(s);const $$=s=>[...document.querySelectorAll(s)];
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 const deepClone=o=>JSON.parse(JSON.stringify(o));
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),1800)}
-function saveTrips(){localStorage.setItem(STORAGE_KEY,JSON.stringify(trips));if(currentTripId)localStorage.setItem(LAST_KEY,currentTripId)}
+function saveTrips(){localStorage.setItem(STORAGE_KEY,JSON.stringify(trips));if(currentTripId)localStorage.setItem(LAST_KEY,currentTripId);if(cloudInitialized&&!cloudApplying){const t=currentTrip();if(t?.cloud?.tripId){cloudDirty.add(t.cloud.tripId);scheduleCloudSync(t)}}renderCloudButton()}
 function currentTrip(){return trips.find(t=>t.id===currentTripId)||trips[0]||null}
 function makeTrip(name='新しい旅行'){return {id:uid(),name,destination:'',days:'1泊2日',month:new Date().getMonth()+1,bgTaste:'写真風',adults:2,children:0,adultGenders:['male','female'],childAges:[],childGenders:[],transport:['車'],familyNames:['パパ','ママ'],groups:[],memo:'',cover:{mode:'auto',preset:'auto'},createdAt:Date.now(),updatedAt:Date.now()}}
 function normalizeTrip(raw){
@@ -1031,11 +1101,18 @@ function normalizeImportedPacking(raw,fileName=''){
 function stripPackingMarker(raw){
   let s=String(raw??'');
   let done=false;
-  if(/^\s*(?:☑|☒|✅|✔|✓)\s*/.test(s))done=true;
-  if(/^\s*(?:[-*+]\s*)?\[[xX✓✔]\]\s*/.test(s))done=true;
-  s=s.replace(/^\s*(?:[-*+]\s*)?\[(?: |x|X|✓|✔)\]\s*/,'');
-  s=s.replace(/^\s*(?:☐|☑|☒|□|■|✅|✔|✓)\s*/,'');
-  s=s.replace(/^\s*(?:[-*+・•●○▪︎◦]|\d+[.)、])\s*/,'');
+  const checked=/(?:☑|☒|✅|✔|✓|\[[xX✓✔]\])/;
+  if(checked.test(s))done=true;
+  // Google Keep / Markdown / copied checklist text can contain more than one
+  // leading marker, e.g. "[ ] ■ 共通" or "[ ] □ 着替え". Strip all
+  // such decoration before deciding whether the line is a heading or item.
+  for(let i=0;i<6;i++){
+    const before=s;
+    s=s.replace(/^\s*(?:[-*+]\s*)?\[(?: |x|X|✓|✔)\]\s*/,'');
+    s=s.replace(/^\s*(?:☐|☑|☒|□|■|▪|▫|◆|◇|✅|✔|✓)\s*/,'');
+    s=s.replace(/^\s*(?:[-*+・•●○▪︎◦]|\d+[.)、])\s*/,'');
+    if(s===before)break;
+  }
   return {text:s.trim(),done};
 }
 function extractPackingQty(raw){
@@ -1093,7 +1170,8 @@ function parsePackingList(raw){
     current={id:uid(),name:clean,type:meta.type,profile:meta.profile,items:[]};groups.push(current);return current;
   };
   const hasExplicitGroups=lines.some((line,i)=>{
-    const plain=line.trim.replace(/^#{1,6}\s*/,'').replace(/[：:]\s*$/,'').trim();
+    const rawPlain=line.trim.replace(/^#{1,6}\s*/,'').replace(/[：:]\s*$/,'').trim();
+    const plain=stripPackingMarker(rawPlain).text.replace(/[：:]\s*$/,'').trim();
     if(known.includes(normalizeGroupKey(plain)))return true;
     if(/^#{1,6}\s+/.test(line.trim))return true;
     if(/[：:]$/.test(line.trim)&&line.indent===0)return true;
@@ -1104,9 +1182,10 @@ function parsePackingList(raw){
     const line=lines[i];let plain=line.trim;
     if(isPackingMetadataLine(plain,t))continue;
     const noHeadingMarks=plain.replace(/^#{1,6}\s*/,'').replace(/[：:]\s*$/,'').trim();
+    const cleanHeading=stripPackingMarker(noHeadingMarks).text.replace(/[：:]\s*$/,'').trim();
     const next=lines[i+1];
-    const explicitHeading=known.includes(normalizeGroupKey(noHeadingMarks))||/^#{1,6}\s+/.test(plain)||(line.indent===0&&/[：:]$/.test(plain))||(line.indent===0&&next&&next.indent>line.indent);
-    if(hasExplicitGroups&&explicitHeading){addGroup(noHeadingMarks);continue}
+    const explicitHeading=known.includes(normalizeGroupKey(cleanHeading))||/^#{1,6}\s+/.test(plain)||(line.indent===0&&/[：:]$/.test(plain))||(line.indent===0&&next&&next.indent>line.indent);
+    if(hasExplicitGroups&&explicitHeading){addGroup(cleanHeading||'共通');continue}
     if(!current)addGroup('共通');
     const stripped=stripPackingMarker(plain);if(!stripped.text)continue;
     const q=extractPackingQty(stripped.text);if(!q.text)continue;
@@ -1132,6 +1211,7 @@ function openPackingImport(){
   $('#externalPackingText').value='';
   $('#externalPackingFile').value='';
   $('#externalPackingFileName').textContent='未選択';
+  if($('#packingImportMode'))$('#packingImportMode').value='append';
   renderPackingImportPreview();
   openModal('#packingImportModal');
   setTimeout(()=>$('#externalPackingText')?.focus(),80);
@@ -1185,28 +1265,205 @@ async function renderAttachments(){if(!db)return;const t=currentTrip();const lis
 async function openAttachment(id){const a=await idbGet('attachments',id);if(!a)return;const url=URL.createObjectURL(a.blob);window.open(url,'_blank');setTimeout(()=>URL.revokeObjectURL(url),60000)}
 async function deleteAttachment(id){await idbDelete('attachments',id);renderAttachments();toast('資料を削除しました')}
 
-function exportJson(){const payload={version:'10.22.6',exportedAt:new Date().toISOString(),trips};downloadBlob(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),`家族旅行もちものバックアップ_${new Date().toISOString().slice(0,10)}.json`)}
+function exportJson(){const payload={version:'10.23.0',exportedAt:new Date().toISOString(),trips};downloadBlob(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),`家族旅行もちものバックアップ_${new Date().toISOString().slice(0,10)}.json`)}
 async function importJson(file){try{const txt=await file.text();const obj=JSON.parse(txt);const arr=Array.isArray(obj)?obj:obj.trips;if(!Array.isArray(arr))throw new Error('形式が違います');trips=arr.map(normalizeTrip);if(!trips.length)throw new Error('旅行データがありません');currentTripId=trips[0].id;saveTrips();renderAll();toast('バックアップを復元しました')}catch(e){alert('JSONを読み込めませんでした。\n'+e.message)}}
 function deleteTrip(){const t=currentTrip();if(!t)return;if(!confirm(`「${t.name}」を削除しますか？`))return;trips=trips.filter(x=>x.id!==t.id);if(!trips.length)trips=[makeTrip('家族旅行')];currentTripId=trips[0].id;saveTrips();renderAll();toast('旅行を削除しました')}
 
 function switchTab(name){$$('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));$$('.tab').forEach(t=>t.classList.toggle('active',t.id===`tab-${name}`));const filter=$('#filterBtn'),imp=$('#importPackingBtn');if(filter)filter.hidden=name!=='packing';if(imp)imp.hidden=name!=='packing';renderTripContext(name);if(name==='share')renderSharePreview();if(name==='summary')renderSummary();setTimeout(autoGrowAll,0)}
-function renderAll(){renderTripSelect();renderSettings();renderPacking();renderSummary();renderAttachments();renderSharePreview();renderTripContext()}
+function renderAll(){renderTripSelect();renderSettings();renderPacking();renderSummary();renderAttachments();renderSharePreview();renderTripContext();renderCloudButton()}
 function bindEvents(){
-  $$('.tab-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));$('#tripSelect').addEventListener('change',e=>{currentTripId=e.target.value;saveTrips();renderAll()});$('#newTripBtn').addEventListener('click',()=>{const t=makeTrip(`旅行${trips.length+1}`);trips.push(t);currentTripId=t.id;saveTrips();renderAll();switchTab('settings')});
-  $('#tripDays').addEventListener('change',()=>{const hadGroups=!!currentTrip()?.groups?.length;gatherSettings();renderPacking();renderTripContext();if(hadGroups)toast(`${currentTrip().days}に合わせて数量を更新しました`)});$('#destination').addEventListener('change',()=>{gatherSettings();renderTripContext()});$('#tripMonth').addEventListener('change',()=>{gatherSettings();renderTripContext()});$('#adultCount').addEventListener('change',()=>renderPeopleInputs(true));$('#childCount').addEventListener('change',()=>renderPeopleInputs(true));$('#adultNames').addEventListener('change',e=>{if(e.target.matches('select[data-adult-gender-index]'))refreshPersonPreview(e.target.closest('.person-card'))});$('#childProfiles').addEventListener('change',e=>{if(e.target.matches('select[data-age-index],select[data-child-gender-index]'))refreshPersonPreview(e.target.closest('.person-card'))});$('#saveSettingsBtn').addEventListener('click',()=>{gatherSettings();renderAll();toast('設定を保存しました')});$('#generateBtn').addEventListener('click',generateGroups);$('#filterBtn').addEventListener('click',()=>{filterUnready=!filterUnready;renderPacking()});$('#importPackingBtn').addEventListener('click',openPackingImport);$('#closePackingImportBtn').addEventListener('click',closePackingImport);$('#cancelPackingImportBtn').addEventListener('click',closePackingImport);$('#pastePackingClipboardBtn').addEventListener('click',pasteExternalPackingFromClipboard);$('#externalPackingFile').addEventListener('change',e=>{if(e.target.files[0])loadExternalPackingFile(e.target.files[0])});$('#externalPackingText').addEventListener('input',renderPackingImportPreview);$('#appendPackingImportBtn').addEventListener('click',()=>applyImportedPacking('append'));$('#replacePackingImportBtn').addEventListener('click',()=>applyImportedPacking('replace'));$('#packingImportModal').addEventListener('click',e=>{if(e.target.id==='packingImportModal')closePackingImport()});
+  $$('.tab-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));$('#tripSelect').addEventListener('change',e=>{currentTripId=e.target.value;saveTrips();renderAll();activateCurrentCloudTrip().catch(console.warn)});$('#newTripBtn').addEventListener('click',()=>{const t=makeTrip(`旅行${trips.length+1}`);trips.push(t);currentTripId=t.id;saveTrips();renderAll();switchTab('settings');activateCurrentCloudTrip().catch(console.warn)});
+  $('#cloudBtn').addEventListener('click',openCloudModal);$('#closeCloudBtn').addEventListener('click',()=>closeModal('#cloudModal'));$('#cloudModal').addEventListener('click',e=>{if(e.target.id==='cloudModal')closeModal('#cloudModal')});$('#saveCloudConfigBtn').addEventListener('click',saveCloudConfigFromUi);$('#startCloudShareBtn').addEventListener('click',startCloudShare);$('#joinCloudBtn').addEventListener('click',()=>processCloudJoinLink($('#cloudJoinPassInput').value));$('#cloudJoinPassInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();processCloudJoinLink(e.currentTarget.value)}});$('#copyCloudLinkBtn').addEventListener('click',copyCloudInviteLink);$('#copyCloudPassBtn').addEventListener('click',copyCloudInvitePass);$('#copyCloudInviteBtn').addEventListener('click',copyCloudInviteBundle);$('#pullCloudBtn').addEventListener('click',pullCloudNow);$('#rotateCloudLinkBtn').addEventListener('click',rotateCloudInviteLink);$('#leaveCloudBtn').addEventListener('click',leaveOrDeleteCloudTrip);
+  $('#tripDays').addEventListener('change',()=>{const hadGroups=!!currentTrip()?.groups?.length;gatherSettings();renderPacking();renderTripContext();if(hadGroups)toast(`${currentTrip().days}に合わせて数量を更新しました`)});$('#destination').addEventListener('change',()=>{gatherSettings();renderTripContext()});$('#tripMonth').addEventListener('change',()=>{gatherSettings();renderTripContext()});$('#adultCount').addEventListener('change',()=>renderPeopleInputs(true));$('#childCount').addEventListener('change',()=>renderPeopleInputs(true));$('#adultNames').addEventListener('change',e=>{if(e.target.matches('select[data-adult-gender-index]'))refreshPersonPreview(e.target.closest('.person-card'))});$('#childProfiles').addEventListener('change',e=>{if(e.target.matches('select[data-age-index],select[data-child-gender-index]'))refreshPersonPreview(e.target.closest('.person-card'))});$('#saveSettingsBtn').addEventListener('click',()=>{gatherSettings();renderAll();toast('設定を保存しました')});$('#generateBtn').addEventListener('click',generateGroups);$('#filterBtn').addEventListener('click',()=>{filterUnready=!filterUnready;renderPacking()});$('#importPackingBtn').addEventListener('click',openPackingImport);$('#closePackingImportBtn').addEventListener('click',closePackingImport);$('#cancelPackingImportBtn').addEventListener('click',closePackingImport);$('#pastePackingClipboardBtn').addEventListener('click',pasteExternalPackingFromClipboard);$('#externalPackingFile').addEventListener('change',e=>{if(e.target.files[0])loadExternalPackingFile(e.target.files[0])});$('#externalPackingText').addEventListener('input',renderPackingImportPreview);$('#confirmPackingImportBtn').addEventListener('click',()=>applyImportedPacking($('#packingImportMode')?.value||'append'));$('#packingImportModal').addEventListener('click',e=>{if(e.target.id==='packingImportModal')closePackingImport()});
   $('#tripMemo').addEventListener('input',()=>{const t=currentTrip();t.memo=$('#tripMemo').value;saveTrips();renderSharePreview()});$('#importMemoBtn').addEventListener('click',openMemoImport);$('#closeMemoImportBtn').addEventListener('click',closeMemoImport);$('#cancelMemoImportBtn').addEventListener('click',closeMemoImport);$('#pasteMemoClipboardBtn').addEventListener('click',pasteExternalMemoFromClipboard);$('#externalMemoFile').addEventListener('change',e=>{if(e.target.files[0])loadExternalMemoFile(e.target.files[0])});$('#appendMemoImportBtn').addEventListener('click',()=>applyImportedMemo('append'));$('#replaceMemoImportBtn').addEventListener('click',()=>applyImportedMemo('replace'));$('#memoImportModal').addEventListener('click',e=>{if(e.target.id==='memoImportModal')closeMemoImport()});$('#shareMode').addEventListener('change',()=>{renderShareGroup();renderSharePreview()});$('#shareGroup').addEventListener('change',renderSharePreview);$('#nativeShareBtn').addEventListener('click',doShare);$('#copyShareBtn').addEventListener('click',async()=>{await navigator.clipboard.writeText(shareText());toast('コピーしました')});$('#saveTxtBtn').addEventListener('click',saveTxt);
   $('#exportBtn').addEventListener('click',exportJson);$('#importFile').addEventListener('change',e=>{if(e.target.files[0])importJson(e.target.files[0]);e.target.value=''});$('#deleteTripBtn').addEventListener('click',deleteTrip);
   $('#confirmDeleteBtn').addEventListener('click',deletePendingItem);$('#cancelDeleteBtn').addEventListener('click',()=>{pendingDelete=null;closeModal('#deleteModal')});$('#deleteModal').addEventListener('click',e=>{if(e.target.id==='deleteModal'){pendingDelete=null;closeModal('#deleteModal')}});
   $('#attachmentInput').addEventListener('change',e=>{addAttachments([...e.target.files]);e.target.value=''});$('#attachmentList').addEventListener('click',e=>{const o=e.target.closest('[data-open-att]'),d=e.target.closest('[data-del-att]');if(o)openAttachment(o.dataset.openAtt);if(d)deleteAttachment(d.dataset.delAtt)});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'){pendingDelete=null;closeModal('#deleteModal');closeMemoImport();closePackingImport()}});window.addEventListener('resize',autoGrowAll);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){pendingDelete=null;closeModal('#deleteModal');closeMemoImport();closePackingImport();closeModal('#cloudModal')}});window.addEventListener('resize',autoGrowAll);
   bindListEvents();
 }
 
-async function init(){initSelects();loadTrips();try{await openDb()}catch(e){console.warn('IndexedDB unavailable',e)}bindEvents();renderAll();if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(console.warn)}
+
+function getCloudClientId(){
+  try{let id=sessionStorage.getItem('tripReadyCloudClientId');if(!id){id=(crypto.randomUUID?crypto.randomUUID():uid());sessionStorage.setItem('tripReadyCloudClientId',id)}return id}catch(_){return uid()}
+}
+function readCloudConfig(){
+  let local={};try{local=JSON.parse(localStorage.getItem(CLOUD_CONFIG_KEY)||'{}')||{}}catch(_){}
+  const file=window.TRIP_READY_CLOUD||{};
+  return {url:String(local.url||file.supabaseUrl||'').trim(),key:String(local.key||file.supabasePublishableKey||'').trim()};
+}
+function isCloudConfigValid(c){return /^https:\/\//i.test(c?.url||'')&&String(c?.key||'').length>20&&!String(c.key).startsWith('sb_secret_')}
+function cloudConfigIsSecret(k){return String(k||'').startsWith('sb_secret_')||/service[_-]?role/i.test(String(k||''))}
+async function configureCloudClient(){
+  const cfg=readCloudConfig();
+  if(!isCloudConfigValid(cfg)){cloudClient=null;cloudInitialized=false;renderCloudButton();return false}
+  if(!window.supabase?.createClient){cloudConnectionState='offline';renderCloudButton();return false}
+  cloudClient=window.supabase.createClient(cfg.url,cfg.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  cloudInitialized=true;cloudConnectionState=navigator.onLine?'ready':'offline';renderCloudButton();return true
+}
+async function ensureCloudAuth(){
+  if(!cloudClient){const ok=await configureCloudClient();if(!ok)throw new Error('Supabase接続設定がありません')}
+  let {data,error}=await cloudClient.auth.getSession();if(error)throw error;
+  if(!data.session){const r=await cloudClient.auth.signInAnonymously();if(r.error)throw new Error('匿名サインインに失敗しました。Supabase側で Anonymous Sign-Ins を有効にしてください。');data={session:r.data.session}}
+  cloudUser=data.session?.user||null;if(!cloudUser)throw new Error('クラウドユーザーを作成できませんでした');return cloudUser
+}
+function serializeTripForCloud(t){const x=deepClone(t);delete x.cloud;return x}
+function eqJson(a,b){try{return JSON.stringify(a)===JSON.stringify(b)}catch(_){return a===b}}
+function mergeCloudValue(base,local,remote){
+  if(eqJson(local,base))return deepClone(remote);if(eqJson(remote,base))return deepClone(local);if(eqJson(local,remote))return deepClone(local);
+  if(Array.isArray(base)&&Array.isArray(local)&&Array.isArray(remote)){
+    const objectArray=[...base,...local,...remote].filter(Boolean).some(v=>typeof v==='object'&&!Array.isArray(v)&&v.id);
+    if(!objectArray)return deepClone(local);
+    const bm=new Map(base.filter(x=>x&&x.id).map(x=>[x.id,x])),lm=new Map(local.filter(x=>x&&x.id).map(x=>[x.id,x])),rm=new Map(remote.filter(x=>x&&x.id).map(x=>[x.id,x]));
+    const localOrder=local.map(x=>x?.id).filter(Boolean),remoteOrder=remote.map(x=>x?.id).filter(Boolean),ids=[...localOrder,...remoteOrder.filter(id=>!localOrder.includes(id))];
+    const out=[];
+    ids.forEach(id=>{const b=bm.get(id),l=lm.get(id),r=rm.get(id);if(b&&l===undefined){return}if(b&&r===undefined){if(l&&!eqJson(l,b))out.push(deepClone(l));return}if(!b&&l&&!r){out.push(deepClone(l));return}if(!b&&r&&!l){out.push(deepClone(r));return}if(l&&r)out.push(mergeCloudValue(b||{},l,r))});
+    return out;
+  }
+  if(base&&local&&remote&&typeof base==='object'&&typeof local==='object'&&typeof remote==='object'&&!Array.isArray(base)&&!Array.isArray(local)&&!Array.isArray(remote)){
+    const out={};new Set([...Object.keys(base),...Object.keys(local),...Object.keys(remote)]).forEach(k=>{if(!(k in local)&&k in base){if(!(k in remote)||eqJson(remote[k],base[k]))return}if(!(k in remote)&&k in base){if(k in local&&!eqJson(local[k],base[k]))out[k]=deepClone(local[k]);return}out[k]=mergeCloudValue(base[k],local[k],remote[k])});return out;
+  }
+  return deepClone(local);
+}
+function findTripByCloudId(id){return trips.find(t=>t.cloud?.tripId===id)||null}
+function applyRemoteTripPayload(cloudId,payload,meta={}){
+  const current=findTripByCloudId(cloudId);let incoming=normalizeTrip(payload||{});const existingId=current?.id;
+  if(existingId)incoming.id=existingId;else if(trips.some(t=>t.id===incoming.id))incoming.id=uid();
+  incoming.cloud={tripId:cloudId,role:meta.role||current?.cloud?.role||'editor',shareToken:meta.shareToken||current?.cloud?.shareToken||'',sharePass:meta.sharePass||current?.cloud?.sharePass||'',ownerId:meta.ownerId||current?.cloud?.ownerId||''};
+  const idx=current?trips.indexOf(current):-1;if(idx>=0)trips[idx]=incoming;else trips.push(incoming);currentTripId=incoming.id;
+  cloudApplying=true;saveTrips();cloudApplying=false;renderAll();return incoming
+}
+async function fetchCloudTrip(id){const {data,error}=await cloudClient.from('shared_trips').select('id,owner_id,title,payload,share_token,share_pass,version,client_id,updated_at').eq('id',id).single();if(error)throw error;return data}
+async function getMyCloudRole(id){if(!cloudUser)return'editor';const {data}=await cloudClient.from('trip_members').select('role').eq('trip_id',id).eq('user_id',cloudUser.id).maybeSingle();return data?.role||'editor'}
+async function subscribeCloudTrip(id){
+  if(!cloudClient)return;if(cloudChannel){await cloudClient.removeChannel(cloudChannel).catch(()=>{});cloudChannel=null}
+  cloudChannel=cloudClient.channel(`trip-ready:${id}`).on('postgres_changes',{event:'UPDATE',schema:'public',table:'shared_trips',filter:`id=eq.${id}`},payload=>handleCloudUpdate(payload.new)).on('postgres_changes',{event:'DELETE',schema:'public',table:'shared_trips',filter:`id=eq.${id}`},()=>handleCloudDeleted(id)).subscribe(status=>{cloudConnectionState=status==='SUBSCRIBED'?'live':status==='CHANNEL_ERROR'?'offline':cloudConnectionState;renderCloudButton();renderCloudModal()})
+}
+function handleCloudDeleted(id){const t=findTripByCloudId(id);if(!t)return;delete t.cloud;cloudBases.delete(id);cloudVersions.delete(id);cloudDirty.delete(id);cloudApplying=true;saveTrips();cloudApplying=false;renderAll();toast('共同編集が終了されました')}
+function handleCloudUpdate(row){
+  const id=row.id;if(row.client_id===getCloudClientId()){cloudVersions.set(id,Number(row.version||1));cloudBases.set(id,deepClone(row.payload||{}));return}
+  const t=findTripByCloudId(id);if(!t)return;const remote=deepClone(row.payload||{}),base=cloudBases.get(id)||remote,local=serializeTripForCloud(t);cloudVersions.set(id,Number(row.version||1));
+  if(cloudDirty.has(id)){const merged=mergeCloudValue(base,local,remote);cloudBases.set(id,remote);applyRemoteTripPayload(id,merged,{role:t.cloud.role,shareToken:row.share_token,sharePass:row.share_pass,ownerId:row.owner_id});cloudDirty.add(id);scheduleCloudSync(findTripByCloudId(id));toast('共同編集の変更を統合しました')}else{cloudBases.set(id,remote);applyRemoteTripPayload(id,remote,{role:t.cloud.role,shareToken:row.share_token,sharePass:row.share_pass,ownerId:row.owner_id});toast('共同編集の変更を反映しました')}
+}
+function scheduleCloudSync(t){
+  if(!cloudInitialized||!cloudClient||!t?.cloud?.tripId)return;const id=t.cloud.tripId;cloudDirty.add(id);clearTimeout(cloudSyncTimers.get(id));cloudSyncTimers.set(id,setTimeout(()=>syncTripToCloud(id),420));renderCloudButton()
+}
+async function syncTripToCloud(id){
+  if(cloudSyncing.has(id)||!cloudDirty.has(id)||!navigator.onLine)return;const t=findTripByCloudId(id);if(!t)return;cloudSyncing.add(id);
+  try{await ensureCloudAuth();for(let attempt=0;attempt<3;attempt++){
+    if(!cloudVersions.has(id)){const row=await fetchCloudTrip(id);cloudVersions.set(id,Number(row.version||1));cloudBases.set(id,deepClone(row.payload||{}))}
+    const localPayload=serializeTripForCloud(findTripByCloudId(id));const baseVersion=Number(cloudVersions.get(id)||1);const {data,error}=await cloudClient.rpc('update_shared_trip',{p_trip_id:id,p_base_version:baseVersion,p_title:findTripByCloudId(id)?.name||'旅行',p_payload:localPayload,p_client_id:getCloudClientId()});if(error)throw error;const newVersion=Number(data||0);
+    if(newVersion>0){cloudVersions.set(id,newVersion);cloudBases.set(id,deepClone(localPayload));cloudDirty.delete(id);cloudConnectionState='live';renderCloudButton();return}
+    const row=await fetchCloudTrip(id);const current=findTripByCloudId(id);const merged=mergeCloudValue(cloudBases.get(id)||row.payload,serializeTripForCloud(current),row.payload);cloudVersions.set(id,Number(row.version||1));cloudBases.set(id,deepClone(row.payload||{}));applyRemoteTripPayload(id,merged,{role:current.cloud.role,shareToken:row.share_token,sharePass:row.share_pass,ownerId:row.owner_id});cloudDirty.add(id)
+  }}catch(e){console.warn('cloud sync',e);cloudConnectionState='offline';renderCloudButton();setTimeout(()=>{if(cloudDirty.has(id)&&navigator.onLine)syncTripToCloud(id)},3500)}finally{cloudSyncing.delete(id)}
+}
+async function activateCurrentCloudTrip(){
+  if(!cloudInitialized)return;const t=currentTrip();if(!t?.cloud?.tripId){if(cloudChannel){await cloudClient.removeChannel(cloudChannel).catch(()=>{});cloudChannel=null}renderCloudButton();return}
+  try{await ensureCloudAuth();const row=await fetchCloudTrip(t.cloud.tripId);const role=await getMyCloudRole(t.cloud.tripId);cloudVersions.set(row.id,Number(row.version||1));cloudBases.set(row.id,deepClone(row.payload||{}));applyRemoteTripPayload(row.id,row.payload,{role,shareToken:row.share_token,sharePass:row.share_pass,ownerId:row.owner_id});await subscribeCloudTrip(row.id);cloudConnectionState='live'}catch(e){console.warn(e);cloudConnectionState='offline';renderCloudButton()}
+}
+function joinTokenFromUrl(){try{return new URLSearchParams(location.hash.replace(/^#/,'' )).get('join')||''}catch(_){return''}}
+function normalizeCloudPass(v){return String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'')}
+function formatCloudPass(v){const s=normalizeCloudPass(v);return s.length>5?`${s.slice(0,5)}-${s.slice(5,10)}`:s}
+async function processCloudJoinLink(passValue){
+  const token=joinTokenFromUrl();if(!token)return false;
+  if(!cloudClient){openCloudModal();toast('共同編集の接続設定が必要です');return false}
+  const pass=normalizeCloudPass(passValue||$('#cloudJoinPassInput')?.value||'');
+  if(!pass){openCloudModal();$('#cloudJoinPassInput')?.focus();toast('共有パスコードを入力してください');return false}
+  try{await ensureCloudAuth();const {data,error}=await cloudClient.rpc('join_shared_trip',{p_share_token:token,p_share_pass:pass});if(error)throw error;if(!data)throw new Error('共有URLまたはパスコードが正しくありません');const row=await fetchCloudTrip(data);const role=await getMyCloudRole(data);cloudVersions.set(row.id,Number(row.version||1));cloudBases.set(row.id,deepClone(row.payload||{}));applyRemoteTripPayload(row.id,row.payload,{role,shareToken:row.share_token,sharePass:row.share_pass,ownerId:row.owner_id});await subscribeCloudTrip(row.id);history.replaceState(null,'',location.pathname+location.search);cloudConnectionState='live';renderCloudButton();closeModal('#cloudModal');toast('共同編集に参加しました');return true}catch(e){openCloudModal();$('#cloudJoinPassInput')?.focus();alert('共同編集に参加できませんでした。\n'+(e.message||e));return false}
+}
+async function initCloud(){
+  await configureCloudClient();const token=joinTokenFromUrl();
+  if(!cloudClient){if(token)setTimeout(openCloudModal,150);return}
+  if(token){setTimeout(()=>{renderCloudModal();openModal('#cloudModal');setTimeout(()=>$('#cloudJoinPassInput')?.focus(),80)},120);return}
+  const t=currentTrip();if(t?.cloud?.tripId)await activateCurrentCloudTrip()
+}
+function renderCloudButton(){
+  const b=$('#cloudBtn'),label=$('#cloudBtnLabel');if(!b||!label)return;const linked=!!currentTrip()?.cloud?.tripId;b.classList.toggle('is-live',linked&&cloudConnectionState==='live');b.classList.toggle('is-offline',linked&&cloudConnectionState==='offline');label.textContent=linked?(cloudConnectionState==='live'?'共同編集中':'共同編集'):'共同編集';
+}
+function inviteUrlForTrip(t){if(!t?.cloud?.shareToken)return'';if(!/^https?:/.test(location.protocol))return`#join=${encodeURIComponent(t.cloud.shareToken)}`;return `${location.origin}${location.pathname}${location.search}#join=${encodeURIComponent(t.cloud.shareToken)}`}
+function renderCloudModal(){
+  const cfg=readCloudConfig(),configured=isCloudConfigValid(cfg),t=currentTrip(),linked=!!t?.cloud?.tripId,joinToken=joinTokenFromUrl(),joining=!!joinToken&&!linked;
+  $('#cloudSetupBox').hidden=configured;$('#cloudJoinBox').hidden=!(configured&&joining);$('#cloudActionsBox').hidden=!configured||joining;
+  $('#cloudUrlInput').value=cfg.url||'';$('#cloudKeyInput').value=cfg.key||'';
+  let title='ローカル保存',desc='この端末だけに保存されています。';
+  if(configured&&!linked&&!joining){title='クラウド接続準備OK';desc='この旅行はまだローカル保存です。'}
+  if(configured&&joining){title='共有URLを確認しました';desc='共有パスコードを入力すると共同編集に参加できます。'}
+  if(linked){title=cloudConnectionState==='live'?'リアルタイム同期中':'共同編集・再接続待ち';desc=cloudConnectionState==='live'?'変更は参加者へリアルタイムで同期されます。':'ローカル変更を保持し、接続復帰後に同期します。'}
+  $('#cloudStatusTitle').textContent=title;$('#cloudStatusText').textContent=desc;$('#cloudStatusCard').dataset.state=linked?cloudConnectionState:(joining?'ready':'local');$('#cloudLocalActions').hidden=linked;$('#cloudSharedActions').hidden=!linked;
+  if(linked){$('#cloudTripName').textContent=t.name||'旅行';$('#cloudRoleBadge').textContent=t.cloud.role==='owner'?'オーナー':'編集者';$('#cloudInviteLink').value=inviteUrlForTrip(t);$('#cloudSharePass').value=formatCloudPass(t.cloud.sharePass||'');$('#rotateCloudLinkBtn').hidden=t.cloud.role!=='owner';$('#rotateCloudLinkBtn').textContent='URL・パスを再発行';$('#leaveCloudBtn').textContent=t.cloud.role==='owner'?'共同編集を終了':'共同編集から退出'}
+}
+function openCloudModal(){renderCloudModal();openModal('#cloudModal')}
+async function saveCloudConfigFromUi(){
+  const url=$('#cloudUrlInput').value.trim(),key=$('#cloudKeyInput').value.trim();if(cloudConfigIsSecret(key)){alert('Secret key / service_role key はブラウザへ保存できません。Publishable key を使用してください。');return}if(!isCloudConfigValid({url,key})){alert('Project URL と Publishable key を確認してください。');return}
+  localStorage.setItem(CLOUD_CONFIG_KEY,JSON.stringify({url,key}));if(cloudChannel&&cloudClient)await cloudClient.removeChannel(cloudChannel).catch(()=>{});cloudClient=null;cloudChannel=null;cloudInitialized=false;await configureCloudClient();renderCloudModal();if(joinTokenFromUrl())setTimeout(()=>$('#cloudJoinPassInput')?.focus(),80);toast('クラウド接続設定を保存しました')
+}
+async function startCloudShare(){
+  const t=currentTrip();if(!t)return;try{await ensureCloudAuth();const payload=serializeTripForCloud(t);const {data,error}=await cloudClient.rpc('start_trip_share',{p_title:t.name||'旅行',p_payload:payload,p_client_id:getCloudClientId()});if(error)throw error;const row=Array.isArray(data)?data[0]:data;if(!row?.trip_id)throw new Error('共有旅行を作成できませんでした');t.cloud={tripId:row.trip_id,role:'owner',shareToken:row.share_token,sharePass:row.share_pass||'',ownerId:cloudUser.id};cloudVersions.set(row.trip_id,Number(row.trip_version||1));cloudBases.set(row.trip_id,deepClone(payload));cloudApplying=true;saveTrips();cloudApplying=false;await subscribeCloudTrip(row.trip_id);cloudConnectionState='live';renderCloudButton();renderCloudModal();toast('共有URLとパスコードを自動作成しました')}catch(e){alert('共同編集を開始できませんでした。\n'+(e.message||e))}
+}
+async function copyCloudInviteLink(){const t=currentTrip();const link=inviteUrlForTrip(t);if(!link){toast('共有リンクがありません');return}try{await navigator.clipboard.writeText(link);toast('共同編集リンクをコピーしました')}catch(_){$('#cloudInviteLink').focus();$('#cloudInviteLink').select();toast('リンクを選択しました')}
+}
+async function copyCloudInvitePass(){const t=currentTrip();const pass=formatCloudPass(t?.cloud?.sharePass||'');if(!pass){toast('パスコードがありません。URL・パスを再発行してください');return}try{await navigator.clipboard.writeText(pass);toast('共有パスコードをコピーしました')}catch(_){$('#cloudSharePass').focus();$('#cloudSharePass').select();toast('パスコードを選択しました')}}
+async function copyCloudInviteBundle(){const t=currentTrip();const link=inviteUrlForTrip(t),pass=formatCloudPass(t?.cloud?.sharePass||'');if(!link||!pass){toast('招待情報がありません。URL・パスを再発行してください');return}const inviteText=`TRIP READY｜旅じたく\n${t.name||'旅行'} の共同編集\n\n共有URL\n${link}\n\n共有パスコード\n${pass}\n\nURLを開いてパスコードを入力してください。`;try{await navigator.clipboard.writeText(inviteText);toast('URLとパスコードをまとめてコピーしました')}catch(_){toast('コピーできませんでした')}}
+async function pullCloudNow(){const t=currentTrip();if(!t?.cloud?.tripId)return;try{await ensureCloudAuth();const row=await fetchCloudTrip(t.cloud.tripId);cloudDirty.delete(row.id);cloudVersions.set(row.id,Number(row.version||1));cloudBases.set(row.id,deepClone(row.payload||{}));applyRemoteTripPayload(row.id,row.payload,{role:t.cloud.role,shareToken:row.share_token,sharePass:row.share_pass,ownerId:row.owner_id});toast('クラウドの最新内容を読み込みました')}catch(e){alert('再読込できませんでした。\n'+(e.message||e))}}
+async function rotateCloudInviteLink(){const t=currentTrip();if(!t?.cloud?.tripId||t.cloud.role!=='owner')return;if(!confirm('現在の共有URLとパスコードを無効にして、新しく自動発行しますか？\nすでに参加済みの人は引き続き編集できます。'))return;try{const {data,error}=await cloudClient.rpc('rotate_trip_share_token',{p_trip_id:t.cloud.tripId});if(error)throw error;const row=Array.isArray(data)?data[0]:data;if(!row?.share_token)throw new Error('再発行に失敗しました');t.cloud.shareToken=String(row.share_token||'');t.cloud.sharePass=String(row.share_pass||'');cloudApplying=true;saveTrips();cloudApplying=false;renderCloudModal();toast('共有URLとパスコードを再発行しました')}catch(e){alert('URL・パスを再発行できませんでした。\n'+(e.message||e))}}
+async function leaveOrDeleteCloudTrip(){const t=currentTrip();if(!t?.cloud?.tripId)return;const owner=t.cloud.role==='owner';const msg=owner?'クラウド上の共同編集データを削除して終了しますか？\nこの端末には現在の旅行データを残します。':'この共同編集から退出しますか？\nこの端末には現在の旅行データを残します。';if(!confirm(msg))return;try{await ensureCloudAuth();const fn=owner?'delete_shared_trip':'leave_shared_trip';const {error}=await cloudClient.rpc(fn,{p_trip_id:t.cloud.tripId});if(error)throw error;const id=t.cloud.tripId;delete t.cloud;cloudBases.delete(id);cloudVersions.delete(id);cloudDirty.delete(id);if(cloudChannel){await cloudClient.removeChannel(cloudChannel).catch(()=>{});cloudChannel=null}cloudApplying=true;saveTrips();cloudApplying=false;cloudConnectionState='ready';renderAll();renderCloudModal();toast(owner?'共同編集を終了しました':'共同編集から退出しました')}catch(e){alert('共同編集を終了できませんでした。\n'+(e.message||e))}}
+window.addEventListener('online',()=>{cloudConnectionState='ready';renderCloudButton();const t=currentTrip();if(t?.cloud?.tripId){activateCurrentCloudTrip().then(()=>{if(cloudDirty.has(t.cloud.tripId))syncTripToCloud(t.cloud.tripId)}).catch(console.warn)}});window.addEventListener('offline',()=>{if(currentTrip()?.cloud?.tripId){cloudConnectionState='offline';renderCloudButton();renderCloudModal()}});
+
+async function init(){initSelects();loadTrips();try{await openDb()}catch(e){console.warn('IndexedDB unavailable',e)}bindEvents();renderAll();if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(console.warn);await initCloud()}
+
 init();
 })();
 </script>
 </body>
+<style id="packing-import-v10231">
+/* ===== v10.23.1 : always-visible import confirmation + cleaner Keep parsing ===== */
+.packing-import-dialog{
+  max-height:min(94vh,900px)!important;
+  overflow:auto!important;
+  overscroll-behavior:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+}
+.packing-import-head{position:sticky!important;top:0!important;z-index:12!important}
+.packing-import-footer{
+  position:sticky!important;
+  bottom:0!important;
+  z-index:14!important;
+  margin-top:14px!important;
+  padding:13px 22px calc(14px + env(safe-area-inset-bottom))!important;
+  border-top:1px solid #cfe0f1!important;
+  background:rgba(250,253,255,.97)!important;
+  backdrop-filter:blur(12px)!important;
+  box-shadow:0 -12px 28px rgba(17,65,116,.10)!important;
+}
+.packing-import-mode-row{display:grid!important;grid-template-columns:minmax(190px,.8fr) minmax(220px,1.1fr)!important;gap:10px!important;align-items:end!important}
+.packing-import-mode{display:flex!important;flex-direction:column!important;gap:5px!important;color:#54718f!important;font-size:10px!important;font-weight:850!important}
+.packing-import-mode select{
+  width:100%!important;height:44px!important;border:1px solid #bfd6ee!important;border-radius:12px!important;
+  padding:0 12px!important;background:#fff!important;color:#153f70!important;font-size:12px!important;font-weight:800!important;
+}
+.packing-import-confirm{width:100%!important;min-height:44px!important;font-size:13px!important;font-weight:900!important;box-shadow:0 9px 20px rgba(32,105,199,.24)!important}
+.packing-import-footer-sub{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;margin-top:8px!important}
+.packing-import-footer-sub .hint{margin:0!important;font-size:9px!important}
+.packing-import-cancel{min-height:32px!important;padding:5px 10px!important;font-size:10px!important;flex:0 0 auto!important}
+@media(max-width:640px){
+  #packingImportModal{padding:8px!important;align-items:center!important}
+  .packing-import-dialog{width:100%!important;max-height:96vh!important;border-radius:18px!important}
+  .packing-import-head{padding:14px 15px 12px!important}
+  .packing-import-desc{padding:10px 15px 5px!important}
+  .packing-import-actions{padding:6px 15px 8px!important}
+  .packing-import-text-field{padding:0 15px!important}
+  .packing-import-text-field textarea{min-height:180px!important;max-height:34vh!important}
+  .packing-import-preview{margin:9px 15px 0!important}
+  .packing-import-footer{padding:10px 15px calc(10px + env(safe-area-inset-bottom))!important}
+  .packing-import-mode-row{grid-template-columns:1fr!important;gap:7px!important}
+  .packing-import-mode{display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;align-items:center!important;gap:8px!important}
+  .packing-import-mode select{height:40px!important}
+  .packing-import-confirm{min-height:46px!important;font-size:14px!important}
+  .packing-import-footer-sub .hint{display:none!important}
+  .packing-import-footer-sub{justify-content:flex-end!important;margin-top:5px!important}
+}
+</style>
+
 </html>
 
 <style>.cover-btn,.cover-options,#coverModal{display:none!important}
@@ -2071,4 +2328,41 @@ body{
 @media(max-width:470px){
   .trip-switch{grid-template-columns:minmax(0,1fr) auto auto!important}.top-import-btn{grid-column:2/3!important}.top-filter-btn{grid-column:3/4!important}.trip-switch #newTripBtn{grid-column:2/4!important;grid-row:2!important}
 }
+</style>
+
+
+<style id="cloud-v10230">
+/* ===== v10.23.0 : Supabase realtime collaboration ===== */
+.cloud-open-btn{display:inline-flex!important;align-items:center!important;gap:7px!important;white-space:nowrap!important}
+.cloud-dot{width:8px;height:8px;border-radius:50%;background:#91a4b9;box-shadow:0 0 0 3px rgba(145,164,185,.13)}
+.cloud-open-btn.is-live{background:linear-gradient(135deg,#eaf4ff,#dcecff)!important;color:#0f5ab5!important;border-color:#bad7f7!important}
+.cloud-open-btn.is-live .cloud-dot{background:#2f80ed;box-shadow:0 0 0 3px rgba(47,128,237,.16)}
+.cloud-open-btn.is-offline .cloud-dot{background:#e49a3a;box-shadow:0 0 0 3px rgba(228,154,58,.16)}
+.cloud-dialog{width:min(720px,calc(100vw - 28px));max-height:min(820px,calc(100vh - 28px));overflow:auto;padding:0!important;border-radius:22px!important}
+.cloud-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px 14px;border-bottom:1px solid #e2ebf5;background:linear-gradient(135deg,#f8fbff,#eef5ff)}
+.cloud-head h3{margin:3px 0 0;color:#103d71;font-size:21px}.cloud-kicker{font-size:9px;letter-spacing:.16em;color:#2b6db5;font-weight:900}
+.cloud-close{border:0;background:#eaf2fb;color:#41688f;width:34px;height:34px;border-radius:50%;font-size:21px;line-height:1}
+.cloud-status-card{margin:16px 20px 0;display:flex;align-items:center;gap:12px;padding:13px 15px;border:1px solid #d9e6f3;border-radius:15px;background:#f8fbff}
+.cloud-status-dot{width:11px;height:11px;border-radius:50%;background:#91a4b9;flex:0 0 11px}.cloud-status-card[data-state="live"] .cloud-status-dot{background:#2f80ed;box-shadow:0 0 0 4px rgba(47,128,237,.12)}.cloud-status-card[data-state="offline"] .cloud-status-dot{background:#e49a3a;box-shadow:0 0 0 4px rgba(228,154,58,.12)}
+.cloud-status-card b{display:block;color:#173f70;font-size:13px}.cloud-status-card small{display:block;margin-top:2px;color:#70859c;font-size:11px;line-height:1.45}
+.cloud-setup,.cloud-actions{padding:18px 20px 20px}.cloud-section-title{font-size:14px;font-weight:900;color:#173f70;margin-bottom:8px}.cloud-setup code{font-size:11px;background:#eef4fb;padding:2px 5px;border-radius:5px}.cloud-security-note{margin:8px 0 0;color:#b24e59;font-size:11px;font-weight:750}
+.cloud-start{width:100%;margin-top:4px}.cloud-trip-row{display:flex;align-items:center;gap:9px;margin:4px 0 13px;padding:10px 12px;border-radius:12px;background:#f4f8fd;border:1px solid #e0eaf4}.cloud-trip-row span:first-child{font-size:10px;color:#73879d}.cloud-trip-row b{min-width:0;flex:1;color:#173f70;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cloud-role{font-size:10px;font-weight:850;color:#2365b4;background:#e7f1ff;border:1px solid #cfe2fb;border-radius:999px;padding:4px 8px}
+.cloud-link-label{display:block;margin-bottom:6px;font-size:11px;font-weight:800;color:#5d7690}.cloud-link-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px}.cloud-link-row input{min-width:0;width:100%;border:1px solid #d4e2f1;border-radius:11px;padding:10px 11px;background:#fbfdff;color:#41607e;font-size:11px}.cloud-secondary-actions{margin-top:11px}.cloud-secondary-actions .btn{font-size:11px;padding:9px 11px}.cloud-attachment-note{margin:15px 0 0;padding-top:12px;border-top:1px solid #e5edf5}
+@media(max-width:640px){.cloud-dialog{width:calc(100vw - 16px);max-height:calc(100vh - 16px);border-radius:17px!important}.cloud-head{padding:16px 15px 12px}.cloud-head h3{font-size:18px}.cloud-status-card{margin:12px 12px 0;padding:11px 12px}.cloud-setup,.cloud-actions{padding:15px 12px 16px}.cloud-link-row{grid-template-columns:1fr}.cloud-link-row .btn{width:100%}.cloud-secondary-actions{display:grid;grid-template-columns:1fr 1fr}.cloud-secondary-actions .btn-danger{grid-column:1/-1}.trip-switch{grid-template-columns:minmax(0,1fr) auto auto!important}.cloud-open-btn{grid-column:auto!important;font-size:9px!important;padding:0 8px!important}.top-import-btn,.top-filter-btn{font-size:9px!important}}
+</style>
+
+
+<style id="cloud-v10232">
+/* ===== v10.23.2 : auto-generated share URL + passcode ===== */
+.cloud-join{padding:18px 20px 20px;border-top:1px solid #edf2f7}
+.cloud-join .cloud-start{margin-top:13px}
+.cloud-invite-card{position:relative;margin:4px 0 12px;padding:14px;border:1px solid #cfe0f3;border-radius:16px;background:linear-gradient(145deg,#f9fcff,#eef6ff);box-shadow:0 8px 22px rgba(36,91,153,.08)}
+.cloud-auto-badge{display:inline-flex;align-items:center;min-height:23px;padding:0 9px;margin-bottom:10px;border-radius:999px;background:#e5f1ff;color:#1f64b7;border:1px solid #c8def8;font-size:9px;font-weight:900;letter-spacing:.05em}
+.cloud-pass-label{margin-top:11px!important}
+.cloud-pass-input{font-size:16px!important;font-weight:900!important;letter-spacing:.12em!important;color:#123f75!important;text-align:left}
+.cloud-copy-invite{width:100%;margin-top:12px}
+.cloud-invite-hint{margin:9px 1px 0!important;font-size:10px!important;line-height:1.55!important}
+#cloudJoinPassInput{text-transform:uppercase;font-weight:900;letter-spacing:.10em;font-size:17px;text-align:center}
+.cloud-status-card[data-state="ready"] .cloud-status-dot{background:#2f80ed;box-shadow:0 0 0 4px rgba(47,128,237,.12)}
+@media(max-width:640px){.cloud-join{padding:15px 12px 16px}.cloud-invite-card{padding:12px;border-radius:14px}.cloud-pass-input{text-align:center!important}}
 </style>
