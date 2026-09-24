@@ -556,6 +556,7 @@ body{background:#f7fbff;color:#29445f}
     <div class="trip-switch">
       <select id="tripSelect" aria-label="旅行を選択"></select>
       <button class="btn btn-soft" id="newTripBtn">＋ 新しい旅行</button>
+      <button class="btn btn-soft top-import-btn" id="importPackingBtn" type="button" hidden>リスト取込</button>
       <button class="btn btn-soft top-filter-btn" id="filterBtn" type="button" hidden aria-pressed="false">未準備のみ</button>
     </div>
   </div>
@@ -647,10 +648,13 @@ body{background:#f7fbff;color:#29445f}
       <div class="grid grid2">
         <div class="panel">
           <h2 class="title-with-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-share"></use></svg>共有</h2>
-          <div class="field"><label>旅行メモ</label><textarea id="tripMemo" rows="6" placeholder="集合時間、予約番号、注意事項など"></textarea></div>
+          <div class="field memo-field">
+            <div class="memo-label-row"><label for="tripMemo">旅行メモ</label><button class="btn btn-soft memo-import-open" type="button" id="importMemoBtn">外部メモを取り込む</button></div>
+            <textarea id="tripMemo" rows="6" placeholder="集合時間、予約番号、注意事項など"></textarea>
+          </div>
           <div class="field" style="margin-top:12px"><label>共有する内容</label><select id="shareMode"><option value="all">全部（メモ＋持ち物）</option><option value="unready">未準備だけ</option><option value="memo">メモだけ</option><option value="group">家族別</option></select></div>
           <div class="field" style="margin-top:12px"><label>共有する人</label><select id="shareGroup"></select></div>
-          <div class="btn-row" style="margin-top:14px"><button class="btn btn-primary" id="nativeShareBtn">送る・共有</button><button class="btn btn-soft" id="copyShareBtn">コピー</button><button class="btn btn-soft" id="saveTxtBtn">TXT保存</button></div>
+          <div class="btn-row" style="margin-top:14px"><button class="btn btn-primary" id="nativeShareBtn">送る・共有</button><button class="btn btn-soft" id="copyShareBtn">コピー</button><button class="btn btn-soft" id="saveTxtBtn">TXT保存</button></div><p class="hint keep-export-hint">コピー／TXT保存は、チェック記号なし＋グループごとにタブで1段下げた形式で出力します。</p>
         </div>
         <div class="panel"><h2 class="title-with-icon"><svg class="ui-icon" aria-hidden="true"><use href="#i-eye"></use></svg>共有プレビュー</h2><div class="preview" id="sharePreview"></div></div>
       </div>
@@ -669,6 +673,63 @@ body{background:#f7fbff;color:#29445f}
 </div>
 
 <div class="modal" id="deleteModal" aria-hidden="true"><div class="dialog"><h3>この持ち物を削除しますか？</h3><p id="deleteTargetName" class="hint"></p><div class="btn-row" style="justify-content:flex-end"><button class="btn btn-soft" id="cancelDeleteBtn">キャンセル</button><button class="btn btn-danger" id="confirmDeleteBtn">削除する</button></div></div></div>
+<div class="modal" id="memoImportModal" aria-hidden="true">
+  <div class="dialog memo-import-dialog" role="dialog" aria-modal="true" aria-labelledby="memoImportTitle">
+    <div class="memo-import-head">
+      <div><span class="memo-import-kicker">IMPORT NOTE</span><h3 id="memoImportTitle">外部メモを取り込む</h3></div>
+      <button class="memo-import-close" type="button" id="closeMemoImportBtn" aria-label="閉じる">×</button>
+    </div>
+    <p class="hint memo-import-desc">Google Keepなどからコピーして貼り付けるか、TXT・Markdown・HTMLファイルを読み込めます。</p>
+    <div class="memo-import-actions">
+      <button class="btn btn-soft" type="button" id="pasteMemoClipboardBtn">クリップボードから貼り付け</button>
+      <label class="btn btn-soft memo-file-label">ファイルを選択<input type="file" id="externalMemoFile" accept="text/plain,text/markdown,text/html,.txt,.md,.markdown,.html,.htm" hidden></label>
+      <span class="memo-file-name" id="externalMemoFileName">未選択</span>
+    </div>
+    <div class="field memo-import-text-field">
+      <label for="externalMemoText">取り込む内容</label>
+      <textarea id="externalMemoText" rows="12" placeholder="ここに外部メモを貼り付けてください"></textarea>
+    </div>
+    <div class="memo-import-footer">
+      <p class="hint">「追記」は現在の旅行メモの末尾に空行を入れて追加します。</p>
+      <div class="btn-row memo-import-buttons">
+        <button class="btn btn-soft" type="button" id="cancelMemoImportBtn">キャンセル</button>
+        <button class="btn btn-soft" type="button" id="replaceMemoImportBtn">現在のメモと置き換え</button>
+        <button class="btn btn-primary" type="button" id="appendMemoImportBtn">旅行メモへ追記</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="packingImportModal" aria-hidden="true">
+  <div class="dialog packing-import-dialog" role="dialog" aria-modal="true" aria-labelledby="packingImportTitle">
+    <div class="packing-import-head">
+      <div><span class="packing-import-kicker">IMPORT LIST</span><h3 id="packingImportTitle">持ち物リストを取り込む</h3></div>
+      <button class="packing-import-close" type="button" id="closePackingImportBtn" aria-label="閉じる">×</button>
+    </div>
+    <p class="hint packing-import-desc">Google Keepなどから貼り付けるか、TXT・Markdownファイルを読み込めます。「共通」「大人1」「子ども1」などの見出しと、タブ・箇条書きの階層を自動判定します。</p>
+    <div class="packing-import-actions">
+      <button class="btn btn-soft" type="button" id="pastePackingClipboardBtn">クリップボードから貼り付け</button>
+      <label class="btn btn-soft packing-file-label">ファイルを選択<input type="file" id="externalPackingFile" accept="text/plain,text/markdown,text/html,.txt,.md,.markdown,.html,.htm" hidden></label>
+      <span class="packing-file-name" id="externalPackingFileName">未選択</span>
+    </div>
+    <div class="field packing-import-text-field">
+      <label for="externalPackingText">取り込む持ち物リスト</label>
+      <textarea id="externalPackingText" rows="13" placeholder="例：\n共通\n\t財布\n\t充電器\n\n大人1\n\t着替え ×3\n\t歯ブラシ"></textarea>
+    </div>
+    <div class="packing-import-preview" id="packingImportPreview" aria-live="polite">
+      <span>テキストを入力すると、取り込み内容を確認できます。</span>
+    </div>
+    <div class="packing-import-footer">
+      <p class="hint">追記では同じグループ名へ追加し、同名の持ち物は重複追加しません。入れ替えでは現在の持ち物リストを置き換えます。</p>
+      <div class="btn-row packing-import-buttons">
+        <button class="btn btn-soft" type="button" id="cancelPackingImportBtn">キャンセル</button>
+        <button class="btn btn-soft" type="button" id="replacePackingImportBtn">現在のリストと入れ替え</button>
+        <button class="btn btn-primary" type="button" id="appendPackingImportBtn">現在のリストへ追記</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -847,7 +908,44 @@ function closeModal(sel){const m=$(sel);m.classList.remove('open');m.setAttribut
 function deletePendingItem(){if(!pendingDelete)return;const g=currentTrip().groups.find(x=>x.id===pendingDelete.gid);g.items=g.items.filter(x=>x.id!==pendingDelete.iid);saveTrips();pendingDelete=null;closeModal('#deleteModal');renderPacking();toast('削除しました')}
 
 function renderShareGroup(){const t=currentTrip();const s=$('#shareGroup');s.innerHTML=(t?.groups||[]).map(g=>`<option value="${esc(g.id)}">${esc(g.name)}</option>`).join('');s.disabled=$('#shareMode').value!=='group'}
-function shareText(){const t=currentTrip();if(!t)return'';const mode=$('#shareMode').value;const lines=[`【${t.name}】`];if(t.destination)lines.push(`行き先：${t.destination}`);lines.push(`日程：${t.days}`,'');if(mode==='memo'||mode==='all'){if(t.memo)lines.push('■ 旅行メモ',t.memo,'')};if(mode!=='memo'){let groups=t.groups||[];if(mode==='group'){groups=groups.filter(g=>g.id===$('#shareGroup').value)}groups.forEach(g=>{let items=g.items;if(mode==='unready')items=items.filter(x=>!x.done);lines.push(`■ ${g.name}`);if(!items.length)lines.push('（対象なし）');else items.forEach(it=>lines.push(`${it.done?'☑':'☐'} ${it.name}${it.qty&&it.qty!=='1'?` ×${it.qty}`:''}`));lines.push('')})}return lines.join('\n').trim()}
+function shareText(){
+  const t=currentTrip();
+  if(!t)return'';
+  const mode=$('#shareMode').value;
+  const lines=[t.name||'家族旅行'];
+  if(t.destination)lines.push(`行き先：${t.destination}`);
+  lines.push(`日程：${t.days}`,'');
+
+  // Plain-text exports are intentionally checkbox-symbol free.
+  // Group names stay at level 0 and each packing item is indented one level
+  // with a real TAB character, which is easier to reuse in apps such as Google Keep.
+  if(mode==='memo'||mode==='all'){
+    if(t.memo){
+      lines.push('旅行メモ');
+      String(t.memo).split(/\r?\n/).forEach(line=>lines.push(`\t${line}`));
+      lines.push('');
+    }
+  }
+  if(mode!=='memo'){
+    let groups=t.groups||[];
+    if(mode==='group')groups=groups.filter(g=>g.id===$('#shareGroup').value);
+    groups.forEach(g=>{
+      let items=g.items||[];
+      if(mode==='unready')items=items.filter(x=>!x.done);
+      lines.push(g.name||'グループ');
+      if(!items.length){
+        lines.push('\t対象なし');
+      }else{
+        items.forEach(it=>{
+          const qty=it.qty&&String(it.qty)!=='1'?` ×${it.qty}`:'';
+          lines.push(`\t${it.name}${qty}`);
+        });
+      }
+      lines.push('');
+    });
+  }
+  return lines.join('\n').trim();
+}
 function renderSharePreview(){const t=currentTrip();if(t)t.memo=$('#tripMemo').value;$('#sharePreview').textContent=shareText()}
 async function doShare(){const text=shareText();if(navigator.share){try{await navigator.share({title:currentTrip().name,text});return}catch(e){if(e.name==='AbortError')return}}await navigator.clipboard.writeText(text);toast('共有内容をコピーしました')}
 function saveTxt(){downloadBlob(new Blob([shareText()],{type:'text/plain;charset=utf-8'}),`${safeName(currentTrip().name)}_もちもの.txt`)}
@@ -856,6 +954,225 @@ function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.
 
 function renderSummary(){const t=currentTrip();if(!t)return;const all=(t.groups||[]).flatMap(g=>g.items);const done=all.filter(x=>x.done).length;const pct=all.length?Math.round(done/all.length*100):0;$('#summaryGrid').innerHTML=`<div class="summary-card">持ち物総数<b>${all.length}</b></div><div class="summary-card">準備済み<b>${done}</b></div><div class="summary-card">未準備<b>${all.length-done}</b></div><div class="summary-card">進捗<b>${pct}%</b></div>`;$('#groupSummary').innerHTML=(t.groups||[]).map(g=>{const d=g.items.filter(x=>x.done).length,p=g.items.length?Math.round(d/g.items.length*100):0;return `<div style="margin:10px 0"><div style="display:flex;justify-content:space-between;font-weight:800"><span>${esc(g.name)}</span><span>${d}/${g.items.length}（${p}%）</span></div><div style="height:9px;background:#edf2f7;border-radius:999px;overflow:hidden;margin-top:6px"><div style="height:100%;width:${p}%;background:linear-gradient(90deg,#4f8cff,#79b1ff)"></div></div></div>`}).join('')||'<p class="hint">まだ持ち物がありません。</p>'}
 
+
+function normalizeImportedMemo(raw,fileName=''){
+  let txt=String(raw??'').replace(/\r\n?/g,'\n').replace(/\u00a0/g,' ');
+  const looksHtml=/\.html?$/i.test(fileName)||/^\s*<!doctype\s+html/i.test(txt)||/^\s*<html[\s>]/i.test(txt);
+  if(looksHtml){
+    try{
+      const doc=new DOMParser().parseFromString(txt,'text/html');
+      txt=doc.body?.innerText||doc.body?.textContent||txt;
+    }catch(e){console.warn('HTML memo parse failed',e)}
+  }
+  return txt.replace(/[ \t]+$/gm,'').replace(/\n{4,}/g,'\n\n\n').trim();
+}
+function openMemoImport(){
+  $('#externalMemoText').value='';
+  $('#externalMemoFile').value='';
+  $('#externalMemoFileName').textContent='未選択';
+  openModal('#memoImportModal');
+  setTimeout(()=>$('#externalMemoText')?.focus(),80);
+}
+function closeMemoImport(){
+  closeModal('#memoImportModal');
+}
+async function loadExternalMemoFile(file){
+  if(!file)return;
+  try{
+    const raw=await file.text();
+    const cleaned=normalizeImportedMemo(raw,file.name);
+    if(!cleaned){toast('読み込める文字がありません');return}
+    $('#externalMemoText').value=cleaned;
+    $('#externalMemoFileName').textContent=file.name;
+    toast('メモを読み込みました');
+  }catch(e){
+    console.error(e);
+    alert('メモファイルを読み込めませんでした。');
+  }
+}
+async function pasteExternalMemoFromClipboard(){
+  try{
+    if(!navigator.clipboard?.readText)throw new Error('clipboard unavailable');
+    const raw=await navigator.clipboard.readText();
+    const cleaned=normalizeImportedMemo(raw);
+    if(!cleaned){toast('クリップボードに文字がありません');return}
+    $('#externalMemoText').value=cleaned;
+    $('#externalMemoFileName').textContent='クリップボード';
+    toast('クリップボードから貼り付けました');
+  }catch(e){
+    $('#externalMemoText')?.focus();
+    toast('貼り付け欄を長押しして貼り付けてください');
+  }
+}
+function applyImportedMemo(mode='append'){
+  const incoming=normalizeImportedMemo($('#externalMemoText').value);
+  if(!incoming){toast('取り込むメモを入力してください');return}
+  const memo=$('#tripMemo');
+  const current=String(memo.value||'').trimEnd();
+  memo.value=mode==='replace'?incoming:(current?`${current}\n\n${incoming}`:incoming);
+  const t=currentTrip();
+  if(t){t.memo=memo.value;t.updatedAt=Date.now();saveTrips()}
+  renderSharePreview();
+  closeMemoImport();
+  toast(mode==='replace'?'旅行メモを置き換えました':'旅行メモへ追記しました');
+}
+
+
+function normalizeImportedPacking(raw,fileName=''){
+  let txt=String(raw??'').replace(/^\uFEFF/,'').replace(/\r\n?/g,'\n').replace(/\u00a0/g,' ');
+  if(/\.html?$/i.test(fileName)||/^\s*<(?:!doctype|html|body|div|p|ul|ol|li|br)\b/i.test(txt)){
+    try{
+      const doc=new DOMParser().parseFromString(txt,'text/html');
+      txt=doc.body?.innerText||doc.body?.textContent||txt;
+    }catch(e){console.warn('HTML packing parse failed',e)}
+  }
+  return txt.replace(/[ \t]+$/gm,'').replace(/\n{4,}/g,'\n\n\n').trim();
+}
+function stripPackingMarker(raw){
+  let s=String(raw??'');
+  let done=false;
+  if(/^\s*(?:☑|☒|✅|✔|✓)\s*/.test(s))done=true;
+  if(/^\s*(?:[-*+]\s*)?\[[xX✓✔]\]\s*/.test(s))done=true;
+  s=s.replace(/^\s*(?:[-*+]\s*)?\[(?: |x|X|✓|✔)\]\s*/,'');
+  s=s.replace(/^\s*(?:☐|☑|☒|□|■|✅|✔|✓)\s*/,'');
+  s=s.replace(/^\s*(?:[-*+・•●○▪︎◦]|\d+[.)、])\s*/,'');
+  return {text:s.trim(),done};
+}
+function extractPackingQty(raw){
+  let s=String(raw??'').trim();
+  let qty='1',explicit=false;
+  let m=s.match(/\s*[×xX*]\s*(\d+(?:\.\d+)?)\s*$/);
+  if(m){qty=m[1];s=s.slice(0,m.index).trim();explicit=true;return{text:s,qty,explicit}}
+  m=s.match(/\s+(\d+)\s*(?:個|枚|本|着|足|セット|袋|台|冊|箱)\s*$/);
+  if(m){qty=m[1];s=s.slice(0,m.index).trim();explicit=true}
+  return {text:s,qty,explicit};
+}
+function normalizeGroupKey(name){return String(name||'').replace(/[\s　:：]+/g,'').toLowerCase()}
+function knownPackingGroupNames(t){
+  const names=new Set(['共通','共通項目','家族共通','みんな','大人','子ども','こども','子供','パパ','ママ','父','母']);
+  (t?.groups||[]).forEach(g=>names.add(String(g.name||'')));
+  (t?.familyNames||[]).forEach(n=>names.add(String(n||'')));
+  for(let i=1;i<=Math.max(6,Number(t?.adults||0));i++)names.add(`大人${i}`);
+  for(let i=1;i<=Math.max(6,Number(t?.children||0));i++){names.add(`子ども${i}`);names.add(`こども${i}`);names.add(`子供${i}`)}
+  return names;
+}
+function isPackingMetadataLine(s,t){
+  const x=String(s||'').trim();
+  if(!x)return true;
+  if(/^【.*】$/.test(x))return true;
+  if(/^(?:旅行名|行き先|目的地|日程|旅行日数|時期|移動|移動手段)\s*[:：]/.test(x))return true;
+  if(t?.name&&normalizeGroupKey(x)===normalizeGroupKey(t.name))return true;
+  return false;
+}
+function inferImportedGroupMeta(name,t){
+  const key=normalizeGroupKey(name);
+  const existing=(t?.groups||[]).find(g=>normalizeGroupKey(g.name)===key);
+  if(existing)return{type:existing.type||'adult',profile:existing.profile?deepClone(existing.profile):null};
+  if(/共通|みんな|家族/.test(name))return{type:'common',profile:null};
+  if(/子ども|こども|子供/.test(name))return{type:'child',profile:{role:'child',gender:'neutral',age:0}};
+  return{type:'adult',profile:{role:'adult',gender:'neutral',age:null}};
+}
+function parsePackingList(raw){
+  const t=currentTrip();
+  const txt=normalizeImportedPacking(raw);
+  if(!txt)return[];
+  const lines=txt.split('\n').map((rawLine,index)=>{
+    const m=rawLine.match(/^[\t ]*/);const prefix=m?m[0]:'';
+    const tabs=(prefix.match(/\t/g)||[]).length;
+    const spaces=prefix.replace(/\t/g,'').length;
+    const indent=tabs+Math.floor(spaces/2);
+    return{raw:rawLine,index,indent,trim:rawLine.trim()};
+  }).filter(x=>x.trim);
+  const known=[...knownPackingGroupNames(t)].map(normalizeGroupKey);
+  const groups=[];let current=null;
+  const addGroup=name=>{
+    const clean=String(name||'').replace(/^#{1,6}\s*/,'').replace(/[：:]\s*$/,'').trim()||'共通';
+    const hit=groups.find(g=>normalizeGroupKey(g.name)===normalizeGroupKey(clean));
+    if(hit){current=hit;return hit}
+    const meta=inferImportedGroupMeta(clean,t);
+    current={id:uid(),name:clean,type:meta.type,profile:meta.profile,items:[]};groups.push(current);return current;
+  };
+  const hasExplicitGroups=lines.some((line,i)=>{
+    const plain=line.trim.replace(/^#{1,6}\s*/,'').replace(/[：:]\s*$/,'').trim();
+    if(known.includes(normalizeGroupKey(plain)))return true;
+    if(/^#{1,6}\s+/.test(line.trim))return true;
+    if(/[：:]$/.test(line.trim)&&line.indent===0)return true;
+    const next=lines[i+1];return line.indent===0&&next&&next.indent>line.indent;
+  });
+  if(!hasExplicitGroups)addGroup('共通');
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i];let plain=line.trim;
+    if(isPackingMetadataLine(plain,t))continue;
+    const noHeadingMarks=plain.replace(/^#{1,6}\s*/,'').replace(/[：:]\s*$/,'').trim();
+    const next=lines[i+1];
+    const explicitHeading=known.includes(normalizeGroupKey(noHeadingMarks))||/^#{1,6}\s+/.test(plain)||(line.indent===0&&/[：:]$/.test(plain))||(line.indent===0&&next&&next.indent>line.indent);
+    if(hasExplicitGroups&&explicitHeading){addGroup(noHeadingMarks);continue}
+    if(!current)addGroup('共通');
+    const stripped=stripPackingMarker(plain);if(!stripped.text)continue;
+    const q=extractPackingQty(stripped.text);if(!q.text)continue;
+    current.items.push({id:uid(),name:q.text,qty:String(q.qty||'1'),done:stripped.done,autoQty:!q.explicit&&isDynamicQtyItem(q.text),_explicitQty:q.explicit});
+  }
+  return groups.filter(g=>g.items.length).map((g,gi)=>{
+    const profile=g.type==='common'?{role:'common',gender:'neutral',age:null}:(g.profile||inferImportedGroupMeta(g.name,t).profile);
+    g.items.forEach(it=>{
+      if(it.autoQty)it.qty=String(autoQtyForItem(it.name,t,profile));
+      delete it._explicitQty;
+    });
+    return g;
+  });
+}
+function renderPackingImportPreview(){
+  const box=$('#packingImportPreview');if(!box)return;
+  const groups=parsePackingList($('#externalPackingText')?.value||'');
+  if(!groups.length){box.innerHTML='<span>読み取れる持ち物がまだありません。</span>';return}
+  const count=groups.reduce((n,g)=>n+g.items.length,0);
+  box.innerHTML=`<strong>${groups.length}グループ・${count}項目</strong><div>${groups.map(g=>`<span>${esc(g.name)} ${g.items.length}</span>`).join('')}</div>`;
+}
+function openPackingImport(){
+  $('#externalPackingText').value='';
+  $('#externalPackingFile').value='';
+  $('#externalPackingFileName').textContent='未選択';
+  renderPackingImportPreview();
+  openModal('#packingImportModal');
+  setTimeout(()=>$('#externalPackingText')?.focus(),80);
+}
+function closePackingImport(){closeModal('#packingImportModal')}
+async function loadExternalPackingFile(file){
+  if(!file)return;
+  try{
+    const raw=await file.text();const cleaned=normalizeImportedPacking(raw,file.name);
+    if(!cleaned){toast('読み込める持ち物がありません');return}
+    $('#externalPackingText').value=cleaned;$('#externalPackingFileName').textContent=file.name;renderPackingImportPreview();toast('持ち物リストを読み込みました');
+  }catch(e){console.error(e);alert('持ち物リストを読み込めませんでした。')}
+}
+async function pasteExternalPackingFromClipboard(){
+  try{
+    if(!navigator.clipboard?.readText)throw new Error('clipboard unavailable');
+    const raw=await navigator.clipboard.readText();const cleaned=normalizeImportedPacking(raw);
+    if(!cleaned){toast('クリップボードに文字がありません');return}
+    $('#externalPackingText').value=cleaned;$('#externalPackingFileName').textContent='クリップボード';renderPackingImportPreview();toast('クリップボードから読み込みました');
+  }catch(e){$('#externalPackingText')?.focus();toast('入力欄を長押しして貼り付けてください')}
+}
+function applyImportedPacking(mode='append'){
+  const t=currentTrip();if(!t)return;
+  const imported=parsePackingList($('#externalPackingText').value);
+  const total=imported.reduce((n,g)=>n+g.items.length,0);
+  if(!total){toast('取り込める持ち物がありません');return}
+  let added=0,skipped=0;
+  if(mode==='replace'){
+    t.groups=imported;added=total;
+  }else{
+    if(!Array.isArray(t.groups))t.groups=[];
+    imported.forEach(ig=>{
+      let target=t.groups.find(g=>normalizeGroupKey(g.name)===normalizeGroupKey(ig.name));
+      if(!target){target=ig;t.groups.push(target);added+=ig.items.length;return}
+      const seen=new Set((target.items||[]).map(it=>normalizeGroupKey(it.name)));
+      ig.items.forEach(it=>{const key=normalizeGroupKey(it.name);if(seen.has(key)){skipped++;return}target.items.push(it);seen.add(key);added++});
+    });
+  }
+  t.updatedAt=Date.now();saveTrips();renderAll();closePackingImport();switchTab('packing');
+  toast(mode==='replace'?`${total}項目の持ち物に入れ替えました`:`${added}項目を追加しました${skipped?`（重複${skipped}件は除外）`:''}`);
+}
 
 function openDb(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,DB_VERSION);req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains('attachments')){const s=d.createObjectStore('attachments',{keyPath:'id'});s.createIndex('tripId','tripId')}if(!d.objectStoreNames.contains('covers'))d.createObjectStore('covers',{keyPath:'tripId'})};req.onsuccess=()=>{db=req.result;resolve(db)};req.onerror=()=>reject(req.error)})}
 function idbTx(store,mode='readonly'){return db.transaction(store,mode).objectStore(store)}
@@ -868,20 +1185,20 @@ async function renderAttachments(){if(!db)return;const t=currentTrip();const lis
 async function openAttachment(id){const a=await idbGet('attachments',id);if(!a)return;const url=URL.createObjectURL(a.blob);window.open(url,'_blank');setTimeout(()=>URL.revokeObjectURL(url),60000)}
 async function deleteAttachment(id){await idbDelete('attachments',id);renderAttachments();toast('資料を削除しました')}
 
-function exportJson(){const payload={version:'10.22.0',exportedAt:new Date().toISOString(),trips};downloadBlob(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),`家族旅行もちものバックアップ_${new Date().toISOString().slice(0,10)}.json`)}
+function exportJson(){const payload={version:'10.22.6',exportedAt:new Date().toISOString(),trips};downloadBlob(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),`家族旅行もちものバックアップ_${new Date().toISOString().slice(0,10)}.json`)}
 async function importJson(file){try{const txt=await file.text();const obj=JSON.parse(txt);const arr=Array.isArray(obj)?obj:obj.trips;if(!Array.isArray(arr))throw new Error('形式が違います');trips=arr.map(normalizeTrip);if(!trips.length)throw new Error('旅行データがありません');currentTripId=trips[0].id;saveTrips();renderAll();toast('バックアップを復元しました')}catch(e){alert('JSONを読み込めませんでした。\n'+e.message)}}
 function deleteTrip(){const t=currentTrip();if(!t)return;if(!confirm(`「${t.name}」を削除しますか？`))return;trips=trips.filter(x=>x.id!==t.id);if(!trips.length)trips=[makeTrip('家族旅行')];currentTripId=trips[0].id;saveTrips();renderAll();toast('旅行を削除しました')}
 
-function switchTab(name){$$('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));$$('.tab').forEach(t=>t.classList.toggle('active',t.id===`tab-${name}`));const filter=$('#filterBtn');if(filter)filter.hidden=name!=='packing';renderTripContext(name);if(name==='share')renderSharePreview();if(name==='summary')renderSummary();setTimeout(autoGrowAll,0)}
+function switchTab(name){$$('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));$$('.tab').forEach(t=>t.classList.toggle('active',t.id===`tab-${name}`));const filter=$('#filterBtn'),imp=$('#importPackingBtn');if(filter)filter.hidden=name!=='packing';if(imp)imp.hidden=name!=='packing';renderTripContext(name);if(name==='share')renderSharePreview();if(name==='summary')renderSummary();setTimeout(autoGrowAll,0)}
 function renderAll(){renderTripSelect();renderSettings();renderPacking();renderSummary();renderAttachments();renderSharePreview();renderTripContext()}
 function bindEvents(){
   $$('.tab-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));$('#tripSelect').addEventListener('change',e=>{currentTripId=e.target.value;saveTrips();renderAll()});$('#newTripBtn').addEventListener('click',()=>{const t=makeTrip(`旅行${trips.length+1}`);trips.push(t);currentTripId=t.id;saveTrips();renderAll();switchTab('settings')});
-  $('#tripDays').addEventListener('change',()=>{const hadGroups=!!currentTrip()?.groups?.length;gatherSettings();renderPacking();renderTripContext();if(hadGroups)toast(`${currentTrip().days}に合わせて数量を更新しました`)});$('#destination').addEventListener('change',()=>{gatherSettings();renderTripContext()});$('#tripMonth').addEventListener('change',()=>{gatherSettings();renderTripContext()});$('#adultCount').addEventListener('change',()=>renderPeopleInputs(true));$('#childCount').addEventListener('change',()=>renderPeopleInputs(true));$('#adultNames').addEventListener('change',e=>{if(e.target.matches('select[data-adult-gender-index]'))refreshPersonPreview(e.target.closest('.person-card'))});$('#childProfiles').addEventListener('change',e=>{if(e.target.matches('select[data-age-index],select[data-child-gender-index]'))refreshPersonPreview(e.target.closest('.person-card'))});$('#saveSettingsBtn').addEventListener('click',()=>{gatherSettings();renderAll();toast('設定を保存しました')});$('#generateBtn').addEventListener('click',generateGroups);$('#filterBtn').addEventListener('click',()=>{filterUnready=!filterUnready;renderPacking()});
-  $('#tripMemo').addEventListener('input',()=>{const t=currentTrip();t.memo=$('#tripMemo').value;saveTrips();renderSharePreview()});$('#shareMode').addEventListener('change',()=>{renderShareGroup();renderSharePreview()});$('#shareGroup').addEventListener('change',renderSharePreview);$('#nativeShareBtn').addEventListener('click',doShare);$('#copyShareBtn').addEventListener('click',async()=>{await navigator.clipboard.writeText(shareText());toast('コピーしました')});$('#saveTxtBtn').addEventListener('click',saveTxt);
+  $('#tripDays').addEventListener('change',()=>{const hadGroups=!!currentTrip()?.groups?.length;gatherSettings();renderPacking();renderTripContext();if(hadGroups)toast(`${currentTrip().days}に合わせて数量を更新しました`)});$('#destination').addEventListener('change',()=>{gatherSettings();renderTripContext()});$('#tripMonth').addEventListener('change',()=>{gatherSettings();renderTripContext()});$('#adultCount').addEventListener('change',()=>renderPeopleInputs(true));$('#childCount').addEventListener('change',()=>renderPeopleInputs(true));$('#adultNames').addEventListener('change',e=>{if(e.target.matches('select[data-adult-gender-index]'))refreshPersonPreview(e.target.closest('.person-card'))});$('#childProfiles').addEventListener('change',e=>{if(e.target.matches('select[data-age-index],select[data-child-gender-index]'))refreshPersonPreview(e.target.closest('.person-card'))});$('#saveSettingsBtn').addEventListener('click',()=>{gatherSettings();renderAll();toast('設定を保存しました')});$('#generateBtn').addEventListener('click',generateGroups);$('#filterBtn').addEventListener('click',()=>{filterUnready=!filterUnready;renderPacking()});$('#importPackingBtn').addEventListener('click',openPackingImport);$('#closePackingImportBtn').addEventListener('click',closePackingImport);$('#cancelPackingImportBtn').addEventListener('click',closePackingImport);$('#pastePackingClipboardBtn').addEventListener('click',pasteExternalPackingFromClipboard);$('#externalPackingFile').addEventListener('change',e=>{if(e.target.files[0])loadExternalPackingFile(e.target.files[0])});$('#externalPackingText').addEventListener('input',renderPackingImportPreview);$('#appendPackingImportBtn').addEventListener('click',()=>applyImportedPacking('append'));$('#replacePackingImportBtn').addEventListener('click',()=>applyImportedPacking('replace'));$('#packingImportModal').addEventListener('click',e=>{if(e.target.id==='packingImportModal')closePackingImport()});
+  $('#tripMemo').addEventListener('input',()=>{const t=currentTrip();t.memo=$('#tripMemo').value;saveTrips();renderSharePreview()});$('#importMemoBtn').addEventListener('click',openMemoImport);$('#closeMemoImportBtn').addEventListener('click',closeMemoImport);$('#cancelMemoImportBtn').addEventListener('click',closeMemoImport);$('#pasteMemoClipboardBtn').addEventListener('click',pasteExternalMemoFromClipboard);$('#externalMemoFile').addEventListener('change',e=>{if(e.target.files[0])loadExternalMemoFile(e.target.files[0])});$('#appendMemoImportBtn').addEventListener('click',()=>applyImportedMemo('append'));$('#replaceMemoImportBtn').addEventListener('click',()=>applyImportedMemo('replace'));$('#memoImportModal').addEventListener('click',e=>{if(e.target.id==='memoImportModal')closeMemoImport()});$('#shareMode').addEventListener('change',()=>{renderShareGroup();renderSharePreview()});$('#shareGroup').addEventListener('change',renderSharePreview);$('#nativeShareBtn').addEventListener('click',doShare);$('#copyShareBtn').addEventListener('click',async()=>{await navigator.clipboard.writeText(shareText());toast('コピーしました')});$('#saveTxtBtn').addEventListener('click',saveTxt);
   $('#exportBtn').addEventListener('click',exportJson);$('#importFile').addEventListener('change',e=>{if(e.target.files[0])importJson(e.target.files[0]);e.target.value=''});$('#deleteTripBtn').addEventListener('click',deleteTrip);
   $('#confirmDeleteBtn').addEventListener('click',deletePendingItem);$('#cancelDeleteBtn').addEventListener('click',()=>{pendingDelete=null;closeModal('#deleteModal')});$('#deleteModal').addEventListener('click',e=>{if(e.target.id==='deleteModal'){pendingDelete=null;closeModal('#deleteModal')}});
   $('#attachmentInput').addEventListener('change',e=>{addAttachments([...e.target.files]);e.target.value=''});$('#attachmentList').addEventListener('click',e=>{const o=e.target.closest('[data-open-att]'),d=e.target.closest('[data-del-att]');if(o)openAttachment(o.dataset.openAtt);if(d)deleteAttachment(d.dataset.delAtt)});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'){pendingDelete=null;closeModal('#deleteModal')}});window.addEventListener('resize',autoGrowAll);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){pendingDelete=null;closeModal('#deleteModal');closeMemoImport();closePackingImport()}});window.addEventListener('resize',autoGrowAll);
   bindListEvents();
 }
 
@@ -1680,5 +1997,78 @@ body{
   .top-trip-context .trip-context-chip::before{left:11px!important;top:8px!important;width:22px!important;height:3px!important}
   .top-trip-context .trip-context-chip small{font-size:8px!important}
   .top-trip-context .trip-context-chip b{font-size:13px!important}
+}
+</style>
+
+<style id="keep-export-v10224">
+/* ===== v10.22.4 : Google Keep friendly text export ===== */
+.keep-export-hint{margin:9px 2px 0!important;font-size:10px!important;line-height:1.55!important;color:#6d84a0!important}
+</style>
+
+
+<style id="memo-import-v10225">
+/* ===== v10.22.5 : external memo import ===== */
+.memo-label-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:1px}
+.memo-label-row>label{margin:0!important}
+.memo-import-open{min-height:34px!important;padding:6px 10px!important;font-size:11px!important;border-radius:10px!important;white-space:nowrap!important}
+.memo-import-dialog{width:min(680px,100%)!important;padding:0!important;overflow:hidden!important;border:1px solid #cfe0f2!important;background:#fff!important}
+.memo-import-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 22px 15px;background:linear-gradient(135deg,#0b315f,#155aa7 70%,#2679d2);color:#fff}
+.memo-import-head h3{margin:4px 0 0!important;color:#fff!important;font-size:21px!important}
+.memo-import-kicker{font-size:9px;letter-spacing:.17em;font-weight:900;color:#a9d3ff}
+.memo-import-close{display:grid;place-items:center;width:34px;height:34px;border:1px solid rgba(255,255,255,.22);border-radius:10px;background:rgba(255,255,255,.10);color:#fff;font-size:24px;line-height:1;cursor:pointer}
+.memo-import-desc{margin:0;padding:16px 22px 10px!important;color:#617c99!important}
+.memo-import-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 22px 14px}
+.memo-file-label{cursor:pointer}
+.memo-file-name{min-width:0;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#7890aa;font-size:11px}
+.memo-import-text-field{padding:0 22px}
+.memo-import-text-field textarea{min-height:220px;resize:vertical;background:#f9fcff!important;border-color:#cfe0f2!important;line-height:1.65;font-family:inherit}
+.memo-import-footer{margin-top:16px;padding:14px 22px 20px;border-top:1px solid #e2edf7;background:#f8fbff}
+.memo-import-footer>p{margin:0 0 12px!important}
+.memo-import-buttons{justify-content:flex-end!important}
+@media(max-width:640px){
+  .memo-label-row{align-items:center}
+  .memo-import-open{font-size:10px!important;padding:5px 8px!important}
+  .memo-import-head{padding:17px 16px 13px}.memo-import-head h3{font-size:18px!important}
+  .memo-import-desc{padding:13px 16px 9px!important}
+  .memo-import-actions{padding:0 16px 12px;align-items:stretch}.memo-import-actions .btn,.memo-file-label{flex:1 1 calc(50% - 4px)}
+  .memo-file-name{flex:1 0 100%;max-width:100%}
+  .memo-import-text-field{padding:0 16px}.memo-import-text-field textarea{min-height:180px}
+  .memo-import-footer{padding:12px 16px 16px}.memo-import-buttons{display:grid!important;grid-template-columns:1fr!important}.memo-import-buttons .btn{width:100%!important}
+}
+</style>
+
+
+<style id="packing-import-v10226">
+/* ===== v10.22.6 : packing-list import ===== */
+.top-import-btn{
+  flex:0 0 auto!important;
+  min-height:38px!important;height:38px!important;padding:0 12px!important;
+  border-radius:10px!important;border:1px solid #aac9ee!important;
+  background:linear-gradient(180deg,#f8fbff,#e8f3ff)!important;
+  color:#1557a4!important;font-size:11px!important;font-weight:900!important;
+  box-shadow:0 4px 10px rgba(27,91,164,.08)!important;white-space:nowrap!important;
+}
+.top-import-btn:hover{background:linear-gradient(180deg,#eef6ff,#deedff)!important}
+.top-import-btn[hidden]{display:none!important}
+.packing-import-dialog{width:min(720px,100%)!important;padding:0!important;overflow:hidden!important;border-radius:22px!important}
+.packing-import-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:20px 22px 16px;background:linear-gradient(135deg,#0b315f,#155ca8);color:#fff}
+.packing-import-kicker{display:block;margin-bottom:5px;font-size:9px;font-weight:900;letter-spacing:.18em;color:#a9d3ff}
+.packing-import-head h3{margin:0!important;color:#fff!important;font-size:21px!important}
+.packing-import-close{display:grid;place-items:center;width:36px;height:36px;border:1px solid rgba(255,255,255,.18);border-radius:11px;background:rgba(255,255,255,.1);color:#fff;font-size:22px;line-height:1}
+.packing-import-desc{margin:0!important;padding:15px 22px 8px;color:#607b98!important}
+.packing-import-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 22px 12px}
+.packing-file-name{min-width:0;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#70869d;font-size:11px}
+.packing-import-text-field{padding:0 22px}.packing-import-text-field textarea{min-height:245px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;line-height:1.6}
+.packing-import-preview{margin:12px 22px 0;padding:12px 14px;border:1px solid #d4e5f5;border-radius:13px;background:linear-gradient(180deg,#f8fbff,#eff6ff);color:#5f7892;font-size:11px}
+.packing-import-preview strong{display:block;margin-bottom:7px;color:#174f8f;font-size:13px}
+.packing-import-preview div{display:flex;gap:6px;flex-wrap:wrap}.packing-import-preview div span{display:inline-flex;padding:5px 8px;border-radius:999px;background:#fff;border:1px solid #d8e7f5;color:#355e89;font-weight:800}
+.packing-import-footer{margin-top:14px;padding:14px 22px 20px;border-top:1px solid #e3edf6;background:#fbfdff}.packing-import-footer>.hint{margin:0 0 12px}.packing-import-buttons{justify-content:flex-end}
+@media(max-width:640px){
+  .trip-switch{grid-template-columns:minmax(0,1fr) auto auto auto!important}
+  .top-import-btn{height:36px!important;min-height:36px!important;padding:0 7px!important;font-size:9px!important}
+  .packing-import-dialog{max-height:94vh!important}.packing-import-head{padding:16px 15px 13px}.packing-import-head h3{font-size:18px!important}.packing-import-desc{padding:12px 15px 6px}.packing-import-actions{padding:7px 15px 10px}.packing-import-text-field{padding:0 15px}.packing-import-text-field textarea{min-height:210px}.packing-import-preview{margin:10px 15px 0}.packing-import-footer{padding:12px 15px 16px}.packing-import-buttons{display:grid!important;grid-template-columns:1fr 1fr!important}.packing-import-buttons .btn:first-child{grid-column:1/-1}.packing-import-buttons .btn{width:100%!important}
+}
+@media(max-width:470px){
+  .trip-switch{grid-template-columns:minmax(0,1fr) auto auto!important}.top-import-btn{grid-column:2/3!important}.top-filter-btn{grid-column:3/4!important}.trip-switch #newTripBtn{grid-column:2/4!important;grid-row:2!important}
 }
 </style>
